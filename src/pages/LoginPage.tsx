@@ -434,7 +434,7 @@ export const LoginPage: React.FC = () => {
       );
     });
     
-    // Clear form and return to subscription overview
+    // Clear form data
     setChildName("");
     setChildBirthDate("");
     setChildGender("");
@@ -444,7 +444,12 @@ export const LoginPage: React.FC = () => {
     setSelectedSkills([]);
     setSelectedSubscription("");
     
-    // Stay on subscription step to allow adding more children or proceeding to delivery
+    // If this is the first child, proceed to delivery
+    // If this is an additional child, stay on subscription overview
+    if (children.length === 1) {
+      setStep(Step.Delivery);
+    }
+    // Otherwise stay on subscription step to allow adding more children
   };
 
   // Handle delivery submission
