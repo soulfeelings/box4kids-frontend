@@ -434,7 +434,17 @@ export const LoginPage: React.FC = () => {
       );
     });
     
-    setStep(Step.Delivery);
+    // Clear form and return to subscription overview
+    setChildName("");
+    setChildBirthDate("");
+    setChildGender("");
+    setChildLimitations("");
+    setChildComment("");
+    setSelectedInterests([]);
+    setSelectedSkills([]);
+    setSelectedSubscription("");
+    
+    // Stay on subscription step to allow adding more children or proceeding to delivery
   };
 
   // Handle delivery submission
