@@ -14,7 +14,30 @@ enum Step {
   Success = 9,
 }
 
-export const LoginPage: React.FC = () => {
+interface UserData {
+  name: string;
+  phone: string;
+  children: Array<{
+    id: string;
+    name: string;
+    birthDate: string;
+    gender: "male" | "female";
+    limitations: "none" | "has_limitations";
+    comment: string;
+    interests: string[];
+    skills: string[];
+    subscription: "base" | "premium" | "";
+  }>;
+  deliveryAddress: string;
+  deliveryDate: string;
+  deliveryTime: string;
+}
+
+interface LoginPageProps {
+  onNavigateToKidsPage: (data: UserData) => void;
+}
+
+export const LoginPage: React.FC<LoginPageProps> = ({ onNavigateToKidsPage }) => {
   const [step, setStep] = useState<Step>(Step.Phone);
 
   // Helper function to calculate age from birth date
@@ -38,19 +61,30 @@ export const LoginPage: React.FC = () => {
 
   // Helper functions for date formatting
   const formatDateForDelivery = (date: string): string => {
-    // Convert from DD/MM to display format
+    // Convert from DD.MM to display format
     return date;
   };
 
   const formatDateForBirth = (date: string): string => {
-    // Convert from DD/MM/YYYY to display format
+    // Convert from DD.MM.YYYY to display format
     return date;
   };
 
   const parseDateFromFormat = (dateString: string): Date | null => {
     if (!dateString) return null;
     
-    // Handle DD/MM/YYYY format
+    // Handle DD.MM.YYYY format
+    if (dateString.includes('.')) {
+      const parts = dateString.split('.');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+      }
+    }
+    
+    // Handle DD/MM/YYYY format (fallback for existing data)
     if (dateString.includes('/')) {
       const parts = dateString.split('/');
       if (parts.length === 3) {
@@ -74,20 +108,20 @@ export const LoginPage: React.FC = () => {
     const digits = value.replace(/\D/g, '');
     
     if (isFullDate) {
-      // Format as DD/MM/YYYY
+      // Format as DD.MM.YYYY
       if (digits.length <= 2) {
         return digits;
       } else if (digits.length <= 4) {
-        return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+        return `${digits.slice(0, 2)}.${digits.slice(2)}`;
       } else {
-        return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+        return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4, 8)}`;
       }
     } else {
-      // Format as DD/MM
+      // Format as DD.MM
       if (digits.length <= 2) {
         return digits;
       } else {
-        return `${digits.slice(0, 2)}/${digits.slice(2, 4)}`;
+        return `${digits.slice(0, 2)}.${digits.slice(2, 4)}`;
       }
     }
   };
@@ -96,9 +130,12 @@ export const LoginPage: React.FC = () => {
   const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({ children, selected = false }) => (
     <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${
       selected 
-        ? 'bg-orange-100 text-orange-800' 
+        ? 'text-gray-700' 
         : 'bg-gray-100 text-gray-700'
-    }`} style={{ fontFamily: 'Nunito, sans-serif' }}>
+    }`} style={{ 
+      fontFamily: 'Nunito, sans-serif',
+      backgroundColor: selected ? '#F2F2F2' : undefined
+    }}>
       {children}
     </span>
   );
@@ -107,39 +144,38 @@ export const LoginPage: React.FC = () => {
   const getPlanItems = (subscription: "base" | "premium" | "") => {
     if (subscription === 'premium') {
       return [
-        { icon: '🔧', count: 3, name: 'Конструктор', color: 'bg-blue-100' },
-        { icon: '🎨', count: 2, name: 'Творческий набор', color: 'bg-green-100' },
-        { icon: '🧸', count: 2, name: 'Мягкая игрушка', color: 'bg-orange-100' },
-        { icon: '🧩', count: 1, name: 'Головоломка', color: 'bg-pink-100' },
-        { icon: '💎', count: 1, name: 'Премиум-игрушка', color: 'bg-purple-100' }
+        { icon: '🔧', count: 3, name: 'Конструктор', color: '#A4B9ED' },
+        { icon: '🎨', count: 2, name: 'Творческий набор', color: '#D4E8C0' },
+        { icon: '🧸', count: 2, name: 'Мягкая игрушка', color: '#FFD8BE' },
+        { icon: '🧠', count: 1, name: 'Головоломка', color: '#F6E592' },
+        { icon: '💎', count: 1, name: 'Премиум-игрушка', color: '#E8D3F0' }
       ];
     }
     return [
-      { icon: '🔧', count: 2, name: 'Конструктор', color: 'bg-blue-100' },
-      { icon: '🎨', count: 2, name: 'Творческий набор', color: 'bg-green-100' },
-      { icon: '🧸', count: 1, name: 'Мягкая игрушка', color: 'bg-orange-100' },
-      { icon: '🧩', count: 1, name: 'Головоломка', color: 'bg-pink-100' }
+      { icon: '🔧', count: 2, name: 'Конструктор', color: '#A4B9ED' },
+      { icon: '🎨', count: 2, name: 'Творческий набор', color: '#D4E8C0' },
+      { icon: '🧸', count: 1, name: 'Мягкая игрушка', color: '#FFD8BE' },
+      { icon: '🧠', count: 1, name: 'Головоломка', color: '#F6E592' }
     ];
   };
 
   // Interest icons mapping
   const interestIcons: Record<string, string> = {
-    'Конструкторы': '🔧',
-    'Творчество': '🎨',
-    'Музыка': '🎵',
-    'Спорт': '⚽',
-    'Книги': '📚',
-    'Логика': '🧠'
+    'Конструкторы': '🧱',
+    'Плюшевые': '🧸',
+    'Ролевые': '🎭',
+    'Развивающие': '🧠',
+    'Техника': '⚙️',
+    'Творчество': '🎨'
   };
 
   // Skills icons mapping
   const skillIcons: Record<string, string> = {
-    'Логическое мышление': '🧠',
-    'Креативность': '🎨',
     'Моторика': '✋',
-    'Воображение': '✨',
-    'Внимание': '👁️',
-    'Социальные навыки': '👥'
+    'Логика': '🧩',
+    'Воображение': '💭',
+    'Творчество': '🎨',
+    'Речь': '🗣'
   };
 
   // Calculate price for child based on position
@@ -197,12 +233,12 @@ export const LoginPage: React.FC = () => {
   const validateBirthDate = (dateString: string) => {
     if (!dateString) return { isValid: false, error: "Введите дату рождения" };
     
-    // Check if format is correct DD/MM/YYYY
-    const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    // Check if format is correct DD.MM.YYYY
+    const datePattern = /^(\d{2})\.(\d{2})\.(\d{4})$/;
     const match = dateString.match(datePattern);
     
     if (!match) {
-      return { isValid: false, error: "Формат: ДД/ММ/ГГГГ" };
+      return { isValid: false, error: "Формат: ДД.ММ.ГГГГ" };
     }
     
     const day = parseInt(match[1], 10);
@@ -405,6 +441,18 @@ export const LoginPage: React.FC = () => {
   // Handle subscription submission
   const handleSubscriptionSubmit = () => {
     setError(null);
+    
+    // Check if we're in children overview with all subscriptions set and user wants to proceed
+    const allChildrenHaveSubscriptions = children.every(child => child.subscription !== "");
+    const isInOverviewMode = children.length > 0 && allChildrenHaveSubscriptions && !editingChildId;
+    
+    // If we're in overview mode and all have subscriptions, proceed to delivery
+    if (isInOverviewMode) {
+      setStep(Step.Delivery);
+      return;
+    }
+    
+    // Otherwise, validate subscription selection for single child or edit mode
     if (!selectedSubscription) {
       setError("Выберите тариф");
       return;
@@ -444,12 +492,8 @@ export const LoginPage: React.FC = () => {
     setSelectedSkills([]);
     setSelectedSubscription("");
     
-    // If this is the first child, proceed to delivery
-    // If this is an additional child, stay on subscription overview
-    if (children.length === 1) {
-      setStep(Step.Delivery);
-    }
-    // Otherwise stay on subscription step to allow adding more children
+    // After adding subscription, always stay on subscription step to show overview
+    // User can add more children or proceed to delivery
   };
 
   // Handle delivery submission
@@ -475,6 +519,20 @@ export const LoginPage: React.FC = () => {
   const handlePaymentSubmit = () => {
     setError(null);
     setStep(Step.Success);
+  };
+
+  // Handle success completion and navigate to kids interface
+  const handleSuccessComplete = () => {
+    // Prepare user data to pass to kids interface
+    const userData: UserData = {
+      name,
+      phone,
+      children,
+      deliveryAddress,
+      deliveryDate,
+      deliveryTime
+    };
+    onNavigateToKidsPage(userData);
   };
 
   // Handle adding another child
@@ -591,7 +649,7 @@ export const LoginPage: React.FC = () => {
             {/* Phone Input */}
             <div className="flex flex-col gap-1">
               <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                phone ? 'border-indigo-400' : 'border-gray-200 focus-within:border-indigo-400'
+                phone ? 'border-[#7782F5]' : 'border-gray-200 focus-within:border-[#7782F5]'
               }`}>
             <input
                   type="tel"
@@ -613,10 +671,13 @@ export const LoginPage: React.FC = () => {
               disabled={!isPhoneValid}
               className={`w-full py-4 rounded-full font-medium text-base transition-all ${
                 isPhoneValid
-                  ? "bg-indigo-400 text-white hover:bg-indigo-500" 
+                  ? "text-white hover:opacity-80" 
                   : "bg-gray-200 text-gray-500"
               }`}
-              style={{ fontFamily: 'Nunito, sans-serif' }}
+              style={{ 
+                fontFamily: 'Nunito, sans-serif',
+                backgroundColor: isPhoneValid ? '#747EEC' : undefined
+              }}
             >
               Получить код
             </button>
@@ -658,19 +719,19 @@ export const LoginPage: React.FC = () => {
               <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
                 error 
                   ? 'border-red-400' 
-                  : code ? 'border-indigo-400' : 'border-gray-200 focus-within:border-indigo-400'
+                  : code ? 'border-[#7782F5]' : 'border-gray-200 focus-within:border-[#7782F5]'
               }`}>
-            <input
+                <input
                   type="text"
                   className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 text-center tracking-widest"
                   placeholder="••••"
-              value={code}
+                  value={code}
                   onChange={(e) => {
                     setError(null);
                     setCode(e.target.value.replace(/\D/g, "").slice(0, 4));
                   }}
-              maxLength={4}
-              inputMode="numeric"
+                  maxLength={4}
+                  inputMode="numeric"
                   autoFocus
                   style={{ fontFamily: 'Nunito, sans-serif' }}
                 />
@@ -686,10 +747,10 @@ export const LoginPage: React.FC = () => {
             <button
               onClick={resendTimer > 0 ? undefined : handleResendCode}
               disabled={resendTimer > 0}
-              className={`w-full py-4 rounded-full font-medium text-base transition-all ${
+              className={`w-full py-4 font-medium text-base transition-all ${
                 resendTimer > 0
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-indigo-400 text-white hover:bg-indigo-500"
+                  ? "text-gray-500 cursor-not-allowed bg-transparent"
+                  : "text-indigo-600 hover:text-indigo-700 bg-transparent"
               }`}
               style={{ fontFamily: 'Nunito, sans-serif' }}
             >
@@ -707,7 +768,7 @@ export const LoginPage: React.FC = () => {
             background: 'linear-gradient(180deg, #747EEC 0%, #9098F0 100%)'
           }}>
             {/* Header with company name and close button */}
-            <div className="flex justify-center items-center px-4 py-4 relative">
+            <div className="flex justify-center items-center px-4 py-4 relative z-10">
               <h1 className="text-white font-semibold text-base" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 BOX4BABY
               </h1>
@@ -720,13 +781,17 @@ export const LoginPage: React.FC = () => {
               </button>
             </div>
             
-            {/* Illustration area */}
-            <div className="flex-1 flex items-center justify-center px-6">
-              <img src={w.img} alt="welcome" className="w-full max-w-xs" />
+            {/* Illustration area - takes remaining space above bottom container */}
+            <div className="relative flex-1 overflow-hidden" style={{ height: 'calc(100vh - 33.33vh - 4rem)' }}>
+              <img 
+                src={w.img} 
+                alt="welcome" 
+                className="absolute inset-0 w-full h-full object-contain"
+              />
             </div>
             
-            {/* Bottom container with text and button */}
-            <div className="bg-[#747EEC] px-4 py-6">
+            {/* Bottom container with text and button - fixed at 1/3 of screen */}
+            <div className="bg-[#747EEC] px-4 py-6 flex flex-col justify-center" style={{ height: '33.33vh', minHeight: '280px' }}>
               <h2 className="font-bold text-2xl mb-4 text-white text-center" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 {w.title}
               </h2>
@@ -767,7 +832,7 @@ export const LoginPage: React.FC = () => {
               </button>
               
               <span className="text-gray-700 font-semibold text-base" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                Шаг 1/8
+                Шаг 1/6
               </span>
               
               <button 
@@ -794,15 +859,19 @@ export const LoginPage: React.FC = () => {
                 <label className="text-sm font-medium text-gray-600 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                   Как к вам обращаться?
                 </label>
-            <input
-                  className="w-full rounded-2xl border-2 border-indigo-400 bg-gray-50 px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
-                  placeholder=""
-              value={name}
-              onChange={e => setName(e.target.value)}
-              maxLength={32}
-                  autoFocus
-                  style={{ fontFamily: 'Nunito, sans-serif' }}
-                />
+                <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
+                  name ? 'border-[#7782F5]' : 'border-gray-200 focus-within:border-[#7782F5]'
+                }`}>
+                  <input
+                    className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
+                    placeholder=""
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    maxLength={32}
+                    autoFocus
+                    style={{ fontFamily: 'Nunito, sans-serif' }}
+                  />
+                </div>
               </div>
               
               <div className="flex-1"></div>
@@ -813,12 +882,15 @@ export const LoginPage: React.FC = () => {
             <button
                 className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
                   name.trim() 
-                    ? 'bg-indigo-400 text-white shadow-sm' 
+                    ? 'text-white shadow-sm' 
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
               disabled={!name.trim()}
               onClick={handleRegister}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
+                style={{ 
+                  fontFamily: 'Nunito, sans-serif',
+                  backgroundColor: name.trim() ? '#30313D' : undefined
+                }}
               >
                 Продолжить
               </button>
@@ -844,7 +916,7 @@ export const LoginPage: React.FC = () => {
               </button>
               
               <span className="text-gray-700 font-semibold text-base" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                Шаг 2/8
+                Шаг 2/6
               </span>
               
               <button 
@@ -872,14 +944,18 @@ export const LoginPage: React.FC = () => {
                   <label className="text-sm font-medium text-gray-600 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                     Имя ребенка
                   </label>
-                  <input
-                    className="w-full rounded-2xl border-2 border-indigo-400 bg-gray-50 px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
-                    placeholder=""
-                    value={childName}
-                    onChange={e => setChildName(e.target.value)}
-                    maxLength={32}
-                    style={{ fontFamily: 'Nunito, sans-serif' }}
-                  />
+                  <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
+                    childName ? 'border-[#7782F5]' : 'border-gray-200 focus-within:border-[#7782F5]'
+                  }`}>
+                    <input
+                      className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
+                      placeholder=""
+                      value={childName}
+                      onChange={e => setChildName(e.target.value)}
+                      maxLength={32}
+                      style={{ fontFamily: 'Nunito, sans-serif' }}
+                    />
+                  </div>
                 </div>
 
                 {/* Birth Date */}
@@ -887,24 +963,28 @@ export const LoginPage: React.FC = () => {
                   <label className="text-sm font-medium text-gray-600 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                     Дата рождения
                   </label>
-                  <input
-                    type="text"
-                    placeholder="ДД/ММ/ГГГГ"
-                    className={`w-full rounded-2xl border bg-gray-50 px-3 py-3 text-base focus:outline-none transition-all ${
-                      childBirthDate && !birthDateValidation.isValid
-                        ? 'border-red-400 focus:ring-2 focus:ring-red-400 focus:border-red-400'
-                        : childBirthDate && birthDateValidation.isValid
-                        ? 'border-green-400 focus:ring-2 focus:ring-green-400 focus:border-green-400'
-                        : 'border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400'
-                    }`}
-                    value={childBirthDate}
-                    onChange={e => {
-                      const formatted = formatDateInput(e.target.value, true);
-                      setChildBirthDate(formatted);
-                    }}
-                    maxLength={10}
-                    style={{ fontFamily: 'Nunito, sans-serif' }}
-                  />
+                  <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
+                    childBirthDate && !birthDateValidation.isValid
+                      ? 'border-red-400'
+                      : childBirthDate && birthDateValidation.isValid
+                      ? 'border-green-400'
+                      : childBirthDate
+                      ? 'border-[#7782F5]'
+                      : 'border-gray-200 focus-within:border-[#7782F5]'
+                  }`}>
+                    <input
+                      type="text"
+                      className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
+                      placeholder=""
+                      value={childBirthDate}
+                      onChange={e => {
+                        const formatted = formatDateInput(e.target.value, true);
+                        setChildBirthDate(formatted);
+                      }}
+                      maxLength={10}
+                      style={{ fontFamily: 'Nunito, sans-serif' }}
+                    />
+                  </div>
                   {childBirthDate && !birthDateValidation.isValid && (
                     <p className="text-sm text-red-400 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                       {birthDateValidation.error}
@@ -927,7 +1007,7 @@ export const LoginPage: React.FC = () => {
                       }`}
                       style={{ fontFamily: 'Nunito, sans-serif' }}
                     >
-                      Мальчик
+                      Мужской
                     </button>
                     <button
                       onClick={() => setChildGender("female")}
@@ -938,7 +1018,7 @@ export const LoginPage: React.FC = () => {
                       }`}
                       style={{ fontFamily: 'Nunito, sans-serif' }}
                     >
-                      Девочка
+                      Женский
                     </button>
                   </div>
                 </div>
@@ -979,19 +1059,23 @@ export const LoginPage: React.FC = () => {
                   <label className="text-sm font-medium text-gray-600 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                     Комментарий
                   </label>
-                  <textarea
-                    className={`w-full rounded-2xl border bg-gray-50 px-3 py-3 text-base focus:outline-none transition-all resize-none ${
-                      childLimitations === "has_limitations" && !childComment.trim()
-                        ? 'border-red-400 focus:ring-2 focus:ring-red-400 focus:border-red-400'
-                        : 'border-gray-200 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400'
-                    }`}
-                    placeholder={childLimitations === "has_limitations" ? "Опишите ограничения ребенка..." : "Дополнительная информация о ребенке..."}
-                    value={childComment}
-                    onChange={e => setChildComment(e.target.value)}
-                    rows={3}
-                    maxLength={200}
-                    style={{ fontFamily: 'Nunito, sans-serif' }}
-                  />
+                  <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
+                    childLimitations === "has_limitations" && !childComment.trim()
+                      ? 'border-red-400'
+                      : childComment
+                      ? 'border-[#7782F5]'
+                      : 'border-gray-200 focus-within:border-[#7782F5]'
+                  }`}>
+                    <textarea
+                      className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
+                      placeholder={childLimitations === "has_limitations" ? "Опишите ограничения ребенка..." : "Дополнительная информация о ребенке..."}
+                      value={childComment}
+                      onChange={e => setChildComment(e.target.value)}
+                      rows={3}
+                      maxLength={200}
+                      style={{ fontFamily: 'Nunito, sans-serif' }}
+                    />
+                  </div>
                   {childLimitations === "has_limitations" && !childComment.trim() && (
                     <p className="text-sm text-red-400 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                       Напишите ограничения ребенка
@@ -1006,12 +1090,15 @@ export const LoginPage: React.FC = () => {
               <button
                 className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
                   isFormValid
-                    ? 'bg-indigo-400 text-white shadow-sm' 
+                    ? 'text-white shadow-sm' 
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
                 disabled={!isFormValid}
                 onClick={handleChildSubmit}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
+                style={{ 
+                  fontFamily: 'Nunito, sans-serif',
+                  backgroundColor: isFormValid ? '#30313D' : undefined
+                }}
               >
                 {editingChildId && editMode === 'data' ? 'Сохранить изменения' : 'Продолжить'}
               </button>
@@ -1068,7 +1155,7 @@ export const LoginPage: React.FC = () => {
               </button>
               
               <span className="text-sm font-medium text-gray-600" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                Шаг 3/8
+                Шаг 3/6
               </span>
               
               <button 
@@ -1149,12 +1236,15 @@ export const LoginPage: React.FC = () => {
               <button
                 className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
                   isCategoriesFormValid
-                    ? 'bg-indigo-400 text-white shadow-sm' 
+                    ? 'text-white shadow-sm' 
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
                 disabled={!isCategoriesFormValid}
                 onClick={handleCategoriesSubmit}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
+                style={{ 
+                  fontFamily: 'Nunito, sans-serif',
+                  backgroundColor: isCategoriesFormValid ? '#30313D' : undefined
+                }}
               >
                 {editingChildId && editMode === 'data' ? 'Сохранить изменения' : 'Продолжить'}
               </button>
@@ -1164,11 +1254,13 @@ export const LoginPage: React.FC = () => {
       case Step.Subscription:
         const currentChild = children[children.length - 1];
         const hasMultipleChildren = children.length > 1;
+        const allChildrenHaveSubscriptions = children.every(child => child.subscription !== "");
         const isSubscriptionValid = selectedSubscription !== "";
+        const shouldShowOverview = children.length > 0 && allChildrenHaveSubscriptions && !editingChildId;
         
 
         return (
-          <div className="flex flex-col min-h-screen" style={{ backgroundColor: hasMultipleChildren && !editingChildId ? '#F2F2F2' : 'white' }}>
+          <div className="flex flex-col min-h-screen" style={{ backgroundColor: hasMultipleChildren && !editingChildId && allChildrenHaveSubscriptions ? '#F2F2F2' : 'white' }}>
             {/* Header with step indicator */}
             <div className="flex items-center justify-between px-4 py-2 h-16 bg-white">
               <button 
@@ -1181,7 +1273,7 @@ export const LoginPage: React.FC = () => {
               </button>
               
               <span className="text-sm font-medium text-gray-600" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                Шаг 4/8
+                Шаг 4/6
               </span>
               
               <button 
@@ -1201,16 +1293,12 @@ export const LoginPage: React.FC = () => {
                 <h1 className="text-xl font-medium text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
                   {editingChildId && editMode === 'subscription' 
                     ? `Изменение тарифа для ${children.find(c => c.id === editingChildId)?.name}`
-                    : hasMultipleChildren 
-                      ? `Какой набор подойдет ${children.map(child => child.name).join(' и ')}?`
+                    : shouldShowOverview
+                      ? `Проверьте составы набора Ваших детей`
                       : `Какой набор подойдёт ${currentChild?.name || 'ребёнку'}?`
                   }
                 </h1>
-                {hasMultipleChildren && !editingChildId && (
-                  <p className="text-sm font-medium text-green-600 mt-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                    🎉 Скидка 20% для второго и последующих детей!
-                  </p>
-                )}
+
               </div>
 
               <div className="space-y-4">
@@ -1221,18 +1309,18 @@ export const LoginPage: React.FC = () => {
                   </p>
                 </div>
 
-                {(hasMultipleChildren && !editingChildId) ? (
+                {shouldShowOverview ? (
                   // Multiple children view
                   <div className="space-y-6">
                     {children.map((child, index) => {
                       const planItems = getPlanItems(child.subscription);
                       return (
-                        <div key={child.id} className="bg-white rounded-xl border border-gray-100 shadow-sm">
+                        <div key={child.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm">
                           {/* Header */}
                           <div className="flex items-center gap-3 p-6 border-b border-gray-100">
-                            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                              <span className="text-orange-600 font-semibold">
-                                {child.gender === 'male' ? '👦' : '👧'}
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                              <span className="font-semibold text-2xl">
+                                {child.gender === 'male' ? '👦🏻' : '👩🏻'}
                               </span>
                             </div>
                             <div>
@@ -1278,7 +1366,7 @@ export const LoginPage: React.FC = () => {
                               <h2 className="text-lg font-semibold text-gray-900 mb-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                                 Тариф
                               </h2>
-                              <div className="bg-gray-50 rounded-xl p-4">
+                              <div className="bg-gray-50 rounded-xl p-4" style={{ borderRadius: '12px' }}>
                                 <div className="flex items-center gap-2 mb-3">
                                   <span className="font-medium text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
                                     {child.subscription === 'premium' ? 'Премиум' : 'Базовый'}
@@ -1289,7 +1377,7 @@ export const LoginPage: React.FC = () => {
                                   </span>
                                   <span className="text-gray-500">•</span>
                                   <span className="text-gray-700" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                                    ${calculateChildPrice(child.subscription, index)}/мес.
+                                    ${child.subscription === 'premium' ? '60' : '35'}/мес.
                                   </span>
                                 </div>
                               </div>
@@ -1303,7 +1391,12 @@ export const LoginPage: React.FC = () => {
                               <div className="space-y-3">
                                 {planItems.map((item, idx) => (
                                   <div key={idx} className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-full ${item.color} flex items-center justify-center text-lg`}>
+                                    <div 
+                                      className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${!item.color.startsWith('#') ? item.color : ''}`}
+                                      style={{ 
+                                        backgroundColor: item.color.startsWith('#') ? item.color : undefined 
+                                      }}
+                                    >
                                       {item.icon}
                                     </div>
                                     <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1320,22 +1413,22 @@ export const LoginPage: React.FC = () => {
                             {/* Кнопки действий */}
                             <div className="space-y-3 pt-4">
                               <button 
-                                className="w-full py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors"
-                                style={{ fontFamily: 'Nunito, sans-serif' }}
+                                className="w-full py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
+                                style={{ fontFamily: 'Nunito, sans-serif', borderRadius: '32px', backgroundColor: '#E3E3E3' }}
                                 onClick={() => handleEditChildData(child.id)}
                               >
                                 Изменить данные ребёнка
                               </button>
                               <button 
-                                className="w-full py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors"
-                                style={{ fontFamily: 'Nunito, sans-serif' }}
+                                className="w-full py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
+                                style={{ fontFamily: 'Nunito, sans-serif', borderRadius: '32px', backgroundColor: '#E3E3E3' }}
                                 onClick={() => handleEditChildSubscription(child.id)}
                               >
                                 Изменить тариф
                               </button>
                               <button 
-                                className="w-full py-3 bg-red-100 text-red-700 rounded-xl font-medium hover:bg-red-200 transition-colors"
-                                style={{ fontFamily: 'Nunito, sans-serif' }}
+                                className="w-full py-3 bg-red-100 text-red-700 font-medium hover:bg-red-200 transition-colors"
+                                style={{ fontFamily: 'Nunito, sans-serif', borderRadius: '32px' }}
                                 onClick={() => {
                                   // TODO: Implement delete child
                                   if (window.confirm(`Удалить данные ребёнка ${child.name}?`)) {
@@ -1355,11 +1448,17 @@ export const LoginPage: React.FC = () => {
                   // Single child subscription selection or edit mode
                   <div className="space-y-4">
                     {/* Base Subscription */}
-                    <div className={`bg-white rounded-xl p-6 shadow-sm border transition-all cursor-pointer ${
-                      selectedSubscription === 'base' 
-                        ? 'border-indigo-400 bg-indigo-50' 
-                        : 'border-gray-100 hover:border-gray-300'
-                    }`} onClick={() => setSelectedSubscription('base')}>
+                    <div 
+                      className={`rounded-3xl p-6 shadow-sm border transition-all cursor-pointer ${
+                        selectedSubscription === 'base' 
+                          ? 'border-indigo-400' 
+                          : 'border-gray-100 hover:border-gray-300'
+                      }`} 
+                      style={{ 
+                        backgroundColor: '#F2F2F2'
+                      }}
+                      onClick={() => setSelectedSubscription('base')}
+                    >
                       <div className="flex items-center gap-2 mb-4">
                         <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
                           Базовый
@@ -1371,7 +1470,7 @@ export const LoginPage: React.FC = () => {
                         <span className="text-gray-500">•</span>
                         <div className="text-right">
                           <span className="text-gray-700" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                            ${calculateChildPrice('base', children.length)}/мес.
+                            $35/мес.
                           </span>
                         </div>
                       </div>
@@ -1382,7 +1481,7 @@ export const LoginPage: React.FC = () => {
                         </p>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#A4B9ED' }}>
                               🔧
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1393,7 +1492,7 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#D4E8C0' }}>
                               🎨
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1404,7 +1503,7 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#FFD8BE' }}>
                               🧸
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1415,8 +1514,8 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-lg">
-                              🧩
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#F6E592' }}>
+                              🧠
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
                               x1
@@ -1428,21 +1527,33 @@ export const LoginPage: React.FC = () => {
                         </div>
                       </div>
                       
-                      <button className={`w-full py-3 rounded-xl font-medium transition-colors ${
-                        selectedSubscription === 'base' 
-                          ? 'bg-indigo-400 text-white' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`} style={{ fontFamily: 'Nunito, sans-serif' }}>
+                      <button 
+                        className={`w-full py-3 rounded-xl font-medium transition-colors ${
+                          selectedSubscription === 'base' 
+                            ? 'bg-indigo-400 text-white' 
+                            : 'text-gray-700 hover:opacity-80'
+                        }`} 
+                        style={{ 
+                          fontFamily: 'Nunito, sans-serif',
+                          backgroundColor: selectedSubscription === 'base' ? undefined : '#E3E3E3'
+                        }}
+                      >
                         {selectedSubscription === 'base' ? 'Выбрано' : 'Выбрать'}
                       </button>
                     </div>
 
                     {/* Premium Subscription */}
-                    <div className={`bg-white rounded-xl p-6 shadow-sm border transition-all cursor-pointer ${
-                      selectedSubscription === 'premium' 
-                        ? 'border-indigo-400 bg-indigo-50' 
-                        : 'border-gray-100 hover:border-gray-300'
-                    }`} onClick={() => setSelectedSubscription('premium')}>
+                    <div 
+                      className={`rounded-3xl p-6 shadow-sm border transition-all cursor-pointer ${
+                        selectedSubscription === 'premium' 
+                          ? 'border-indigo-400' 
+                          : 'border-gray-100 hover:border-gray-300'
+                      }`} 
+                      style={{ 
+                        backgroundColor: '#F2F2F2'
+                      }}
+                      onClick={() => setSelectedSubscription('premium')}
+                    >
                       <div className="flex items-center gap-2 mb-4">
                         <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>
                           Премиум
@@ -1454,7 +1565,7 @@ export const LoginPage: React.FC = () => {
                         <span className="text-gray-500">•</span>
                         <div className="text-right">
                           <span className="text-gray-700" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                            ${calculateChildPrice('premium', children.length)}/мес.
+                            $60/мес.
                           </span>
                         </div>
                       </div>
@@ -1465,7 +1576,7 @@ export const LoginPage: React.FC = () => {
                         </p>
                         <div className="space-y-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#A4B9ED' }}>
                               🔧
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1476,7 +1587,7 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#D4E8C0' }}>
                               🎨
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1487,7 +1598,7 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#FFD8BE' }}>
                               🧸
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1498,8 +1609,8 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-lg">
-                              🧩
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#F6E592' }}>
+                              🧠
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
                               x1
@@ -1509,7 +1620,7 @@ export const LoginPage: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-lg">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: '#E8D3F0' }}>
                               💎
                             </div>
                             <span className="text-gray-700 font-medium" style={{ fontFamily: 'Nunito, sans-serif' }}>
@@ -1522,11 +1633,17 @@ export const LoginPage: React.FC = () => {
                         </div>
                       </div>
                       
-                      <button className={`w-full py-3 rounded-xl font-medium transition-colors ${
-                        selectedSubscription === 'premium' 
-                          ? 'bg-indigo-400 text-white' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`} style={{ fontFamily: 'Nunito, sans-serif' }}>
+                      <button 
+                        className={`w-full py-3 rounded-xl font-medium transition-colors ${
+                          selectedSubscription === 'premium' 
+                            ? 'bg-indigo-400 text-white' 
+                            : 'text-gray-700 hover:opacity-80'
+                        }`} 
+                        style={{ 
+                          fontFamily: 'Nunito, sans-serif',
+                          backgroundColor: selectedSubscription === 'premium' ? undefined : '#E3E3E3'
+                        }}
+                      >
                         {selectedSubscription === 'premium' ? 'Выбрано' : 'Выбрать'}
                       </button>
                     </div>
@@ -1534,58 +1651,50 @@ export const LoginPage: React.FC = () => {
                 )}
 
                 {/* Add Child Banner */}
-                {!hasMultipleChildren && !editingChildId && (
+                {shouldShowOverview && (
                   <div className="bg-indigo-400 rounded-3xl p-6 text-center">
                     <p className="text-lg font-semibold text-white mb-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                      Добавьте ещё одного ребёнка и получите скидку 20% на его набор
+                      Добавьте ещё одного ребёнка и получите скидку 20% на следующий набор
                     </p>
                     <button
                       onClick={handleAddChild}
                       className="bg-white bg-opacity-30 text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-40 transition-all"
                       style={{ fontFamily: 'Nunito, sans-serif' }}
                     >
-                      Добавить ребёнка
-                    </button>
-                  </div>
-                )}
-                
-                {hasMultipleChildren && !editingChildId && (
-                  <div className="bg-green-500 rounded-3xl p-6 text-center">
-                    <p className="text-lg font-semibold text-white mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                      🎉 Скидка активна!
-                    </p>
-                    <p className="text-sm text-white mb-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                      Все дети кроме первого получают скидку 20% на свой набор
-                    </p>
-                    <button
-                      onClick={handleAddChild}
-                      className="bg-white bg-opacity-30 text-white py-3 px-6 rounded-full text-sm font-medium hover:bg-opacity-40 transition-all"
-                      style={{ fontFamily: 'Nunito, sans-serif' }}
-                    >
-                      Добавить ещё ребёнка
+                      {children.length === 1 ? 'Добавить ребёнка' : 'Добавить ещё ребёнка'}
                     </button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Bottom action button */}
+                        {/* Bottom action button */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4">
-              <button
-                className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-                  (isSubscriptionValid || hasMultipleChildren) && !(editingChildId && editMode === 'subscription' && !selectedSubscription)
-                    ? 'bg-indigo-400 text-white shadow-sm' 
-                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={!isSubscriptionValid && !hasMultipleChildren}
-                onClick={handleSubscriptionSubmit}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
-              >
-                {editingChildId && editMode === 'subscription' 
-                  ? 'Сохранить изменения' 
-                  : 'Перейти к оформлению'
-                }
-            </button>
+              {(() => {
+                const isEditingWithoutSubscription = editingChildId && editMode === 'subscription' && !selectedSubscription;
+                const isButtonEnabled = (shouldShowOverview || isSubscriptionValid) && !isEditingWithoutSubscription;
+                
+                return (
+                  <button
+                    className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
+                      isButtonEnabled
+                        ? 'text-white shadow-sm' 
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
+                    style={{ 
+                      fontFamily: 'Nunito, sans-serif',
+                      backgroundColor: isButtonEnabled ? '#30313D' : undefined
+                    }}
+                    disabled={!isButtonEnabled}
+                    onClick={handleSubscriptionSubmit}
+                  >
+                    {editingChildId && editMode === 'subscription' 
+                      ? 'Сохранить изменения' 
+                      : 'Перейти к оформлению'
+                    }
+                  </button>
+                );
+              })()}
             </div>
           </div>
         );
@@ -1598,40 +1707,41 @@ export const LoginPage: React.FC = () => {
           { value: '18-21', label: '18:00 - 21:00' }
         ];
 
-        // Get current date info for validation
-        const today = new Date();
-        const currentDay = today.getDate();
-        const currentMonth = today.getMonth() + 1;
-        
-        // Validate delivery date format DD/MM
-        const validateDeliveryDate = (dateString: string) => {
-          if (!dateString) return { isValid: false, error: "Выберите дату" };
+        // Generate date options for next 14 days
+        const generateDateOptions = () => {
+          const options = [{ value: '', label: 'Выберите дату' }];
+          const today = new Date();
           
-          const datePattern = /^(\d{2})\/(\d{2})$/;
-          const match = dateString.match(datePattern);
-          
-          if (!match) {
-            return { isValid: false, error: "Формат: ДД/ММ" };
+          for (let i = 0; i < 14; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            const value = `${day}.${month}`;
+            const dayOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'][date.getDay()];
+            const monthName = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][date.getMonth()];
+            
+            let label;
+            if (i === 0) {
+              label = `Сегодня, ${day} ${monthName}`;
+            } else if (i === 1) {
+              label = `Завтра, ${day} ${monthName}`;
+            } else {
+              label = `${dayOfWeek}, ${day} ${monthName}`;
+            }
+            
+            options.push({ value, label });
           }
           
-          const day = parseInt(match[1], 10);
-          const month = parseInt(match[2], 10);
-          
-          if (day < 1 || day > 31 || month < 1 || month > 12) {
-            return { isValid: false, error: "Некорректная дата" };
-          }
-          
-          // Check if date is not in the past (same month comparison)
-          if (month < currentMonth || (month === currentMonth && day < currentDay)) {
-            return { isValid: false, error: "Дата не может быть в прошлом" };
-          }
-          
-          return { isValid: true, error: "" };
+          return options;
         };
-        
-        const deliveryDateValidation = validateDeliveryDate(deliveryDate);
 
-        const isDeliveryFormValid = deliveryAddress.trim() && deliveryDate && deliveryDateValidation.isValid && deliveryTime;
+        const dateOptions = generateDateOptions();
+
+        const isDeliveryFormValid = deliveryAddress.trim() && deliveryDate && deliveryTime;
 
         return (
           <div className="flex flex-col min-h-screen bg-white">
@@ -1647,7 +1757,7 @@ export const LoginPage: React.FC = () => {
               </button>
               
                              <span className="text-sm font-medium text-gray-600" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                 Шаг 5/8
+                 Шаг 5/6
                </span>
               
               <button 
@@ -1675,53 +1785,47 @@ export const LoginPage: React.FC = () => {
                   <label className="block text-gray-600 text-sm mb-3 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                     Адрес
                   </label>
-                  <div className="relative">
+                  <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative ${
+                    deliveryAddress ? 'border-[#7782F5]' : 'border-gray-200 focus-within:border-[#7782F5]'
+                  }`}>
                     <input
                       type="text"
+                      className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 pr-9"
+                      placeholder="Введите адрес доставки"
                       value={deliveryAddress}
                       onChange={(e) => setDeliveryAddress(e.target.value)}
-                      className="w-full px-4 py-4 bg-gray-50 border-2 border-indigo-400 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-indigo-500 pr-12"
-                      placeholder="Введите адрес доставки"
                       style={{ fontFamily: 'Nunito, sans-serif' }}
                     />
-                    <svg className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                   </div>
                 </div>
 
-                                 {/* Дата доставки */}
-                 <div>
-                   <label className="block text-gray-600 text-sm mb-3 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                     Дата доставки
-                   </label>
-                   <div className="relative">
-                     <input
-                       type="text"
-                       placeholder="ДД/ММ"
-                       value={deliveryDate}
-                       onChange={(e) => {
-                         const formatted = formatDateInput(e.target.value, false);
-                         setDeliveryDate(formatted);
-                       }}
-                       maxLength={5}
-                       className={`w-full px-4 py-4 bg-gray-50 border-2 rounded-2xl text-gray-900 focus:outline-none ${
-                         deliveryDate && !deliveryDateValidation.isValid
-                           ? 'border-red-400 focus:border-red-400'
-                           : deliveryDate && deliveryDateValidation.isValid
-                           ? 'border-green-400 focus:border-green-400'
-                           : 'border-gray-200 focus:border-indigo-400'
-                       }`}
-                       style={{ fontFamily: 'Nunito, sans-serif' }}
-                     />
-                   </div>
-                   {deliveryDate && !deliveryDateValidation.isValid && (
-                     <p className="text-sm text-red-400 px-3 mt-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                       {deliveryDateValidation.error}
-                     </p>
-                   )}
-                 </div>
+                {/* Дата доставки */}
+                <div>
+                  <label className="block text-gray-600 text-sm mb-3 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                    Дата доставки
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
+                      style={{ fontFamily: 'Nunito, sans-serif' }}
+                    >
+                      {dateOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <svg className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </div>
+                </div>
 
                 {/* Время доставки */}
                 <div>
@@ -1732,7 +1836,7 @@ export const LoginPage: React.FC = () => {
                     <select
                       value={deliveryTime}
                       onChange={(e) => setDeliveryTime(e.target.value)}
-                      className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-indigo-400 pr-12"
+                      className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
                       style={{ fontFamily: 'Nunito, sans-serif' }}
                     >
                       {timeOptions.map(option => (
@@ -1752,14 +1856,18 @@ export const LoginPage: React.FC = () => {
                   <label className="block text-gray-600 text-sm mb-3 px-3" style={{ fontFamily: 'Nunito, sans-serif' }}>
                     Комментарий для курьера
                   </label>
-                  <textarea
-                    value={deliveryComments}
-                    onChange={(e) => setDeliveryComments(e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-indigo-400 resize-none"
-                    placeholder="Дополнительная информация для курьера"
-                    style={{ fontFamily: 'Nunito, sans-serif' }}
-                  />
+                  <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
+                    deliveryComments ? 'border-[#7782F5]' : 'border-gray-200 focus-within:border-[#7782F5]'
+                  }`}>
+                    <textarea
+                      className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
+                      placeholder="Дополнительная информация для курьера"
+                      value={deliveryComments}
+                      onChange={(e) => setDeliveryComments(e.target.value)}
+                      rows={4}
+                      style={{ fontFamily: 'Nunito, sans-serif' }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1769,12 +1877,15 @@ export const LoginPage: React.FC = () => {
               <button
                 className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
                   isDeliveryFormValid
-                    ? 'bg-indigo-400 text-white shadow-sm' 
+                    ? 'text-white shadow-sm' 
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
                 disabled={!isDeliveryFormValid}
                 onClick={handleDeliverySubmit}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
+                style={{ 
+                  fontFamily: 'Nunito, sans-serif',
+                  backgroundColor: isDeliveryFormValid ? '#30313D' : undefined
+                }}
               >
                 Продолжить
               </button>
@@ -1787,7 +1898,7 @@ export const LoginPage: React.FC = () => {
       case Step.Payment:
         // Calculate total for all children
         const totalPrice = children.reduce((sum, child, index) => {
-          return sum + calculateChildPrice(child.subscription, index);
+          return sum + (child.subscription === 'premium' ? 60 : 35);
         }, 0);
 
         return (
@@ -1804,7 +1915,7 @@ export const LoginPage: React.FC = () => {
               </button>
               
               <span className="text-sm font-medium text-gray-600" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                Шаг 6/8
+                Шаг 6/6
               </span>
               
               <button 
@@ -1830,7 +1941,7 @@ export const LoginPage: React.FC = () => {
                 {/* Наборы для детей */}
                 {children.map((child, index) => {
                   const planItems = getPlanItems(child.subscription);
-                  const price = calculateChildPrice(child.subscription, index);
+                  const price = child.subscription === 'premium' ? 60 : 35;
                   
                   return (
                     <div key={child.id} className="bg-gray-100 rounded-xl p-4">
@@ -1884,9 +1995,12 @@ export const LoginPage: React.FC = () => {
             {/* Bottom section */}
             <div className="px-6 pb-6">
               <button 
-                className="w-full py-4 bg-indigo-400 text-white rounded-full font-medium text-lg hover:bg-indigo-500 transition-colors mb-3"
+                className="w-full py-4 text-white rounded-full font-medium text-lg hover:opacity-80 transition-all mb-3"
                 onClick={handlePaymentSubmit}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
+                style={{ 
+                  fontFamily: 'Nunito, sans-serif',
+                  backgroundColor: '#30313D'
+                }}
               >
                 Оплатить и активировать
               </button>
@@ -1904,13 +2018,13 @@ export const LoginPage: React.FC = () => {
         return (
           <div className="flex flex-col min-h-screen bg-white">
             {/* Header */}
-            <div className="flex justify-between items-center p-4">
+            <div className="flex justify-center items-center p-4 relative">
               <span className="text-lg font-bold text-gray-900 tracking-wider" style={{ fontFamily: 'Nunito, sans-serif' }}>
                 BOX4BABY
               </span>
               <button 
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                onClick={() => setStep(Step.Phone)}
+                className="absolute right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                onClick={handleSuccessComplete}
               >
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path d="M18 6L6 18M6 6l12 12"/>
@@ -1925,7 +2039,7 @@ export const LoginPage: React.FC = () => {
                 <img 
                   src="/illustrations/ok.png" 
                   alt="Success" 
-                  className="w-24 h-24 mx-auto"
+                  className="w-32 h-32 mx-auto"
                 />
               </div>
 
@@ -1942,9 +2056,12 @@ export const LoginPage: React.FC = () => {
             {/* Bottom Button */}
             <div className="px-6 pb-6">
               <button 
-                className="w-full py-4 bg-indigo-400 text-white rounded-full font-medium text-lg hover:bg-indigo-500 transition-colors"
-                onClick={() => setStep(Step.Phone)}
-                style={{ fontFamily: 'Nunito, sans-serif' }}
+                className="w-full py-4 text-white rounded-full font-medium text-lg transition-colors"
+                onClick={handleSuccessComplete}
+                style={{ 
+                  fontFamily: 'Nunito, sans-serif',
+                  backgroundColor: '#30313D'
+                }}
               >
                 Перейти на главную
               </button>
@@ -1972,11 +2089,9 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header - скрывать на welcome экранах */}
-        <div className="flex items-center justify-between px-4 py-3 h-16">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-lg text-gray-800">BOX4BABY</span>
-          </div>
-          <button className="bg-gray-100 rounded-lg p-1" onClick={() => setStep(Step.Phone)}>
+        <div className="flex items-center justify-center px-4 py-3 h-16 relative">
+          <span className="font-bold text-lg text-gray-800">BOX4BABY</span>
+          <button className="absolute right-4 bg-gray-100 rounded-lg p-1" onClick={() => setStep(Step.Phone)}>
             <span className="sr-only">Закрыть</span>
             <svg width="24" height="24" fill="none" stroke="#30313D" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6"/></svg>
           </button>
