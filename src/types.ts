@@ -3,7 +3,7 @@ export interface UserData {
   name: string;
   phone: string;
   children: Array<{
-    id: string;
+    id: number;
     name: string;
     birthDate: string;
     gender: "male" | "female";
@@ -20,4 +20,4 @@ export interface UserData {
   subscriptionStatus: "not_subscribed" | "just_subscribed" | "active";
   nextSetStatus: "not_determined" | "determined";
   subscriptionDate?: string; // ISO date string when subscription was made
-} 
+}
