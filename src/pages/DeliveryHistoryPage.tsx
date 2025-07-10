@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 
 interface DeliveryItem {
   id: string;
@@ -34,17 +34,23 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClos
       </div>
 
       {/* Title */}
-      <div className="px-4 pb-6">
-        <h1 className="text-xl font-semibold text-gray-900">История доставок</h1>
+      <div className="px-4 pb-6 relative">
+        <h1 className="text-[20px] font-semibold text-gray-900 text-center">История доставок</h1>
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-0 p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-600" />
+        </button>
       </div>
 
       {/* Table Header */}
-      <div className="bg-[#F2F2F2] mx-4 rounded-lg px-4 py-3 mb-2">
+      <div className="mx-4 px-4 py-3 mb-2">
         <div className="flex justify-between items-center">
-          <div className="text-sm font-medium text-gray-700 flex-1">
+          <div className="text-base font-medium text-black flex-1">
             №
           </div>
-          <div className="text-sm font-medium text-gray-700 flex-1 text-right">
+          <div className="text-base font-medium text-black flex-1 text-right">
             Доставка
           </div>
         </div>
@@ -55,7 +61,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClos
         {deliveries.map((delivery, index) => (
           <div 
             key={delivery.id}
-            className="bg-[#FFFFFF] rounded-lg px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="bg-[#F2F2F2] rounded-[8px] px-4 py-4 hover:bg-gray-300 transition-colors cursor-pointer"
           >
             <div className="flex justify-between items-center">
               <div className="text-base text-gray-900 flex-1">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { UserData } from "../types";
 
 // Step enums for clarity
 enum Step {
@@ -12,25 +13,6 @@ enum Step {
   Delivery = 7,
   Payment = 8,
   Success = 9,
-}
-
-interface UserData {
-  name: string;
-  phone: string;
-  children: Array<{
-    id: string;
-    name: string;
-    birthDate: string;
-    gender: "male" | "female";
-    limitations: "none" | "has_limitations";
-    comment: string;
-    interests: string[];
-    skills: string[];
-    subscription: "base" | "premium" | "";
-  }>;
-  deliveryAddress: string;
-  deliveryDate: string;
-  deliveryTime: string;
 }
 
 interface LoginPageProps {
@@ -530,7 +512,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigateToKidsPage }) =>
       children,
       deliveryAddress,
       deliveryDate,
-      deliveryTime
+      deliveryTime,
+      subscriptionStatus: "just_subscribed",
+      nextSetStatus: "not_determined",
+      subscriptionDate: new Date().toISOString()
     };
     onNavigateToKidsPage(userData);
   };

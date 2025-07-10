@@ -43,7 +43,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose, BottomNavigat
       {/* Content */}
       <div className="px-4">
         {/* Description */}
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-left">
           <p className="text-base text-gray-600 leading-relaxed">
             Возникли проблемы с приложением?<br />
             Напишите нам — мы поможем!
@@ -51,13 +51,13 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose, BottomNavigat
         </div>
 
         {/* Contact Buttons */}
-        <div className="space-y-4">
+        <div className="space-y-0">
           {/* WhatsApp Button */}
           <button
             onClick={handleWhatsAppClick}
             className="w-full bg-[#FFFFFF] rounded-lg px-4 py-4 flex items-center hover:bg-gray-100 transition-colors"
           >
-            <div className="bg-[#F2F2F2] rounded-[12px] w-8 h-8 flex items-center justify-center mr-3">
+            <div className="bg-[#F2F2F2] rounded-[12px] w-10 h-10 flex items-center justify-center mr-3">
               <img 
                 src="/illustrations/whatsup.png" 
                 alt="WhatsApp" 
@@ -72,7 +72,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose, BottomNavigat
             onClick={handleTelegramClick}
             className="w-full bg-[#FFFFFF] rounded-lg px-4 py-4 flex items-center hover:bg-gray-100 transition-colors"
           >
-            <div className="bg-[#F2F2F2] rounded-[12px] w-8 h-8 flex items-center justify-center mr-3">
+            <div className="bg-[#F2F2F2] rounded-[12px] w-10 h-10 flex items-center justify-center mr-3">
               <img 
                 src="/illustrations/Telegram.png" 
                 alt="Telegram" 
