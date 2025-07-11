@@ -14,9 +14,10 @@ import { ProfilePage } from './ProfilePage';
 
 interface KidsAppInterfaceProps {
   userData: UserData;
+  onUpdateUserData?: (userData: UserData) => void;
 }
 
-export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData }) => {
+export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, onUpdateUserData }) => {
   const [rating, setRating] = useState<number>(0);
   const [showAllToys, setShowAllToys] = useState<boolean>(false);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
@@ -270,6 +271,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData }) 
         userData={userData}
         setShowProfile={setShowProfile}
         BottomNavigation={BottomNavigation}
+        onUpdateUserData={onUpdateUserData || (() => {})}
       />
     );
   }
@@ -336,6 +338,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData }) 
           userData={userData}
           BottomNavigation={BottomNavigation}
           currentToys={currentToys}
+          nextToys={nextToys}
           rating={rating}
           setShowAllToys={setShowAllToys}
           handleStarClick={handleStarClick}

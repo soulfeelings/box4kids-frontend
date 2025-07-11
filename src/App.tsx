@@ -64,8 +64,8 @@ const testUserDataScenarios: Record<string, UserData> = {
         name: "Алина",
         birthDate: "2016-03-15",
         gender: "female",
-        limitations: "none",
-        comment: "",
+        limitations: "has_limitations",
+        comment: "Не любит слишком громкие игрушки, предпочитает спокойные занятия",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
         subscription: "base"
@@ -88,10 +88,56 @@ const testUserDataScenarios: Record<string, UserData> = {
         name: "Алина",
         birthDate: "2016-03-15",
         gender: "female",
-        limitations: "none",
-        comment: "",
+        limitations: "has_limitations",
+        comment: "Очень активная, любит подвижные игры и творчество",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
+        subscription: "base"
+      }
+    ],
+    deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
+    deliveryDate: "24.04",
+    deliveryTime: "14-18",
+    subscriptionStatus: "active",
+    nextSetStatus: "determined"
+  },
+  
+  // 5. Multiple children scenario
+  multipleChildren: {
+    name: "Елена",
+    phone: "+7 (999) 123-45-67",
+    children: [
+      {
+        id: "1",
+        name: "Алина",
+        birthDate: "2016-03-15",
+        gender: "female",
+        limitations: "has_limitations",
+        comment: "Очень активная, любит подвижные игры и творчество",
+        interests: ["Конструкторы", "Творчество"],
+        skills: ["Логика", "Воображение", "Творчество"],
+        subscription: "base"
+      },
+      {
+        id: "2",
+        name: "Максим",
+        birthDate: "2018-07-22",
+        gender: "male",
+        limitations: "has_limitations",
+        comment: "Спокойный ребенок, любит книги и пазлы. Не переносит слишком яркий свет",
+        interests: ["Чтение", "Пазлы"],
+        skills: ["Внимание", "Память"],
+        subscription: "premium"
+      },
+      {
+        id: "3",
+        name: "София",
+        birthDate: "2020-01-10",
+        gender: "female",
+        limitations: "none",
+        comment: "",
+        interests: ["Музыка", "Танцы"],
+        skills: ["Координация", "Ритм"],
         subscription: "base"
       }
     ],
@@ -115,6 +161,10 @@ function App() {
     setCurrentPage("kids");
   };
 
+  const handleUpdateUserData = (updatedData: UserData) => {
+    setUserData(updatedData);
+  };
+
   const handleTestDemo = (scenario: string) => {
     setUserData(testUserDataScenarios[scenario]);
     setCurrentPage("kids");
@@ -136,7 +186,7 @@ function App() {
             ← Назад к демо
           </button>
         </div>
-        <KidsAppInterface userData={userData} />
+        <KidsAppInterface userData={userData} onUpdateUserData={handleUpdateUserData} />
       </div>
     );
   }
@@ -184,6 +234,14 @@ function App() {
                 >
                   <div className="font-medium">4. Набор определен</div>
                   <div className="text-sm opacity-75">Обычное состояние - состав следующего набора определен</div>
+                </button>
+                
+                <button
+                  onClick={() => handleTestDemo('multipleChildren')}
+                  className="w-full bg-purple-100 text-purple-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-purple-200 transition-colors"
+                >
+                  <div className="font-medium">5. Несколько детей</div>
+                  <div className="text-sm opacity-75">Семья с тремя детьми и их особенностями</div>
                 </button>
               </div>
             </div>

@@ -16,6 +16,7 @@ export interface UserData {
   deliveryAddress: string;
   deliveryDate: string;
   deliveryTime: string;
+  deliveryComments?: string; // Optional comment for courier
   // New fields for different states
   subscriptionStatus: "not_subscribed" | "just_subscribed" | "active";
   nextSetStatus: "not_determined" | "determined";

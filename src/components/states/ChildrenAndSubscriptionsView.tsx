@@ -15,8 +15,6 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
   BottomNavigation,
   getAge
 }) => {
-  const child = userData.children[0]; // Assuming first child for now
-  
   return (
     <div className="w-full min-h-screen" style={{ fontFamily: 'Nunito, sans-serif', backgroundColor: '#FFE8C8' }}>
       {/* Header */}
@@ -34,96 +32,108 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
 
       {/* Content */}
       <div className="p-4 pb-24">
-        {/* Combined Child Info and Toy Set Container */}
-        <div className="bg-white rounded-2xl p-4 mb-4">
-          {/* Child Info */}
-          <div className="mb-6">
-            <div className="flex items-center mb-3">
-              <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center mr-3">
-                <User size={20} className="text-orange-600" />
+        {/* Loop through all children */}
+        {userData.children.map((child, index) => (
+          <div key={child.id} className="bg-white rounded-2xl p-4 mb-4">
+            {/* Child Info */}
+            <div className="mb-6">
+              <div className="flex items-center mb-3">
+                <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center mr-3">
+                  <User size={20} className="text-orange-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">{child.name}, {getAge(child.birthDate)} лет</h3>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">{child.name}, {getAge(child.birthDate)} лет</h3>
+
+              {/* Child Comment/Characteristics */}
+              {child.comment && child.comment.trim() !== '' && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">Особенности</p>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-800">{child.comment}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Interests */}
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-2">Интересы</p>
+                <div className="flex flex-wrap gap-2">
+                  {child.interests.map((interest, index) => (
+                    <span key={index} className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm">
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Skills */}
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-2">Навыки для развития</p>
+                <div className="flex flex-wrap gap-2">
+                  {child.skills.map((skill, index) => (
+                    <span key={index} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Subscription */}
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-2">Тариф</p>
+                <p className="text-gray-800 font-medium">
+                  {child.subscription === 'base' ? 'Базовый' : 'Премиум'} • 6 игрушек • 535₽/мес
+                </p>
               </div>
             </div>
 
-            {/* Interests */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">Интересы</p>
-              <div className="flex flex-wrap gap-2">
-                {child.interests.map((interest, index) => (
-                  <span key={index} className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm">
-                    {interest}
-                  </span>
-                ))}
+            {/* Toy Set Composition */}
+            <div className="mb-6">
+              <h4 className="text-gray-800 font-medium mb-3">Состав набора игрушек</h4>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    🔧
+                  </div>
+                  <span className="text-gray-700">x2 Конструктор</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    🎨
+                  </div>
+                  <span className="text-gray-700">x2 Творческий набор</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                    🧸
+                  </div>
+                  <span className="text-gray-700">x1 Мягкая игрушка</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-3">
+                    🎪
+                  </div>
+                  <span className="text-gray-700">x1 Головоломка</span>
+                </div>
               </div>
             </div>
 
-            {/* Skills */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">Навыки для развития</p>
-              <div className="flex flex-wrap gap-2">
-                {child.skills.map((skill, index) => (
-                  <span key={index} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Subscription */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">Тариф</p>
-              <p className="text-gray-800 font-medium">
-                {child.subscription === 'base' ? 'Базовый' : 'Премиум'} • 6 игрушек • 535₽/мес
-              </p>
-            </div>
-          </div>
-
-          {/* Toy Set Composition */}
-          <div className="mb-6">
-            <h4 className="text-gray-800 font-medium mb-3">Состав набора игрушек</h4>
+            {/* Action buttons */}
             <div className="space-y-3">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                  🔧
-                </div>
-                <span className="text-gray-700">x2 Конструктор</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                  🎨
-                </div>
-                <span className="text-gray-700">x2 Творческий набор</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                  🧸
-                </div>
-                <span className="text-gray-700">x1 Мягкая игрушка</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-3">
-                  🎪
-                </div>
-                <span className="text-gray-700">x1 Головоломка</span>
-              </div>
+              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
+                Изменить данные ребенка
+              </button>
+              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
+                Изменить тариф
+              </button>
+              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
+                Оставить подписку
+              </button>
             </div>
           </div>
-
-          {/* Action buttons */}
-          <div className="space-y-3">
-            <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
-              Изменить данные ребенка
-            </button>
-            <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
-              Изменить тариф
-            </button>
-            <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
-              Оставить подписку
-            </button>
-          </div>
-        </div>
+        ))}
 
         {/* Add child button */}
         <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: '#747EEC' }}>

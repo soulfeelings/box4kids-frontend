@@ -3,11 +3,15 @@ import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { UserData } from '../types';
 import { DeliveryHistoryPage } from './DeliveryHistoryPage';
 import { SupportPage } from './SupportPage';
+import { EditNamePage } from './EditNamePage';
+import { EditPhonePage } from './EditPhonePage';
+import { EditDeliveryPage } from './EditDeliveryPage';
 
 interface ProfilePageProps {
   userData: UserData;
   setShowProfile: (show: boolean) => void;
   BottomNavigation: React.ComponentType;
+  onUpdateUserData: (userData: UserData) => void;
 }
 
 interface ProfileItemProps {
@@ -23,6 +27,7 @@ interface ProfileItemProps {
   deliveryTime?: string;
   customRadius?: string;
   isMenuItem?: boolean;
+  onEditClick?: () => void;
 }
 
 const ProfileItem: React.FC<ProfileItemProps> = ({ 
@@ -37,7 +42,8 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
   deliveryDate,
   deliveryTime,
   customRadius = 'rounded-lg',
-  isMenuItem = false
+  isMenuItem = false,
+  onEditClick
 }) => {
   const backgroundColor = isMenuItem || isLogout ? 'bg-[#FFFFFF]' : 'bg-[#F2F2F2]';
   
@@ -68,7 +74,10 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
                 {deliveryDate}, {deliveryTime}
               </div>
               <div className="mt-3">
-                <button className="w-full bg-[#E3E3E3] text-sm text-black py-2 px-4 rounded-[32px] text-center hover:bg-gray-300 transition-colors">
+                <button 
+                  onClick={onEditClick}
+                  className="w-full bg-[#E3E3E3] text-sm text-black py-2 px-4 rounded-[32px] text-center hover:bg-gray-300 transition-colors"
+                >
                   Изменить адрес или дату доставки
                 </button>
               </div>
@@ -77,7 +86,10 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
         </div>
         <div className="flex items-center ml-4">
           {isEditable && (
-            <button className="bg-[#E3E3E3] rounded-full p-2 mr-2 hover:bg-gray-300 transition-colors">
+            <button 
+              onClick={onEditClick}
+              className="bg-[#E3E3E3] rounded-full p-2 mr-2 hover:bg-gray-300 transition-colors"
+            >
               <img 
                 src="/illustrations/pen.png" 
                 alt="Edit" 
@@ -94,9 +106,12 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
   );
 };
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfile, BottomNavigation }) => {
+export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfile, BottomNavigation, onUpdateUserData }) => {
   const [showDeliveryHistory, setShowDeliveryHistory] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  const [showEditName, setShowEditName] = useState(false);
+  const [showEditPhone, setShowEditPhone] = useState(false);
+  const [showEditDelivery, setShowEditDelivery] = useState(false);
 
   // Helper function to format delivery date
   const formatDeliveryDate = (dateString: string) => {
@@ -144,6 +159,38 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfi
     setShowSupport(true);
   };
 
+  // Handle edit name click
+  const handleEditNameClick = () => {
+    setShowEditName(true);
+  };
+
+  // Handle save name
+  const handleSaveName = (newName: string) => {
+    const updatedUserData = { ...userData, name: newName };
+    onUpdateUserData(updatedUserData);
+  };
+
+  // Handle edit phone click
+  const handleEditPhoneClick = () => {
+    setShowEditPhone(true);
+  };
+
+  // Handle save phone
+  const handleSavePhone = (newPhone: string) => {
+    const updatedUserData = { ...userData, phone: newPhone };
+    onUpdateUserData(updatedUserData);
+  };
+
+  // Handle edit delivery click
+  const handleEditDeliveryClick = () => {
+    setShowEditDelivery(true);
+  };
+
+  // Handle save delivery
+  const handleSaveDelivery = (updatedUserData: UserData) => {
+    onUpdateUserData(updatedUserData);
+  };
+
   // Show delivery history page if requested
   if (showDeliveryHistory) {
     return (
@@ -159,6 +206,42 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfi
     return (
       <SupportPage
         onClose={() => setShowSupport(false)}
+        BottomNavigation={BottomNavigation}
+      />
+    );
+  }
+
+  // Show edit name page if requested
+  if (showEditName) {
+    return (
+      <EditNamePage
+        currentName={userData.name}
+        onClose={() => setShowEditName(false)}
+        onSave={handleSaveName}
+        BottomNavigation={BottomNavigation}
+      />
+    );
+  }
+
+  // Show edit phone page if requested
+  if (showEditPhone) {
+    return (
+      <EditPhonePage
+        currentPhone={userData.phone}
+        onClose={() => setShowEditPhone(false)}
+        onSave={handleSavePhone}
+        BottomNavigation={BottomNavigation}
+      />
+    );
+  }
+
+  // Show edit delivery page if requested
+  if (showEditDelivery) {
+    return (
+      <EditDeliveryPage
+        userData={userData}
+        onClose={() => setShowEditDelivery(false)}
+        onSave={handleSaveDelivery}
         BottomNavigation={BottomNavigation}
       />
     );
@@ -184,6 +267,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfi
           value={userData.name} 
           isEditable={true}
           customRadius="rounded-[24px]"
+          onEditClick={handleEditNameClick}
         />
 
         {/* Phone */}
@@ -192,6 +276,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfi
           value={userData.phone} 
           isEditable={true}
           customRadius="rounded-[24px]"
+          onEditClick={handleEditPhoneClick}
         />
 
         {/* Delivery */}
@@ -202,6 +287,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ userData, setShowProfi
           deliveryDate={formatDeliveryDate(userData.deliveryDate)}
           deliveryTime={formatDeliveryTime(userData.deliveryTime)}
           customRadius="rounded-[24px]"
+          onEditClick={handleEditDeliveryClick}
         />
 
         {/* Menu Items */}
