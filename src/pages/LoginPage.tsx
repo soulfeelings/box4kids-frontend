@@ -45,7 +45,7 @@ interface ChildResponse {
   id: number;
   name: string;
   date_of_birth: string;
-  gender: "MALE" | "FEMALE";
+  gender: "male" | "female";
   has_limitations: boolean;
   comment: string | null;
   parent_id: number;
@@ -542,6 +542,67 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
   };
 
+  // Update child basic data only (name, birth date, gender, limitations, comment)
+  const updateChildBasicData = async (childId: number) => {
+    try {
+      const response = await apiRequest(`/children/${childId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: childName,
+          date_of_birth: childBirthDate.split(".").reverse().join("-"), // Convert DD.MM.YYYY to YYYY-MM-DD
+          gender: childGender,
+          has_limitations: childLimitations === "has_limitations",
+          comment: childComment.trim() || null,
+        }),
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Failed to update child basic data:", error);
+      throw error;
+    }
+  };
+
+  // Full update child with all data
+  const updateChildFull = async (childId: number) => {
+    try {
+      // Map selected interests/skills names to IDs
+      const selectedInterestIds = selectedInterests
+        .map((interestName) => {
+          const interest = availableInterests.find((i) =>
+            i.name.includes(interestName)
+          );
+          return interest?.id;
+        })
+        .filter((id) => id !== undefined) as number[];
+
+      const selectedSkillIds = selectedSkills
+        .map((skillName) => {
+          const skill = availableSkills.find((s) => s.name.includes(skillName));
+          return skill?.id;
+        })
+        .filter((id) => id !== undefined) as number[];
+
+      const response = await apiRequest(`/children/${childId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name: childName,
+          date_of_birth: childBirthDate.split(".").reverse().join("-"), // Convert DD.MM.YYYY to YYYY-MM-DD
+          gender: childGender,
+          has_limitations: childLimitations === "has_limitations",
+          comment: childComment.trim() || null,
+          interest_ids: selectedInterestIds,
+          skill_ids: selectedSkillIds,
+        }),
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Failed to update child:", error);
+      throw error;
+    }
+  };
+
   // Load subscription plans
   const loadSubscriptionPlans = async () => {
     if (subscriptionPlans.length > 0) {
@@ -916,10 +977,46 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       return;
     }
 
-    // If editing, go to categories to edit interests and skills
+    // If editing, update basic data and go to categories to edit interests and skills
     if (editingChildId && editMode === "data") {
-      await loadReferenceData();
-      setStep(Step.Categories);
+      setIsLoading(true);
+      try {
+        // Update child basic data via API
+        const childIdToUpdate = children.find(
+          (child) => child.id === editingChildId
+        )?.id;
+        if (childIdToUpdate) {
+          await updateChildBasicData(childIdToUpdate);
+        }
+
+        // Update local state with basic data
+        setChildren((prev) =>
+          prev.map((child) =>
+            child.id === editingChildId
+              ? {
+                  ...child,
+                  name: childName,
+                  birthDate: childBirthDate,
+                  gender: childGender as "male" | "female",
+                  limitations: childLimitations as "none" | "has_limitations",
+                  comment: childComment,
+                }
+              : child
+          )
+        );
+
+        // Load reference data and go to categories
+        await loadReferenceData();
+        setStep(Step.Categories);
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Не удалось обновить данные ребенка"
+        );
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -979,7 +1076,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     if (editingChildId && editMode === "data") {
       setIsLoading(true);
       try {
-        // Update child via API
+        // Update child interests and skills via API
         const childIdToUpdate = children.find(
           (child) => child.id === editingChildId
         )?.id;
@@ -991,17 +1088,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           );
         }
 
-        // Update local state
+        // Update local state with interests and skills
         setChildren((prev) =>
           prev.map((child) =>
             child.id === editingChildId
               ? {
                   ...child,
-                  name: childName,
-                  birthDate: childBirthDate,
-                  gender: childGender as "male" | "female",
-                  limitations: childLimitations as "none" | "has_limitations",
-                  comment: childComment,
                   interests: selectedInterests,
                   skills: selectedSkills,
                 }
@@ -1017,7 +1109,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         setError(
           error instanceof Error
             ? error.message
-            : "Не удалось обновить данные ребенка"
+            : "Не удалось обновить интересы и навыки ребенка"
         );
       } finally {
         setIsLoading(false);
