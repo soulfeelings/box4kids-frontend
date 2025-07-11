@@ -651,6 +651,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
   };
 
+  // Delete child via API
+  const deleteChild = async (childId: number) => {
+    try {
+      await apiRequest(`/children/${childId}`, {
+        method: "DELETE",
+      });
+      return true;
+    } catch (error) {
+      console.error("Failed to delete child:", error);
+      throw error;
+    }
+  };
+
   // Process payment via API
   const processPayment = async (paymentId: number) => {
     try {
@@ -2504,16 +2517,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                                   fontFamily: "Nunito, sans-serif",
                                   borderRadius: "32px",
                                 }}
-                                onClick={() => {
-                                  // TODO: Implement delete child
+                                onClick={async () => {
                                   if (
                                     window.confirm(
                                       `Удалить данные ребёнка ${child.name}?`
                                     )
                                   ) {
-                                    setChildren((prev) =>
-                                      prev.filter((c) => c.id !== child.id)
-                                    );
+                                    setIsLoading(true);
+                                    try {
+                                      await deleteChild(child.id);
+
+                                      // Remove child from subscription tracking
+                                      setChildSubscriptions((prev) => {
+                                        const newMap = new Map(prev);
+                                        newMap.delete(child.id);
+                                        return newMap;
+                                      });
+
+                                      // Remove child from local state
+                                      setChildren((prev) =>
+                                        prev.filter((c) => c.id !== child.id)
+                                      );
+                                    } catch (error) {
+                                      setError(
+                                        error instanceof Error
+                                          ? error.message
+                                          : "Не удалось удалить ребенка"
+                                      );
+                                    } finally {
+                                      setIsLoading(false);
+                                    }
                                   }
                                 }}
                               >
