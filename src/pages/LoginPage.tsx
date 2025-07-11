@@ -246,23 +246,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     </span>
   );
 
-  // Get plan items based on subscription type
+  // Get plan items based on subscription type from API data
   const getPlanItems = (subscription: "base" | "premium" | "") => {
-    if (subscription === "premium") {
-      return [
-        { icon: "🔧", count: 3, name: "Конструктор", color: "#A4B9ED" },
-        { icon: "🎨", count: 2, name: "Творческий набор", color: "#D4E8C0" },
-        { icon: "🧸", count: 2, name: "Мягкая игрушка", color: "#FFD8BE" },
-        { icon: "🧠", count: 1, name: "Головоломка", color: "#F6E592" },
-        { icon: "💎", count: 1, name: "Премиум-игрушка", color: "#E8D3F0" },
-      ];
-    }
-    return [
-      { icon: "🔧", count: 2, name: "Конструктор", color: "#A4B9ED" },
-      { icon: "🎨", count: 2, name: "Творческий набор", color: "#D4E8C0" },
-      { icon: "🧸", count: 1, name: "Мягкая игрушка", color: "#FFD8BE" },
-      { icon: "🧠", count: 1, name: "Головоломка", color: "#F6E592" },
-    ];
+    if (!subscription) return [];
+    const plan = getPlanByType(subscription);
+    if (!plan) return [];
+
+    return plan.toy_configurations.map((config) => ({
+      icon: config.icon || "🎯",
+      count: config.quantity,
+      name: config.name,
+      color: "#A4B9ED", // Default color, can be enhanced later
+    }));
   };
 
   // Interest icons mapping
@@ -284,20 +279,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     Речь: "🗣",
   };
 
-  // Calculate price for child based on position
-  const calculateChildPrice = (
-    subscription: "base" | "premium" | "",
-    childIndex: number
-  ) => {
-    const basePrice = subscription === "premium" ? 60 : 35;
-    const isFirstChild = childIndex === 0;
-    return isFirstChild ? basePrice : Math.round(basePrice * 0.8); // 20% discount for non-first children
-  };
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isNewUser, setIsNewUser] = useState(false); // Mock: true if phone ends with odd digit
+
   const [resendTimer, setResendTimer] = useState(0);
   const [welcomeIndex, setWelcomeIndex] = useState(0); // 0, 1, 2
 
@@ -793,8 +779,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         body: JSON.stringify({ phone_number: phone }),
       });
 
-      // Mock logic for new user detection (remove when backend implements this)
-      setIsNewUser(Number(phone[phone.length - 1]) % 2 === 1);
       setStep(Step.Code);
 
       // DEV MODE: Start auto-fill immediately after successful send
@@ -2517,9 +2501,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                                     style={{ fontFamily: "Nunito, sans-serif" }}
                                   >
                                     $
-                                    {child.subscription === "premium"
-                                      ? "60"
-                                      : "35"}
+                                    {child.subscription
+                                      ? getPlanByType(child.subscription)
+                                          ?.price_monthly || 0
+                                      : 0}
                                     /мес.
                                   </span>
                                 </div>
@@ -3124,7 +3109,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       case Step.Payment:
         // Calculate total for all children
         const totalPrice = children.reduce((sum, child, index) => {
-          return sum + (child.subscription === "premium" ? 60 : 35);
+          return (
+            sum +
+            (child.subscription
+              ? getPlanByType(child.subscription)?.price_monthly || 0
+              : 0)
+          );
         }, 0);
 
         return (
@@ -3187,7 +3177,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 {/* Наборы для детей */}
                 {children.map((child, index) => {
                   const planItems = getPlanItems(child.subscription);
-                  const price = child.subscription === "premium" ? 60 : 35;
+                  const price = child.subscription
+                    ? getPlanByType(child.subscription)?.price_monthly || 0
+                    : 0;
 
                   return (
                     <div key={child.id} className="bg-gray-100 rounded-xl p-4">
