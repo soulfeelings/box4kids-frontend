@@ -1,31 +1,106 @@
 import React from 'react';
-import { ArrowLeft, User } from 'lucide-react';
+
 import { UserData } from '../../types';
 
 interface ChildrenAndSubscriptionsViewProps {
   userData: UserData;
-  setShowChildrenScreen: (show: boolean) => void;
   BottomNavigation: React.ComponentType;
   getAge: (birthDate: string) => number;
+  onEditChild: (child: UserData['children'][0]) => void;
+  onEditSubscription: (child: UserData['children'][0]) => void;
+  onCancelSubscription: (child: UserData['children'][0]) => void;
+  onResumeSubscription: () => void;
+  onDeleteChild: (child: UserData['children'][0]) => void;
 }
 
 export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsViewProps> = ({
   userData,
-  setShowChildrenScreen,
   BottomNavigation,
-  getAge
+  getAge,
+  onEditChild,
+  onEditSubscription,
+  onCancelSubscription,
+  onResumeSubscription,
+  onDeleteChild
 }) => {
+  // Mapping для эмодзи интересов
+  const interestEmojis: { [key: string]: string } = {
+    'Конструкторы': '🧱',
+    'Плюшевые': '🧸',
+    'Ролевые': '🎭',
+    'Развивающие': '🧠',
+    'Техника': '⚙️',
+    'Творчество': '🎨'
+  };
+
+  // Mapping для эмодзи навыков
+  const skillEmojis: { [key: string]: string } = {
+    'Моторика': '✋',
+    'Логика': '🧩',
+    'Воображение': '💭',
+    'Творчество': '🎨',
+    'Речь': '🗣'
+  };
+
+  // If no children, show "not subscribed" state
+  if (!userData.children || userData.children.length === 0) {
+    return (
+      <div className="w-full min-h-screen" style={{ fontFamily: 'Nunito, sans-serif', backgroundColor: '#FFE8C8' }}>
+        {/* Header */}
+        <div className="p-4 flex items-center justify-center" style={{ backgroundColor: '#FFE8C8' }}>
+          <h1 className="font-semibold text-gray-800" style={{ fontSize: '26px' }}>
+            Дети и наборы
+          </h1>
+        </div>
+
+        {/* Not subscribed content */}
+        <div className="p-4 pb-24">
+          <div className="relative flex flex-col rounded-3xl overflow-hidden" style={{ 
+            backgroundColor: '#747EEC',
+            minHeight: '380px',
+            maxHeight: '60vh',
+            height: 'clamp(380px, 55vh, 600px)'
+          }}>
+            {/* Illustration area - flexible height */}
+            <div className="relative flex-1 overflow-hidden min-h-0">
+              <img 
+                src="/illustrations/continue.png" 
+                alt="Girl with toy box" 
+                className="absolute inset-0 w-full h-full object-contain p-2"
+                style={{ objectPosition: 'center top' }}
+              />
+            </div>
+            
+            {/* Bottom container with text and button - flexible height */}
+            <div className="px-4 sm:px-6 py-4 flex flex-col justify-center" style={{ 
+              minHeight: '120px',
+              maxHeight: '160px'
+            }}>
+              <p className="text-sm sm:text-base text-white/90 text-center mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                Завершите оформление подпсики, чтобы мы могли собрать коробку с игрушками и доставить её вам
+              </p>
+              
+              <button
+                onClick={() => console.log('Navigate to subscription')}
+                className="w-full bg-white text-[#30313D] py-3 sm:py-4 rounded-3xl font-semibold text-sm sm:text-base transition-all hover:bg-gray-50"
+                style={{ fontFamily: 'Open Sans, sans-serif' }}
+              >
+                Продолжить оформление
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <BottomNavigation />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen" style={{ fontFamily: 'Nunito, sans-serif', backgroundColor: '#FFE8C8' }}>
       {/* Header */}
-      <div className="p-4 flex items-center justify-center relative" style={{ backgroundColor: '#FFE8C8' }}>
-        <button 
-          onClick={() => setShowChildrenScreen(false)}
-          className="absolute left-4 p-1"
-        >
-          <ArrowLeft size={24} className="text-gray-600" />
-        </button>
-        <h1 className="text-lg font-semibold text-gray-800">
+      <div className="p-4 flex items-center justify-center" style={{ backgroundColor: '#FFE8C8' }}>
+        <h1 className="font-semibold text-gray-800" style={{ fontSize: '26px' }}>
           Дети и наборы
         </h1>
       </div>
@@ -38,8 +113,10 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
             {/* Child Info */}
             <div className="mb-6">
               <div className="flex items-center mb-3">
-                <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center mr-3">
-                  <User size={20} className="text-orange-600" />
+                <div className="w-10 h-10 flex items-center justify-center mr-3">
+                  <span className="text-lg">
+                    {child.gender === 'male' ? '👦' : '👧'}
+                  </span>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">{child.name}, {getAge(child.birthDate)} лет</h3>
@@ -61,8 +138,9 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
                 <p className="text-sm text-gray-600 mb-2">Интересы</p>
                 <div className="flex flex-wrap gap-2">
                   {child.interests.map((interest, index) => (
-                    <span key={index} className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm">
-                      {interest}
+                    <span key={index} className="text-gray-800 px-3 py-1 rounded-full text-sm flex items-center gap-1" style={{ backgroundColor: '#F2F2F2' }}>
+                      <span>{interestEmojis[interest] || ''}</span>
+                      <span>{interest}</span>
                     </span>
                   ))}
                 </div>
@@ -73,8 +151,9 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
                 <p className="text-sm text-gray-600 mb-2">Навыки для развития</p>
                 <div className="flex flex-wrap gap-2">
                   {child.skills.map((skill, index) => (
-                    <span key={index} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">
-                      {skill}
+                    <span key={index} className="text-gray-800 px-3 py-1 rounded-full text-sm flex items-center gap-1" style={{ backgroundColor: '#F2F2F2' }}>
+                      <span>{skillEmojis[skill] || ''}</span>
+                      <span>{skill}</span>
                     </span>
                   ))}
                 </div>
@@ -84,52 +163,84 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
               <div className="mb-4">
                 <p className="text-sm text-gray-600 mb-2">Тариф</p>
                 <p className="text-gray-800 font-medium">
-                  {child.subscription === 'base' ? 'Базовый' : 'Премиум'} • 6 игрушек • 535₽/мес
+                  {child.subscription === 'base' ? 'Базовый' : 'Премиум'} • 6 игрушек • ${child.subscription === 'base' ? '35' : '60'}/мес
                 </p>
               </div>
             </div>
 
             {/* Toy Set Composition */}
-            <div className="mb-6">
-              <h4 className="text-gray-800 font-medium mb-3">Состав набора игрушек</h4>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    🔧
+            {userData.subscriptionStatus !== 'paused' && (
+              <div className="mb-6">
+                <h4 className="text-gray-800 font-medium mb-3">Состав набора игрушек</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                      🔧
+                    </div>
+                    <span className="text-gray-700">x2 Конструктор</span>
                   </div>
-                  <span className="text-gray-700">x2 Конструктор</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    🎨
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                      🎨
+                    </div>
+                    <span className="text-gray-700">x2 Творческий набор</span>
                   </div>
-                  <span className="text-gray-700">x2 Творческий набор</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                    🧸
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                      🧸
+                    </div>
+                    <span className="text-gray-700">x1 Мягкая игрушка</span>
                   </div>
-                  <span className="text-gray-700">x1 Мягкая игрушка</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-3">
-                    🎪
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-3">
+                      🎪
+                    </div>
+                    <span className="text-gray-700">x1 Головоломка</span>
                   </div>
-                  <span className="text-gray-700">x1 Головоломка</span>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Paused subscription message */}
+            {userData.subscriptionStatus === 'paused' && (
+              <div className="mb-6 p-6 bg-orange-50 rounded-2xl text-center">
+                <p className="text-orange-600 text-sm">
+                  Подписка остановлена! Возобновите её<br />
+                  в любое время — и мы снова начнём<br />
+                  собирать коробки для вашего ребенка
+                </p>
+              </div>
+            )}
 
             {/* Action buttons */}
             <div className="space-y-3">
-              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
+              <button 
+                onClick={() => onEditChild(child)}
+                className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
+              >
                 Изменить данные ребенка
               </button>
-              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
-                Изменить тариф
+              <button 
+                onClick={() => userData.subscriptionStatus === 'paused' ? onDeleteChild(child) : onEditSubscription(child)}
+                className={`w-full py-3 rounded-xl text-sm font-medium transition-colors ${
+                  userData.subscriptionStatus === 'paused' 
+                    ? 'text-gray-700 hover:opacity-90' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                style={userData.subscriptionStatus === 'paused' ? { backgroundColor: '#FBC8D5' } : {}}
+              >
+                {userData.subscriptionStatus === 'paused' ? 'Удалить' : 'Изменить тариф'}
               </button>
-              <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl text-sm font-medium">
-                Оставить подписку
+              <button 
+                onClick={() => userData.subscriptionStatus === 'paused' ? onResumeSubscription() : onCancelSubscription(child)}
+                className={`w-full py-3 rounded-xl text-sm font-medium transition-colors ${
+                  userData.subscriptionStatus === 'paused' 
+                    ? 'text-white hover:opacity-90' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                style={userData.subscriptionStatus === 'paused' ? { backgroundColor: '#30313D' } : {}}
+              >
+                {userData.subscriptionStatus === 'paused' ? 'Возобновить подписку' : 'Остановить подписку'}
               </button>
             </div>
           </div>

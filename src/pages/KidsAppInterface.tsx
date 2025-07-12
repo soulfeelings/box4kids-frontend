@@ -11,6 +11,9 @@ import {
   ChildrenAndSubscriptionsView
 } from '../components/states';
 import { ProfilePage } from './ProfilePage';
+import { EditChildPage } from './EditChildPage';
+import { EditSubscriptionPage } from './EditSubscriptionPage';
+import { CancelSubscriptionPage } from './CancelSubscriptionPage';
 
 interface KidsAppInterfaceProps {
   userData: UserData;
@@ -24,6 +27,9 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
   const [showChildrenScreen, setShowChildrenScreen] = useState<boolean>(false);
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
+  const [editingChild, setEditingChild] = useState<UserData['children'][0] | null>(null);
+  const [editingSubscription, setEditingSubscription] = useState<UserData['children'][0] | null>(null);
+  const [cancelingSubscription, setCancelingSubscription] = useState<UserData['children'][0] | null>(null);
 
   const handleStarClick = (starIndex: number): void => {
     setRating(starIndex + 1);
@@ -141,8 +147,11 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
             setShowFeedback(false);
             setShowChildrenScreen(false);
             setShowProfile(false);
+            setEditingChild(null);
+            setEditingSubscription(null);
+            setCancelingSubscription(null);
           }}
-          className={`p-3 rounded-2xl ${!showAllToys && !showFeedback && !showChildrenScreen && !showProfile ? 'bg-purple-500' : ''}`}
+          className={`p-3 rounded-2xl ${!showAllToys && !showFeedback && !showChildrenScreen && !showProfile && !editingChild && !editingSubscription && !cancelingSubscription ? 'bg-purple-500' : ''}`}
         >
           <Home size={24} className="text-white" />
         </button>
@@ -152,8 +161,11 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
             setShowAllToys(false);
             setShowFeedback(false);
             setShowProfile(false);
+            setEditingChild(null);
+            setEditingSubscription(null);
+            setCancelingSubscription(null);
           }}
-          className={`p-3 rounded-2xl ${showChildrenScreen ? 'bg-purple-500' : ''}`}
+          className={`p-3 rounded-2xl ${showChildrenScreen && !editingChild && !editingSubscription && !cancelingSubscription ? 'bg-purple-500' : ''}`}
         >
           <img 
             src="/illustrations/Icon.png" 
@@ -167,8 +179,11 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
             setShowAllToys(false);
             setShowFeedback(false);
             setShowChildrenScreen(false);
+            setEditingChild(null);
+            setEditingSubscription(null);
+            setCancelingSubscription(null);
           }}
-          className={`p-3 rounded-2xl ${showProfile ? 'bg-purple-500' : ''}`}
+          className={`p-3 rounded-2xl ${showProfile && !editingChild && !editingSubscription && !cancelingSubscription ? 'bg-purple-500' : ''}`}
         >
           <MoreHorizontal size={24} className="text-white" />
         </button>
@@ -178,8 +193,8 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
 
   // Determine current screen state
   const getCurrentScreenState = (): 'not_subscribed' | 'just_subscribed' | 'next_set_not_determined' | 'next_set_determined' => {
-    // Check if user is not subscribed
-    if (userData.subscriptionStatus === 'not_subscribed') {
+    // Check if user is not subscribed or has no children
+    if (userData.subscriptionStatus === 'not_subscribed' || !userData.children || userData.children.length === 0) {
       return 'not_subscribed';
     }
     
@@ -264,7 +279,110 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
     return age;
   };
 
+  // Handle child update
+  const handleChildUpdate = (updatedChild: UserData['children'][0]) => {
+    if (onUpdateUserData) {
+      const updatedUserData = {
+        ...userData,
+        children: userData.children.map(child => 
+          child.id === updatedChild.id ? updatedChild : child
+        )
+      };
+      onUpdateUserData(updatedUserData);
+    }
+    setEditingChild(null);
+    setShowChildrenScreen(true);
+  };
+
+  // Handle subscription update
+  const handleSubscriptionUpdate = (updatedChild: UserData['children'][0]) => {
+    if (onUpdateUserData) {
+      const updatedUserData = {
+        ...userData,
+        children: userData.children.map(child => 
+          child.id === updatedChild.id ? updatedChild : child
+        )
+      };
+      onUpdateUserData(updatedUserData);
+    }
+    setEditingSubscription(null);
+    setShowChildrenScreen(true);
+  };
+
+  // Handle cancel subscription
+  const handleCancelSubscription = (child: UserData['children'][0]) => {
+    setCancelingSubscription(child);
+  };
+
+  const handleConfirmCancelSubscription = () => {
+    if (cancelingSubscription && onUpdateUserData) {
+      const updatedUserData = {
+        ...userData,
+        subscriptionStatus: 'paused' as const
+      };
+      onUpdateUserData(updatedUserData);
+    }
+    setCancelingSubscription(null);
+  };
+
+  const handleCancelCancelSubscription = () => {
+    setCancelingSubscription(null);
+  };
+
+  const handleResumeSubscription = () => {
+    if (onUpdateUserData) {
+      const updatedUserData = {
+        ...userData,
+        subscriptionStatus: 'active' as const
+      };
+      onUpdateUserData(updatedUserData);
+    }
+  };
+
+  const handleDeleteChild = (child: UserData['children'][0]) => {
+    if (onUpdateUserData) {
+      const updatedChildren = userData.children.filter(c => c.id !== child.id);
+      const updatedUserData = {
+        ...userData,
+        children: updatedChildren,
+        subscriptionStatus: updatedChildren.length === 0 ? 'not_subscribed' as const : userData.subscriptionStatus
+      };
+      onUpdateUserData(updatedUserData);
+    }
+  };
+
   // Render based on current view
+  if (editingChild) {
+    return (
+      <EditChildPage
+        child={editingChild}
+        onClose={() => setEditingChild(null)}
+        onSave={handleChildUpdate}
+        BottomNavigation={BottomNavigation}
+      />
+    );
+  }
+
+  if (editingSubscription) {
+    return (
+      <EditSubscriptionPage
+        child={editingSubscription}
+        onClose={() => setEditingSubscription(null)}
+        onSave={handleSubscriptionUpdate}
+        BottomNavigation={BottomNavigation}
+      />
+    );
+  }
+
+  if (cancelingSubscription) {
+    return (
+      <CancelSubscriptionPage
+        onCancel={handleCancelCancelSubscription}
+        onConfirm={handleConfirmCancelSubscription}
+      />
+    );
+  }
+
   if (showProfile) {
     return (
       <ProfilePage
@@ -292,9 +410,13 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({ userData, on
     return (
       <ChildrenAndSubscriptionsView
         userData={userData}
-        setShowChildrenScreen={setShowChildrenScreen}
         BottomNavigation={BottomNavigation}
         getAge={getAge}
+        onEditChild={setEditingChild}
+        onEditSubscription={setEditingSubscription}
+        onCancelSubscription={handleCancelSubscription}
+        onResumeSubscription={handleResumeSubscription}
+        onDeleteChild={handleDeleteChild}
       />
     );
   }

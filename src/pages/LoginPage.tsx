@@ -776,15 +776,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigateToKidsPage }) =>
             </div>
             
             {/* Bottom container with text and button - fixed at 1/3 of screen */}
-            <div className="bg-[#747EEC] px-4 py-6 flex flex-col justify-center" style={{ height: '33.33vh', minHeight: '280px' }}>
-              <h2 className="font-bold text-2xl mb-4 text-white text-center" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            <div className="bg-[#747EEC] px-4 flex flex-col" style={{ height: '33.33vh', minHeight: '280px' }}>
+              {/* Fixed top spacing */}
+              <div style={{ height: '40px' }}></div>
+              
+              <h2 className="font-bold text-2xl text-white text-center" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 {w.title}
               </h2>
-              <p className="text-base text-white/90 text-center mb-6 max-w-sm mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                {w.desc}
-              </p>
               
-              <div className="px-4">
+              {/* Flexible middle section for description */}
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-base text-white/90 text-center max-w-sm mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  {w.desc}
+                </p>
+              </div>
+              
+              {/* Fixed bottom section for button */}
+              <div className="px-4" style={{ paddingBottom: '40px' }}>
                 <button
                   onClick={() => {
                     if (welcomeIndex < welcomeScreens.length - 1) {
@@ -952,7 +960,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigateToKidsPage }) =>
                     childBirthDate && !birthDateValidation.isValid
                       ? 'border-red-400'
                       : childBirthDate && birthDateValidation.isValid
-                      ? 'border-green-400'
+                      ? 'border-[#7782F5]'
                       : childBirthDate
                       ? 'border-[#7782F5]'
                       : 'border-gray-200 focus-within:border-[#7782F5]'

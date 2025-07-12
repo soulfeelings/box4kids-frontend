@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
 import { KidsAppInterface } from "./pages/KidsAppInterface";
 import { UserData } from "./types";
+import { useScenarioNavigation, scenarioConfigs } from "./hooks/useScenarioNavigation";
 
 // Test data scenarios for different states
 const testUserDataScenarios: Record<string, UserData> = {
@@ -149,129 +151,139 @@ const testUserDataScenarios: Record<string, UserData> = {
   }
 };
 
-// Default test data
-const testUserData: UserData = testUserDataScenarios.nextSetDetermined;
-
-function App() {
-  const [currentPage, setCurrentPage] = useState<"login" | "kids" | "demo">("demo");
-  const [userData, setUserData] = useState<UserData | null>(null);
-
-  const handleNavigateToKidsPage = (data: UserData) => {
-    setUserData(data);
-    setCurrentPage("kids");
-  };
-
-  const handleUpdateUserData = (updatedData: UserData) => {
-    setUserData(updatedData);
-  };
+// Demo page component
+function DemoPage() {
+  const navigate = useNavigate();
 
   const handleTestDemo = (scenario: string) => {
-    setUserData(testUserDataScenarios[scenario]);
-    setCurrentPage("kids");
+    navigate(`/demo/${scenario}`);
   };
 
-  const handleBackToDemo = () => {
-    setCurrentPage("demo");
-    setUserData(null);
-  };
-
-  if (currentPage === "kids" && userData) {
-    return (
-      <div>
-        <div className="fixed top-4 left-4 z-50">
-          <button
-            onClick={handleBackToDemo}
-            className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
-          >
-            ← Назад к демо
-          </button>
-        </div>
-        <KidsAppInterface userData={userData} onUpdateUserData={handleUpdateUserData} />
-      </div>
-    );
-  }
-
-  if (currentPage === "demo") {
-    return (
-      <div className="min-h-screen bg-gray-100 p-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
-        <div className="max-w-md mx-auto bg-white rounded-2xl p-6 shadow-lg">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Демонстрация состояний приложения
-          </h1>
-          
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-medium text-gray-800 mb-3">Выберите состояние:</h2>
-              
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleTestDemo('notSubscribed')}
-                  className="w-full bg-red-100 text-red-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-red-200 transition-colors"
-                >
-                  <div className="font-medium">1. Не подписан</div>
-                  <div className="text-sm opacity-75">Пользователь не оформил подписку</div>
-                </button>
-                
-                <button
-                  onClick={() => handleTestDemo('justSubscribed')}
-                  className="w-full bg-green-100 text-green-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-green-200 transition-colors"
-                >
-                  <div className="font-medium">2. Только подписался</div>
-                  <div className="text-sm opacity-75">Первые 2 часа после подписки</div>
-                </button>
-                
-                <button
-                  onClick={() => handleTestDemo('nextSetNotDetermined')}
-                  className="w-full bg-yellow-100 text-yellow-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-yellow-200 transition-colors"
-                >
-                  <div className="font-medium">3. Набор не определен</div>
-                  <div className="text-sm opacity-75">Состав следующего набора еще не определен</div>
-                </button>
-                
-                <button
-                  onClick={() => handleTestDemo('nextSetDetermined')}
-                  className="w-full bg-blue-100 text-blue-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-blue-200 transition-colors"
-                >
-                  <div className="font-medium">4. Набор определен</div>
-                  <div className="text-sm opacity-75">Обычное состояние - состав следующего набора определен</div>
-                </button>
-                
-                <button
-                  onClick={() => handleTestDemo('multipleChildren')}
-                  className="w-full bg-purple-100 text-purple-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-purple-200 transition-colors"
-                >
-                  <div className="font-medium">5. Несколько детей</div>
-                  <div className="text-sm opacity-75">Семья с тремя детьми и их особенностями</div>
-                </button>
-              </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-gray-100 p-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      <div className="max-w-md mx-auto bg-white rounded-2xl p-6 shadow-lg">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+          Демонстрация состояний приложения
+        </h1>
+        
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-medium text-gray-800 mb-3">Выберите состояние:</h2>
             
-            <div className="border-t pt-4">
-              <button
-                onClick={() => setCurrentPage("login")}
-                className="w-full bg-gray-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors"
-              >
-                Перейти к регистрации
-              </button>
+            <div className="space-y-3">
+              {Object.entries(scenarioConfigs).map(([key, config]) => (
+                <button
+                  key={key}
+                  onClick={() => handleTestDemo(key)}
+                  className={`w-full bg-${config.color}-100 text-${config.color}-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-${config.color}-200 transition-colors`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">
+                        {config.title}
+                      </div>
+                      <div className="text-sm opacity-75">{config.description}</div>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      → /demo/{key}
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
+          </div>
+          
+          <div className="border-t pt-4">
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full bg-gray-100 text-gray-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-gray-200 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">
+                    Перейти к логину
+                  </div>
+                  <div className="text-sm opacity-75">Обычный вход в приложение</div>
+                </div>
+                <div className="text-sm text-gray-500">
+                  → /login
+                </div>
+              </div>
+            </button>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+// Demo state component
+function DemoState() {
+  const { 
+    currentScenario, 
+    navigateToDemo
+  } = useScenarioNavigation();
+
+  const initialUserData = currentScenario && testUserDataScenarios[currentScenario] 
+    ? testUserDataScenarios[currentScenario] 
+    : testUserDataScenarios.nextSetDetermined;
+
+  const [userData, setUserData] = React.useState(initialUserData);
+
+  // Обновляем данные при смене сценария
+  React.useEffect(() => {
+    const newUserData = currentScenario && testUserDataScenarios[currentScenario] 
+      ? testUserDataScenarios[currentScenario] 
+      : testUserDataScenarios.nextSetDetermined;
+    setUserData(newUserData);
+  }, [currentScenario]);
+
+  const handleUpdateUserData = (updatedData: UserData) => {
+    console.log('Updated user data:', updatedData);
+    setUserData(updatedData);
+  };
 
   return (
     <div>
-      <div className="fixed top-4 left-4 z-50">
+      {/* Navigation Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-sm border-b border-gray-200">
         <button
-          onClick={handleBackToDemo}
-          className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          onClick={navigateToDemo}
+          className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
         >
           ← Назад к демо
         </button>
       </div>
-      <LoginPage onNavigateToKidsPage={handleNavigateToKidsPage} />
+      
+      <div className="pt-16">
+        <KidsAppInterface userData={userData} onUpdateUserData={handleUpdateUserData} />
+      </div>
     </div>
+  );
+}
+
+// Login page wrapper
+function LoginPageWrapper() {
+  const handleNavigateToKidsPage = (data: UserData) => {
+    // В реальном приложении здесь была бы логика аутентификации
+    // Для демо просто переходим к состоянию по умолчанию
+    window.location.href = '/demo/nextSetDetermined';
+  };
+
+  return <LoginPage onNavigateToKidsPage={handleNavigateToKidsPage} />;
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<DemoPage />} />
+        <Route path="/login" element={<LoginPageWrapper />} />
+        <Route path="/demo/:scenario" element={<DemoState />} />
+        {/* Fallback для неизвестных маршрутов */}
+        <Route path="*" element={<DemoPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
