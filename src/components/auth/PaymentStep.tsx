@@ -1,41 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
-import { useAuthApi } from "../../hooks/useAuthApi";
+import {
+  useCreateBatchPaymentPaymentsCreateBatchPost,
+  useProcessPaymentPaymentsPaymentIdProcessPost,
+  useGetAllSubscriptionPlansSubscriptionPlansGet,
+} from "../../api-client";
 import { ROUTES } from "../../constants/routes";
-import { SubscriptionPlanResponse } from "../../types/api";
 
 export const PaymentStep: React.FC = () => {
   const navigate = useNavigate();
   const {
-    childData,
+    editingChild,
     subscriptionData,
     deliveryData,
     isLoading,
     setPaymentData,
   } = useRegistrationStore();
-  const { createPayment, processPayment, loadSubscriptionPlans } = useAuthApi();
+
+  const { data: plansData } = useGetAllSubscriptionPlansSubscriptionPlansGet();
+  const createBatchPaymentMutation =
+    useCreateBatchPaymentPaymentsCreateBatchPost();
+  const processPaymentMutation =
+    useProcessPaymentPaymentsPaymentIdProcessPost();
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
-  const [availablePlans, setAvailablePlans] = useState<
-    SubscriptionPlanResponse[]
-  >([]);
-
-  // Загрузка планов при монтировании
-  useEffect(() => {
-    const loadPlans = async () => {
-      try {
-        const plansResponse = await loadSubscriptionPlans();
-        if (plansResponse) {
-          setAvailablePlans(plansResponse.plans);
-        }
-      } catch (error) {
-        console.error("Failed to load subscription plans:", error);
-      }
-    };
-
-    loadPlans();
-  }, [loadSubscriptionPlans]);
+  const availablePlans = plansData?.plans || [];
 
   const handleBack = () => {
     navigate(ROUTES.AUTH.DELIVERY);
@@ -51,10 +41,20 @@ export const PaymentStep: React.FC = () => {
     setPaymentProcessing(true);
     try {
       // Создаем платеж
-      await createPayment([subscriptionData.subscriptionId]);
+      const paymentResponse = await createBatchPaymentMutation.mutateAsync({
+        data: {
+          subscription_ids: [subscriptionData.subscriptionId],
+        },
+      });
 
-      // Здесь можно добавить логику для обработки платежа
-      // если нужно вызвать processPayment
+      // Сохраняем данные платежа в store
+      setPaymentData({
+        paymentId: paymentResponse.payment_id,
+        status: "created",
+      });
+
+      // Переходим к успешному завершению или обработке платежа
+      navigate(ROUTES.APP.ROOT); // или другой маршрут для завершения
     } catch (error) {
       console.error("Payment error:", error);
     } finally {
@@ -159,7 +159,7 @@ export const PaymentStep: React.FC = () => {
               className="text-lg font-semibold text-gray-900 mb-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Набор для {childData.name}
+              Набор для {editingChild?.name}
             </h2>
 
             <div className="space-y-2">

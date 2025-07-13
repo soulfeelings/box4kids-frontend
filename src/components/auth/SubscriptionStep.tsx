@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
-import { useAuthApi } from "../../hooks/useAuthApi";
+import {
+  useGetAllSubscriptionPlansSubscriptionPlansGet,
+  useCreateSubscriptionOrderSubscriptionsPost,
+  useGetAllInterestsInterestsGet,
+  useGetAllSkillsSkillsGet,
+} from "../../api-client";
 import { ROUTES } from "../../constants/routes";
-import { SubscriptionPlanResponse } from "../../types/api";
 
 // Tag component for interests and skills
 const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({
@@ -23,59 +27,30 @@ const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({
   </span>
 );
 
-// Interest icons mapping
-const interestIcons: Record<string, string> = {
-  Конструкторы: "🧱",
-  Плюшевые: "🧸",
-  Ролевые: "🎭",
-  Развивающие: "🧠",
-  Техника: "⚙️",
-  Творчество: "🎨",
-};
-
-// Skills icons mapping
-const skillIcons: Record<string, string> = {
-  Моторика: "✋",
-  Логика: "🧩",
-  Воображение: "💭",
-  Творчество: "🎨",
-  Речь: "🗣",
-};
-
 export const SubscriptionStep: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    childData,
-    categoriesData,
-    subscriptionData,
-    setSubscriptionData,
-    isLoading,
-  } = useRegistrationStore();
-  const { loadSubscriptionPlans, createSubscription } = useAuthApi();
+  const { editingChild, subscriptionData, setSubscriptionData, isLoading } =
+    useRegistrationStore();
 
-  const [availablePlans, setAvailablePlans] = useState<
-    SubscriptionPlanResponse[]
-  >([]);
-  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const { data: plansData, isLoading: isLoadingPlans } =
+    useGetAllSubscriptionPlansSubscriptionPlansGet();
+  const createSubscriptionMutation =
+    useCreateSubscriptionOrderSubscriptionsPost();
+  const { data: interestsData } = useGetAllInterestsInterestsGet();
+  const { data: skillsData } = useGetAllSkillsSkillsGet();
 
-  // Загрузка планов при монтировании
-  useEffect(() => {
-    const loadPlans = async () => {
-      setIsLoadingPlans(true);
-      try {
-        const plansResponse = await loadSubscriptionPlans();
-        if (plansResponse) {
-          setAvailablePlans(plansResponse.plans);
-        }
-      } catch (error) {
-        console.error("Failed to load subscription plans:", error);
-      } finally {
-        setIsLoadingPlans(false);
-      }
-    };
+  const availablePlans = plansData?.plans || [];
 
-    loadPlans();
-  }, [loadSubscriptionPlans]);
+  // Функции для получения названий по ID
+  const getInterestName = (id: number) => {
+    const interest = interestsData?.interests.find((i) => i.id === id);
+    return interest?.name || `Интерес ${id}`;
+  };
+
+  const getSkillName = (id: number) => {
+    const skill = skillsData?.skills.find((s) => s.id === id);
+    return skill?.name || `Навык ${id}`;
+  };
 
   const handleBack = () => {
     navigate(ROUTES.AUTH.CATEGORIES);
@@ -110,7 +85,7 @@ export const SubscriptionStep: React.FC = () => {
   };
 
   const handleSubscriptionSubmit = async () => {
-    if (!subscriptionData.plan) return;
+    if (!subscriptionData.plan || !editingChild?.id) return;
 
     const selectedPlan = availablePlans.find(
       (plan) => mapPlanNameToType(plan.name) === subscriptionData.plan
@@ -118,10 +93,25 @@ export const SubscriptionStep: React.FC = () => {
 
     if (!selectedPlan) return;
 
-    // Предполагаем, что child имеет ID (нужно будет получить из создания child)
-    const childId = 1; // TODO: получить из store после создания child
+    try {
+      await createSubscriptionMutation.mutateAsync({
+        data: {
+          child_id: editingChild.id,
+          plan_id: selectedPlan.id,
+        },
+      });
 
-    await createSubscription(childId, selectedPlan.id);
+      // Обновляем данные подписки в store
+      setSubscriptionData({
+        subscriptionId: selectedPlan.id,
+        plan: subscriptionData.plan,
+      });
+
+      // Переходим к следующему шагу
+      navigate(ROUTES.AUTH.DELIVERY);
+    } catch (error) {
+      console.error("Failed to create subscription:", error);
+    }
   };
 
   const isSubscriptionValid = subscriptionData.plan !== "";
@@ -178,7 +168,7 @@ export const SubscriptionStep: React.FC = () => {
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Какой набор подойдёт {childData.name}?
+            Какой набор подойдёт {editingChild?.name}?
           </h1>
         </div>
 
@@ -199,7 +189,7 @@ export const SubscriptionStep: React.FC = () => {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full flex items-center justify-center">
                 <span className="font-semibold text-2xl">
-                  {childData.gender === "male" ? "👦🏻" : "👩🏻"}
+                  {editingChild?.gender === "male" ? "👦🏻" : "👩🏻"}
                 </span>
               </div>
               <div>
@@ -207,7 +197,10 @@ export const SubscriptionStep: React.FC = () => {
                   className="font-semibold text-gray-900"
                   style={{ fontFamily: "Nunito, sans-serif" }}
                 >
-                  {childData.name}, {calculateAge(childData.birthDate)}
+                  {editingChild?.name},{" "}
+                  {editingChild?.birthDate
+                    ? calculateAge(editingChild.birthDate)
+                    : ""}
                 </h2>
               </div>
             </div>
@@ -221,14 +214,20 @@ export const SubscriptionStep: React.FC = () => {
                 Интересы
               </h3>
               <div className="flex flex-wrap gap-2">
-                {categoriesData.interests.map((interest, idx) => (
-                  <Tag key={idx} selected={true}>
-                    <span className="mr-1">
-                      {interestIcons[interest] || "🎯"}
-                    </span>
-                    {interest}
-                  </Tag>
-                ))}
+                {editingChild?.interestIds?.map((interestId, idx) => {
+                  const interestName = getInterestName(interestId);
+                  // Извлекаем эмодзи и текст из названия интереса
+                  const match = interestName.match(/^(\S+)\s+(.+)$/);
+                  const emoji = match ? match[1] : "🎯";
+                  const name = match ? match[2] : interestName;
+
+                  return (
+                    <Tag key={idx} selected={true}>
+                      <span className="mr-1">{emoji}</span>
+                      {name}
+                    </Tag>
+                  );
+                })}
               </div>
             </div>
 
@@ -241,12 +240,20 @@ export const SubscriptionStep: React.FC = () => {
                 Навыки для развития
               </h3>
               <div className="flex flex-wrap gap-2">
-                {categoriesData.skills.map((skill, idx) => (
-                  <Tag key={idx} selected={true}>
-                    <span className="mr-1">{skillIcons[skill] || "⭐"}</span>
-                    {skill}
-                  </Tag>
-                ))}
+                {editingChild?.skillIds?.map((skillId, idx) => {
+                  const skillName = getSkillName(skillId);
+                  // Извлекаем эмодзи и текст из названия навыка
+                  const match = skillName.match(/^(\S+)\s+(.+)$/);
+                  const emoji = match ? match[1] : "⭐";
+                  const name = match ? match[2] : skillName;
+
+                  return (
+                    <Tag key={idx} selected={true}>
+                      <span className="mr-1">{emoji}</span>
+                      {name}
+                    </Tag>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -317,7 +324,7 @@ export const SubscriptionStep: React.FC = () => {
                     Состав набора игрушек
                   </p>
                   <div className="space-y-3">
-                    {plan.toy_configurations.map((config) => (
+                    {plan.toy_configurations?.map((config) => (
                       <div key={config.id} className="flex items-center gap-3">
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center text-lg"

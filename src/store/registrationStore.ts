@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AUTH_STEPS, AuthStep } from "../constants/auth";
 import { UserData } from "../types";
+import { Gender } from "../api-client/model/gender";
 
 // Типы для данных каждого шага
 export interface PhoneData {
@@ -21,13 +22,25 @@ export interface RegisterData {
   name: string;
 }
 
-export interface ChildData {
-  id?: number; // Добавляем ID
+export interface StoredChild {
+  id: number;
   name: string;
   birthDate: string;
-  gender: string;
+  gender: Gender;
   limitations: string;
   comment: string;
+}
+
+// Данные ребенка во время редактирования
+export interface EditingChild {
+  id?: number; // Если есть ID - редактируем, если нет - создаем
+  name: string;
+  birthDate: string;
+  gender: Gender | null;
+  limitations: string;
+  comment: string;
+  interestIds: number[];
+  skillIds: number[];
 }
 
 export interface CategoriesData {
@@ -63,7 +76,11 @@ interface RegistrationState {
   phoneData: PhoneData;
   welcomeData: WelcomeData;
   registerData: RegisterData;
-  children: ChildData[]; // Изменяем на массив
+  children: StoredChild[];
+
+  // Редактируемый ребенок
+  editingChild: EditingChild | null;
+
   categoriesData: CategoriesData;
   subscriptionData: SubscriptionData;
   deliveryData: DeliveryData;
@@ -85,9 +102,13 @@ interface RegistrationState {
   setPhoneData: (data: Partial<PhoneData>) => void;
   setWelcomeData: (data: Partial<WelcomeData>) => void;
   setRegisterData: (data: Partial<RegisterData>) => void;
-  addChild: (child: ChildData) => void; // Добавить ребенка
-  updateChild: (id: number, data: Partial<ChildData>) => void; // Обновить ребенка
-  getCurrentChild: () => ChildData | null; // Получить текущего ребенка
+  addChild: (child: StoredChild) => void;
+
+  // Методы для работы с editingChild
+  setEditingChild: (child: EditingChild | null) => void;
+  updateEditingChild: (updates: Partial<EditingChild>) => void;
+  resetEditingChild: () => void;
+
   setCategoriesData: (data: Partial<CategoriesData>) => void;
   setSubscriptionData: (data: Partial<SubscriptionData>) => void;
   setDeliveryData: (data: Partial<DeliveryData>) => void;
@@ -100,10 +121,6 @@ interface RegistrationState {
   // Аутентификация
   setUser: (user: UserData, userId: number) => void;
   logout: () => void;
-
-  // Для обратной совместимости
-  childData: ChildData; // Виртуальное поле для текущего ребенка
-  setChildData: (data: Partial<ChildData>) => void; // Обновить текущего ребенка
 }
 
 // Начальное состояние
@@ -125,6 +142,7 @@ const initialState = {
     name: "",
   },
   children: [], // Пустой массив детей
+  editingChild: null, // Нет редактируемого ребенка
   categoriesData: {
     interests: [],
     skills: [],
@@ -160,20 +178,6 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
     return get().userId !== null;
   },
 
-  // Виртуальное поле для текущего ребенка (обратная совместимость)
-  get childData() {
-    const children = get().children;
-    return (
-      children[0] || {
-        name: "",
-        birthDate: "",
-        gender: "",
-        limitations: "",
-        comment: "",
-      }
-    );
-  },
-
   // Действия
   setCurrentStep: (step) => set({ currentStep: step }),
 
@@ -192,49 +196,32 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
       registerData: { ...state.registerData, ...data },
     })),
 
-  // Новые методы для работы с детьми
   addChild: (child) =>
     set((state) => ({
       children: [...state.children, child],
     })),
 
-  updateChild: (id, data) =>
+  // Методы для работы с editingChild
+  setEditingChild: (child) => set({ editingChild: child }),
+
+  updateEditingChild: (updates) =>
     set((state) => ({
-      children: state.children.map((child) =>
-        child.id === id ? { ...child, ...data } : child
-      ),
+      editingChild: state.editingChild
+        ? { ...state.editingChild, ...updates }
+        : null,
     })),
 
-  getCurrentChild: () => {
-    const children = get().children;
-    return children[0] || null;
-  },
-
-  // Для обратной совместимости - обновляем первого ребенка или создаем нового
-  setChildData: (data) =>
-    set((state) => {
-      if (state.children.length === 0) {
-        // Создаем нового ребенка
-        return {
-          children: [
-            {
-              ...data,
-              name: data.name || "",
-              birthDate: data.birthDate || "",
-              gender: data.gender || "",
-              limitations: data.limitations || "",
-              comment: data.comment || "",
-            },
-          ],
-        };
-      } else {
-        // Обновляем первого ребенка
-        return {
-          children: state.children.map((child, index) =>
-            index === 0 ? { ...child, ...data } : child
-          ),
-        };
-      }
+  resetEditingChild: () =>
+    set({
+      editingChild: {
+        name: "",
+        birthDate: "",
+        gender: null,
+        limitations: "",
+        comment: "",
+        interestIds: [],
+        skillIds: [],
+      },
     }),
 
   setCategoriesData: (data) =>

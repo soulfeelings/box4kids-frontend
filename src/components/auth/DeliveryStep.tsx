@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
-import { useAuthApi } from "../../hooks/useAuthApi";
 import { ROUTES } from "../../constants/routes";
+import { useCreateDeliveryAddressDeliveryAddressesPost } from "../../api-client";
 
 export const DeliveryStep: React.FC = () => {
   const navigate = useNavigate();
-  const { deliveryData, setDeliveryData, isLoading } = useRegistrationStore();
-  const { createDeliveryAddress } = useAuthApi();
+  const { deliveryData, setDeliveryData, userId } = useRegistrationStore();
+  const createDeliveryAddressMutation =
+    useCreateDeliveryAddressDeliveryAddressesPost();
 
   const handleBack = () => {
     navigate(ROUTES.AUTH.SUBSCRIPTION);
@@ -76,11 +77,23 @@ export const DeliveryStep: React.FC = () => {
 
   const handleDeliverySubmit = async () => {
     if (!isDeliveryFormValid) return;
-    await createDeliveryAddress();
+    await createDeliveryAddressMutation.mutateAsync({
+      data: {
+        name: deliveryData.address,
+        address: deliveryData.address,
+        delivery_time_preference: deliveryData.time,
+        courier_comment: deliveryData.comment,
+      },
+      params: {
+        user_id: userId!,
+      },
+    });
   };
 
   const isDeliveryFormValid =
     deliveryData.address.trim() && deliveryData.date && deliveryData.time;
+
+  const isLoading = createDeliveryAddressMutation.isPending;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

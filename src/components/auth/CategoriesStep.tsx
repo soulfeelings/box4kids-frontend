@@ -11,61 +11,54 @@ import { X } from "lucide-react";
 
 export const CategoriesStep: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    categoriesData,
-    setCategoriesData,
-    childData,
-    updateChild,
-    setError,
-  } = useRegistrationStore();
+  const { editingChild, updateEditingChild, setError } = useRegistrationStore();
 
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
   const [selectedInterests, setSelectedInterests] = useState<number[]>(
-    categoriesData.interestIds || []
+    editingChild?.interestIds || []
   );
   const [selectedSkills, setSelectedSkills] = useState<number[]>(
-    categoriesData.skillIds || []
+    editingChild?.skillIds || []
   );
+
+  // Синхронизируем состояние с editingChild при изменении
+  useEffect(() => {
+    if (editingChild) {
+      setSelectedInterests(editingChild.interestIds || []);
+      setSelectedSkills(editingChild.skillIds || []);
+    }
+  }, [editingChild]);
 
   const handleUpdateChildCategories = async (
     interestIds: number[],
     skillIds: number[]
   ) => {
+    if (!editingChild?.id) {
+      setError("ID ребенка не найден");
+      return;
+    }
+
     try {
-      // Получаем ID текущего ребенка
-      const childId = childData.id;
-
-      if (!childId) {
-        setError("ID ребенка не найден");
-        return;
-      }
-
       await updateChildMutation.mutateAsync({
-        childId,
+        childId: editingChild.id,
         data: {
-          name: childData.name,
-          date_of_birth: childData.birthDate,
-          gender: childData.gender as any, // TODO: исправить типы
-          has_limitations: childData.limitations === "has_limitations",
-          comment: childData.comment,
+          name: editingChild.name,
+          date_of_birth: editingChild.birthDate,
+          gender: editingChild.gender,
+          has_limitations: editingChild.limitations === "has_limitations",
+          comment: editingChild.comment,
           interest_ids: interestIds,
           skill_ids: skillIds,
         },
       });
 
-      // Обновляем данные в store
-      updateChild(childId, {
-        name: childData.name,
-        birthDate: childData.birthDate,
-        gender: childData.gender,
-        limitations: childData.limitations,
-        comment: childData.comment,
-      });
+      // Обновляем editingChild с интересами и навыками
+      updateEditingChild({ interestIds, skillIds });
 
-      setCategoriesData({ interestIds, skillIds });
+      // Переходим на следующий шаг
       navigate(ROUTES.AUTH.SUBSCRIPTION);
     } catch (error) {
       setError("Не удалось обновить категории");
@@ -120,8 +113,24 @@ export const CategoriesStep: React.FC = () => {
   const isCategoriesFormValid =
     selectedInterests.length > 0 && selectedSkills.length > 0;
 
-  // Проверяем наличие ID ребенка
-  if (!childData.id) {
+  // Проверяем наличие editingChild и ID ребенка
+  if (!editingChild) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white items-center justify-center">
+        <p className="text-red-500 font-medium">
+          Ошибка: Данные ребенка не найдены. Вернитесь к предыдущему шагу.
+        </p>
+        <button
+          onClick={handleBack}
+          className="mt-4 px-4 py-2 bg-gray-200 rounded-lg"
+        >
+          Назад
+        </button>
+      </div>
+    );
+  }
+
+  if (!editingChild.id) {
     return (
       <div className="flex flex-col min-h-screen bg-white items-center justify-center">
         <p className="text-red-500 font-medium">

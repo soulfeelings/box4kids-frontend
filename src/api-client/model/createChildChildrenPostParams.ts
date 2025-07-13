@@ -7,5 +7,5 @@
  */
 
 export type CreateChildChildrenPostParams = {
-parent_id: number;
+  parent_id: number;
 };

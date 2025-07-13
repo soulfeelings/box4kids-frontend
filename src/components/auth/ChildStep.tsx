@@ -1,13 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
-import { useAuthApi } from "../../hooks/useAuthApi";
 import { ROUTES } from "../../constants/routes";
+import { useCreateChildChildrenPost } from "../../api-client";
+import { Gender } from "../../api-client/model/gender";
 
 export const ChildStep: React.FC = () => {
   const navigate = useNavigate();
-  const { childData, setChildData, isLoading } = useRegistrationStore();
-  const { createChild } = useAuthApi();
+  const {
+    userId,
+    addChild,
+    editingChild,
+    updateEditingChild,
+    resetEditingChild,
+  } = useRegistrationStore();
+  const createChildMutation = useCreateChildChildrenPost();
+
+  // Инициализируем editingChild при загрузке компонента
+  useEffect(() => {
+    if (!editingChild) {
+      resetEditingChild();
+    }
+  }, [editingChild, resetEditingChild]);
+
+  // Если editingChild еще не инициализирован, показываем заглушку
+  if (!editingChild) {
+    return <div>Загрузка...</div>;
+  }
 
   const handleBack = () => {
     navigate(ROUTES.AUTH.REGISTER);
@@ -84,18 +103,50 @@ export const ChildStep: React.FC = () => {
 
   const handleChildSubmit = async () => {
     if (!isFormValid) return;
-    await createChild();
+
+    try {
+      const response = await createChildMutation.mutateAsync({
+        data: {
+          name: editingChild.name,
+          date_of_birth: editingChild.birthDate,
+          gender: editingChild.gender as Gender,
+          has_limitations: editingChild.limitations === "has_limitations",
+          comment: editingChild.comment,
+        },
+        params: {
+          parent_id: userId!,
+        },
+      });
+
+      // Добавляем созданного ребенка в store
+      addChild({
+        id: response.id,
+        name: response.name,
+        birthDate: response.date_of_birth,
+        gender: response.gender,
+        limitations: response.has_limitations ? "has_limitations" : "none",
+        comment: response.comment || "",
+      });
+
+      // Обновляем editingChild с ID созданного ребенка
+      updateEditingChild({ id: response.id });
+
+      // Переходим на следующий шаг
+      navigate(ROUTES.AUTH.CATEGORIES);
+    } catch (error) {
+      console.error("Ошибка при создании ребенка:", error);
+    }
   };
 
-  const birthDateValidation = validateBirthDate(childData.birthDate);
+  const birthDateValidation = validateBirthDate(editingChild.birthDate);
   const isFormValid =
-    childData.name.trim() &&
+    editingChild.name.trim() &&
     birthDateValidation.isValid &&
-    childData.gender &&
-    childData.limitations &&
-    (childData.limitations === "none" ||
-      (childData.limitations === "has_limitations" &&
-        childData.comment.trim()));
+    editingChild.gender &&
+    editingChild.limitations &&
+    (editingChild.limitations === "none" ||
+      (editingChild.limitations === "has_limitations" &&
+        editingChild.comment.trim()));
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -164,7 +215,7 @@ export const ChildStep: React.FC = () => {
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                childData.name
+                editingChild.name
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -172,8 +223,10 @@ export const ChildStep: React.FC = () => {
               <input
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
                 placeholder=""
-                value={childData.name}
-                onChange={(e) => setChildData({ name: e.target.value })}
+                value={editingChild.name}
+                onChange={(e) => {
+                  updateEditingChild({ name: e.target.value });
+                }}
                 maxLength={32}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
@@ -190,11 +243,11 @@ export const ChildStep: React.FC = () => {
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                childData.birthDate && !birthDateValidation.isValid
+                editingChild.birthDate && !birthDateValidation.isValid
                   ? "border-red-400"
-                  : childData.birthDate && birthDateValidation.isValid
+                  : editingChild.birthDate && birthDateValidation.isValid
                   ? "border-green-400"
-                  : childData.birthDate
+                  : editingChild.birthDate
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -203,16 +256,16 @@ export const ChildStep: React.FC = () => {
                 type="text"
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
                 placeholder=""
-                value={childData.birthDate}
+                value={editingChild.birthDate}
                 onChange={(e) => {
                   const formatted = formatDateInput(e.target.value, true);
-                  setChildData({ birthDate: formatted });
+                  updateEditingChild({ birthDate: formatted });
                 }}
                 maxLength={10}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
             </div>
-            {childData.birthDate && !birthDateValidation.isValid && (
+            {editingChild.birthDate && !birthDateValidation.isValid && (
               <p
                 className="text-sm text-red-400 px-3"
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -232,9 +285,9 @@ export const ChildStep: React.FC = () => {
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() => setChildData({ gender: "male" })}
+                onClick={() => updateEditingChild({ gender: "male" })}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  childData.gender === "male"
+                  editingChild.gender === "male"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -243,9 +296,9 @@ export const ChildStep: React.FC = () => {
                 Мужской
               </button>
               <button
-                onClick={() => setChildData({ gender: "female" })}
+                onClick={() => updateEditingChild({ gender: "female" })}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  childData.gender === "female"
+                  editingChild.gender === "female"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -266,9 +319,9 @@ export const ChildStep: React.FC = () => {
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() => setChildData({ limitations: "none" })}
+                onClick={() => updateEditingChild({ limitations: "none" })}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  childData.limitations === "none"
+                  editingChild.limitations === "none"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -277,9 +330,11 @@ export const ChildStep: React.FC = () => {
                 Нет
               </button>
               <button
-                onClick={() => setChildData({ limitations: "has_limitations" })}
+                onClick={() =>
+                  updateEditingChild({ limitations: "has_limitations" })
+                }
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  childData.limitations === "has_limitations"
+                  editingChild.limitations === "has_limitations"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -300,10 +355,10 @@ export const ChildStep: React.FC = () => {
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                childData.limitations === "has_limitations" &&
-                !childData.comment.trim()
+                editingChild.limitations === "has_limitations" &&
+                !editingChild.comment.trim()
                   ? "border-red-400"
-                  : childData.comment
+                  : editingChild.comment
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -311,19 +366,21 @@ export const ChildStep: React.FC = () => {
               <textarea
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
                 placeholder={
-                  childData.limitations === "has_limitations"
+                  editingChild.limitations === "has_limitations"
                     ? "Опишите ограничения ребенка..."
                     : "Дополнительная информация о ребенке..."
                 }
-                value={childData.comment}
-                onChange={(e) => setChildData({ comment: e.target.value })}
+                value={editingChild.comment}
+                onChange={(e) =>
+                  updateEditingChild({ comment: e.target.value })
+                }
                 rows={3}
                 maxLength={200}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
             </div>
-            {childData.limitations === "has_limitations" &&
-              !childData.comment.trim() && (
+            {editingChild.limitations === "has_limitations" &&
+              !editingChild.comment.trim() && (
                 <p
                   className="text-sm text-red-400 px-3"
                   style={{ fontFamily: "Nunito, sans-serif" }}
@@ -339,18 +396,21 @@ export const ChildStep: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-            isFormValid && !isLoading
+            isFormValid && !createChildMutation.isPending
               ? "text-white shadow-sm"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
-          disabled={!isFormValid || isLoading}
+          disabled={!isFormValid || createChildMutation.isPending}
           onClick={handleChildSubmit}
           style={{
             fontFamily: "Nunito, sans-serif",
-            backgroundColor: isFormValid && !isLoading ? "#30313D" : undefined,
+            backgroundColor:
+              isFormValid && !createChildMutation.isPending
+                ? "#30313D"
+                : undefined,
           }}
         >
-          {isLoading ? "Сохраняем..." : "Продолжить"}
+          {createChildMutation.isPending ? "Сохраняем..." : "Продолжить"}
         </button>
       </div>
     </div>
