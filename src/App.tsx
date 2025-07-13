@@ -1,225 +1,50 @@
-import React, { useState } from "react";
-import { LoginPage } from "./pages/LoginPage";
+import React from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { DemoPage } from "./pages/DemoPage";
 import { KidsAppInterface } from "./pages/KidsAppInterface";
+// import { ProfilePage } from "./pages/ProfilePage";
+// import { SupportPage } from "./pages/SupportPage";
+// import { DeliveryHistoryPage } from "./pages/DeliveryHistoryPage";
 import { UserData } from "./types";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { RouteGuard } from "./components/common/RouteGuard";
+import { AppLayout } from "./components/layout/AppLayout";
+import { AuthContainer } from "./components/layout/AuthContainer";
+import { ROUTES } from "./constants/routes";
 
-// Test data scenarios for different states
-const testUserDataScenarios: Record<string, UserData> = {
-  // 1. User not subscribed
-  notSubscribed: {
-    name: "Елена",
-    phone: "+7 (999) 123-45-67",
-    children: [
-      {
-        id: 1,
-        name: "Алина",
-        birthDate: "2016-03-15",
-        gender: "female",
-        limitations: "none",
-        comment: "",
-        interests: ["Конструкторы", "Творчество"],
-        skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "",
-      },
-    ],
-    deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
-    deliveryDate: "24.04",
-    deliveryTime: "14-18",
-    subscriptionStatus: "not_subscribed",
-    nextSetStatus: "not_determined",
-  },
+// Импорт компонентов шагов авторизации
+import { PhoneStep } from "./components/auth/PhoneStep";
+import { CodeStep } from "./components/auth/CodeStep";
+import { WelcomeStep } from "./components/auth/WelcomeStep";
+import { RegisterStep } from "./components/auth/RegisterStep";
+import { ChildStep } from "./components/auth/ChildStep";
+import { CategoriesStep } from "./components/auth/CategoriesStep";
+import { SubscriptionStep } from "./components/auth/SubscriptionStep";
+import { DeliveryStep } from "./components/auth/DeliveryStep";
+import { PaymentStep } from "./components/auth/PaymentStep";
+import { SuccessStep } from "./components/auth/SuccessStep";
 
-  // 2. User just subscribed (first 2 hours)
-  justSubscribed: {
-    name: "Елена",
-    phone: "+7 (999) 123-45-67",
-    children: [
-      {
-        id: 1,
-        name: "Алина",
-        birthDate: "2016-03-15",
-        gender: "female",
-        limitations: "none",
-        comment: "",
-        interests: ["Конструкторы", "Творчество"],
-        skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base",
-      },
-    ],
-    deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
-    deliveryDate: "24.04",
-    deliveryTime: "14-18",
-    subscriptionStatus: "just_subscribed",
-    nextSetStatus: "not_determined",
-    subscriptionDate: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
-  },
+// Временный компонент для app маршрутов
+const AppRoutes: React.FC = () => {
+  const { userId, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // 3. Next set not determined
-  nextSetNotDetermined: {
-    name: "Елена",
-    phone: "+7 (999) 123-45-67",
-    children: [
-      {
-        id: 1,
-        name: "Алина",
-        birthDate: "2016-03-15",
-        gender: "female",
-        limitations: "none",
-        comment: "",
-        interests: ["Конструкторы", "Творчество"],
-        skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base",
-      },
-    ],
-    deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
-    deliveryDate: "24.04",
-    deliveryTime: "14-18",
-    subscriptionStatus: "active",
-    nextSetStatus: "not_determined",
-  },
-
-  // 4. Next set determined (original state)
-  nextSetDetermined: {
-    name: "Елена",
-    phone: "+7 (999) 123-45-67",
-    children: [
-      {
-        id: 1,
-        name: "Алина",
-        birthDate: "2016-03-15",
-        gender: "female",
-        limitations: "none",
-        comment: "",
-        interests: ["Конструкторы", "Творчество"],
-        skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base",
-      },
-    ],
-    deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
-    deliveryDate: "24.04",
-    deliveryTime: "14-18",
-    subscriptionStatus: "active",
-    nextSetStatus: "determined",
-  },
-};
-
-// Default test data
-const testUserData: UserData = testUserDataScenarios.nextSetDetermined;
-
-function App() {
-  const [currentPage, setCurrentPage] = useState<"login" | "kids" | "demo">(
-    "demo"
-  );
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
-
-  const handleNavigateToKidsPage = (data: UserData, userId?: number) => {
-    setUserData(data);
-    setUserId(userId || 1); // Fallback на тестового пользователя для демо
-    setCurrentPage("kids");
-  };
-
-  const handleTestDemo = (scenario: string) => {
-    setUserData(testUserDataScenarios[scenario]);
-    setUserId(1); // Тестовый пользователь для демо
-    setCurrentPage("kids");
-  };
+  // Если не авторизован - перенаправляем на регистрацию
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.AUTH.PHONE} replace />;
+  }
 
   const handleBackToDemo = () => {
-    setCurrentPage("demo");
-    setUserData(null);
-    setUserId(null);
+    logout(); // Очищаем состояние
+    navigate(ROUTES.DEMO);
   };
-
-  if (currentPage === "kids" && userId) {
-    return (
-      <div>
-        <div className="fixed top-4 left-4 z-50">
-          <button
-            onClick={handleBackToDemo}
-            className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
-          >
-            ← Назад к демо
-          </button>
-        </div>
-        <KidsAppInterface userId={userId} />
-      </div>
-    );
-  }
-
-  if (currentPage === "demo") {
-    return (
-      <div
-        className="min-h-screen bg-gray-100 p-4"
-        style={{ fontFamily: "Nunito, sans-serif" }}
-      >
-        <div className="max-w-md mx-auto bg-white rounded-2xl p-6 shadow-lg">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Демонстрация состояний приложения
-          </h1>
-
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-medium text-gray-800 mb-3">
-                Выберите состояние:
-              </h2>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleTestDemo("notSubscribed")}
-                  className="w-full bg-red-100 text-red-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-red-200 transition-colors"
-                >
-                  <div className="font-medium">1. Не подписан</div>
-                  <div className="text-sm opacity-75">
-                    Пользователь не оформил подписку
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleTestDemo("justSubscribed")}
-                  className="w-full bg-green-100 text-green-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-green-200 transition-colors"
-                >
-                  <div className="font-medium">2. Только подписался</div>
-                  <div className="text-sm opacity-75">
-                    Первые 2 часа после подписки
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleTestDemo("nextSetNotDetermined")}
-                  className="w-full bg-yellow-100 text-yellow-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-yellow-200 transition-colors"
-                >
-                  <div className="font-medium">3. Набор не определен</div>
-                  <div className="text-sm opacity-75">
-                    Состав следующего набора еще не определен
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleTestDemo("nextSetDetermined")}
-                  className="w-full bg-blue-100 text-blue-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-blue-200 transition-colors"
-                >
-                  <div className="font-medium">4. Набор определен</div>
-                  <div className="text-sm opacity-75">
-                    Обычное состояние - состав следующего набора определен
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <button
-                onClick={() => setCurrentPage("login")}
-                className="w-full bg-gray-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors"
-              >
-                Перейти к регистрации
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -231,8 +56,96 @@ function App() {
           ← Назад к демо
         </button>
       </div>
-      <LoginPage onNavigateToKidsPage={handleNavigateToKidsPage} />
+      <KidsAppInterface userId={userId!} />
     </div>
+  );
+};
+
+// Основное приложение с роутингом
+const AppWithRoutes: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Главная страница - редирект на /demo */}
+        <Route
+          path={ROUTES.HOME}
+          element={<Navigate to={ROUTES.DEMO} replace />}
+        />
+
+        {/* Демонстрация состояний */}
+        <Route path={ROUTES.DEMO} element={<DemoPage />} />
+
+        {/* Авторизация - компоненты напрямую с AuthContainer */}
+        <Route
+          path={ROUTES.AUTH.PHONE}
+          element={
+            <AuthContainer>
+              <PhoneStep />
+            </AuthContainer>
+          }
+        />
+        <Route
+          path={ROUTES.AUTH.CODE}
+          element={
+            <AuthContainer>
+              <CodeStep />
+            </AuthContainer>
+          }
+        />
+
+        {/* WelcomeStep использует свой fullscreen layout */}
+        <Route path={ROUTES.AUTH.WELCOME} element={<WelcomeStep />} />
+
+        {/* Остальные шаги - пока заглушки, потом добавим с AuthContainer */}
+        <Route path={ROUTES.AUTH.REGISTER} element={<RegisterStep />} />
+        <Route path={ROUTES.AUTH.CHILD} element={<ChildStep />} />
+        <Route path={ROUTES.AUTH.CATEGORIES} element={<CategoriesStep />} />
+        <Route path={ROUTES.AUTH.SUBSCRIPTION} element={<SubscriptionStep />} />
+        <Route path={ROUTES.AUTH.DELIVERY} element={<DeliveryStep />} />
+        <Route path={ROUTES.AUTH.PAYMENT} element={<PaymentStep />} />
+        <Route path={ROUTES.AUTH.SUCCESS} element={<SuccessStep />} />
+
+        {/* Приложение - защищенные маршруты */}
+        <Route
+          path={ROUTES.APP.ROOT}
+          element={
+            <RouteGuard>
+              <AppLayout />
+            </RouteGuard>
+          }
+        >
+          <Route index element={<AppRoutes />} />
+          {/* TODO: Адаптировать для router */}
+          {/* <Route path="profile" element={<ProfilePage />} /> */}
+          {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
+          {/* <Route path="support" element={<SupportPage />} /> */}
+        </Route>
+
+        {/* Fallback - перенаправление на регистрацию */}
+        <Route path="*" element={<Navigate to={ROUTES.AUTH.PHONE} replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+// Создаем QueryClient
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5 минут
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppWithRoutes />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

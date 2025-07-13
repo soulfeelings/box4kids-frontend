@@ -1,32 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Star,
-  Home,
-  MessageCircle,
-  MoreHorizontal,
-  ArrowLeft,
-  X,
-  User,
-  Gift,
-  Calendar,
-  Heart,
-} from "lucide-react";
-import { UserData } from "../types";
-import {
-  NotSubscribedView,
-  JustSubscribedView,
-  NextSetNotDeterminedView,
-  NextSetDeterminedView,
   FeedbackView,
   ToySetDetailView,
   ChildrenAndSubscriptionsView,
+  NotSubscribedView,
+  JustSubscribedView,
+  NextSetDeterminedView,
+  NextSetNotDeterminedView,
 } from "../components/states";
 import { ProfilePage } from "./ProfilePage";
-import { useMainScreenData } from "../hooks/useMainScreenData";
+import {
+  useGetUserProfileUsersProfileUserIdGet,
+  useGetUserSubscriptionsSubscriptionsUserUserIdGet,
+  useGetUserDeliveryAddressesDeliveryAddressesGet,
+  useGetCurrentBoxToyBoxesCurrentChildIdGet,
+  useGetNextBoxToyBoxesNextChildIdGet,
+} from "../api-client";
 import {
   transformMainScreenData,
   transformToyBoxToToys,
 } from "../utils/dataTransformers";
+import { error } from "console";
+import { Home, MoreHorizontal } from "lucide-react";
 
 interface KidsAppInterfaceProps {
   userId: number; // вместо userData
@@ -42,29 +37,45 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
-  // Заменить useState на хук
-  const {
-    userProfile,
-    subscriptions,
-    deliveryAddresses,
-    currentToyBoxes,
-    nextToyBoxes,
-    isLoading,
-    error,
-    reload,
-    submitReview,
-  } = useMainScreenData(userId);
+  // Заменить useState на хуки
+  const { data: userProfile, isLoading: profileLoading } =
+    useGetUserProfileUsersProfileUserIdGet(userId);
+  const { data: subscriptions, isLoading: subscriptionsLoading } =
+    useGetUserSubscriptionsSubscriptionsUserUserIdGet(userId);
+  const { data: deliveryAddresses, isLoading: deliveryLoading } =
+    useGetUserDeliveryAddressesDeliveryAddressesGet({ user_id: userId });
+
+  // Для коробок нужно получить детей из профиля
+  const firstChildId = userProfile?.children?.[0]?.id;
+  const { data: currentToyBox } = useGetCurrentBoxToyBoxesCurrentChildIdGet(
+    firstChildId || 0,
+    {
+      query: { enabled: !!firstChildId },
+    }
+  );
+  const { data: nextToyBox } = useGetNextBoxToyBoxesNextChildIdGet(
+    firstChildId || 0,
+    {
+      query: { enabled: !!firstChildId },
+    }
+  );
+
+  const isLoading = profileLoading || subscriptionsLoading || deliveryLoading;
 
   // Преобразовать данные
-  const userData = userProfile
-    ? transformMainScreenData(
-        userProfile,
-        subscriptions,
-        deliveryAddresses,
-        currentToyBoxes,
-        nextToyBoxes
-      )
-    : null;
+  const userData =
+    userProfile && subscriptions
+      ? transformMainScreenData(
+          // @ts-ignore
+          userProfile,
+          subscriptions,
+          deliveryAddresses?.addresses || [],
+          currentToyBox
+            ? new Map([[firstChildId || 0, currentToyBox]])
+            : new Map(),
+          nextToyBox ? new Map([[firstChildId || 0, nextToyBox]]) : new Map()
+        )
+      : null;
 
   // Добавить обработку загрузки и ошибок
   if (isLoading && !userData) {
@@ -78,13 +89,13 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
     );
   }
 
-  if (error) {
+  if ("Error") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-red-600 mb-4">Error</p>
           <button
-            onClick={reload}
+            onClick={() => {}}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
             Попробовать снова
@@ -112,11 +123,11 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
     const currentChild = userData.children[0]; // Упрощение для примера
     if (!currentChild) return [];
 
-    const currentBox = currentToyBoxes.get(currentChild.id);
+    // const currentBox = currentToyBoxes.get(currentChild.id);
 
-    if (currentBox) {
-      return transformToyBoxToToys(currentBox);
-    }
+    // if (currentBox) {
+    //   return transformToyBoxToToys(currentBox);
+    // }
 
     // Fallback на существующую логику если нет API данных
     const toys: Array<{
@@ -166,26 +177,26 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
     const currentChild = userData.children[0]; // Упрощение для примера
     if (!currentChild) return;
 
-    const currentBox = currentToyBoxes.get(currentChild.id);
+    // const currentBox = currentToyBoxes.get(currentChild.id);
 
-    if (currentBox) {
-      await submitReview(currentBox.id, rating, comment);
-      // После успешной отправки отзыва закрываем модальное окно
-      setShowFeedback(false);
-      setRating(0);
-      setFeedbackComment("");
-    }
+    // if (currentBox) {
+    //   await submitReview(currentBox.id, rating, comment);
+    //   // После успешной отправки отзыва закрываем модальное окно
+    //   setShowFeedback(false);
+    //   setRating(0);
+    //   setFeedbackComment("");
+    // }
   };
 
   const getNextToys = () => {
     const currentChild = userData.children[0]; // Упрощение для примера
     if (!currentChild) return [];
 
-    const nextBox = nextToyBoxes.get(currentChild.id);
+    // const nextBox = nextToyBoxes.get(currentChild.id);
 
-    if (nextBox) {
-      return transformToyBoxToToys(nextBox);
-    }
+    // if (nextBox) {
+    //   return transformToyBoxToToys(nextBox);
+    // }
 
     // Fallback на существующую логику если нет API данных
     const toys: Array<{
