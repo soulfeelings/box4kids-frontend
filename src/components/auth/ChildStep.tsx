@@ -25,7 +25,6 @@ interface ChildData {
 export const ChildStep: React.FC = () => {
   const navigate = useNavigate();
   const childId = useChildIdLocation();
-  const { userId } = useRegistrationStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
   const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
@@ -95,24 +94,11 @@ export const ChildStep: React.FC = () => {
           has_limitations: childData.has_limitations,
           comment: childData.comment,
         },
-        params: {
-          parent_id: userId!,
-        },
       });
     }
     // Переходим на следующий шаг
     navigate(ROUTES.AUTH.CATEGORIES);
   };
-
-  useEffect(() => {
-    if (!userId) {
-      navigate(ROUTES.AUTH.PHONE);
-    }
-  }, [userId, navigate]);
-
-  if (!userId) {
-    return null;
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

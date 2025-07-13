@@ -1,14 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
-import { useUpdateUserProfileUsersProfileUserIdPut } from "../../api-client";
+import { useUpdateUserProfileUsersProfilePut } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
 
 export const RegisterStep: React.FC = () => {
   const navigate = useNavigate();
   const { registerData, setRegisterData, user } = useRegistrationStore();
 
-  const updateUserMutation = useUpdateUserProfileUsersProfileUserIdPut();
+  const updateUserMutation = useUpdateUserProfileUsersProfilePut();
 
   const handleUpdateUser = async (name: string) => {
     if (!user) {
@@ -18,7 +18,6 @@ export const RegisterStep: React.FC = () => {
 
     try {
       await updateUserMutation.mutateAsync({
-        userId: user.id,
         data: { name },
       });
 

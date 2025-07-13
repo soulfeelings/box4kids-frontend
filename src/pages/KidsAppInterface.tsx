@@ -10,8 +10,8 @@ import {
 } from "../components/states";
 import { ProfilePage } from "./ProfilePage";
 import {
-  useGetUserProfileUsersProfileUserIdGet,
-  useGetUserSubscriptionsSubscriptionsUserUserIdGet,
+  useGetUserProfileUsersProfileGet,
+  useGetUserSubscriptionsSubscriptionsUserGet,
   useGetUserDeliveryAddressesDeliveryAddressesGet,
   useGetCurrentBoxToyBoxesCurrentChildIdGet,
   useGetNextBoxToyBoxesNextChildIdGet,
@@ -23,13 +23,9 @@ import {
 import { error } from "console";
 import { Home, MoreHorizontal } from "lucide-react";
 
-interface KidsAppInterfaceProps {
-  userId: number; // вместо userData
-}
+interface KidsAppInterfaceProps {}
 
-export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
-  userId,
-}) => {
+export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
   const [showAllToys, setShowAllToys] = useState<boolean>(false);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
@@ -39,11 +35,11 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
 
   // Заменить useState на хуки
   const { data: userProfile, isLoading: profileLoading } =
-    useGetUserProfileUsersProfileUserIdGet(userId);
+    useGetUserProfileUsersProfileGet();
   const { data: subscriptions, isLoading: subscriptionsLoading } =
-    useGetUserSubscriptionsSubscriptionsUserUserIdGet(userId);
+    useGetUserSubscriptionsSubscriptionsUserGet();
   const { data: deliveryAddresses, isLoading: deliveryLoading } =
-    useGetUserDeliveryAddressesDeliveryAddressesGet({ user_id: userId });
+    useGetUserDeliveryAddressesDeliveryAddressesGet();
 
   // Для коробок нужно получить детей из профиля
   const firstChildId = userProfile?.children?.[0]?.id;
@@ -84,22 +80,6 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
         <div className="text-center">
           <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600">Загружаем данные...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if ("Error") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error</p>
-          <button
-            onClick={() => {}}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          >
-            Попробовать снова
-          </button>
         </div>
       </div>
     );

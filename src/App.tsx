@@ -33,7 +33,7 @@ import { SuccessStep } from "./components/auth/SuccessStep";
 
 // Временный компонент для app маршрутов
 const AppRoutes: React.FC = () => {
-  const { userId, isAuthenticated, logout } = useRegistrationStore();
+  const { isAuthenticated, logout } = useRegistrationStore();
   const navigate = useNavigate();
 
   // Если не авторизован - перенаправляем на регистрацию
@@ -56,7 +56,7 @@ const AppRoutes: React.FC = () => {
           ← Назад к демо
         </button>
       </div>
-      <KidsAppInterface userId={userId!} />
+      <KidsAppInterface />
     </div>
   );
 };

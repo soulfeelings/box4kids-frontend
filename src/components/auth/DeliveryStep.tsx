@@ -6,7 +6,7 @@ import { useCreateDeliveryAddressDeliveryAddressesPost } from "../../api-client"
 
 export const DeliveryStep: React.FC = () => {
   const navigate = useNavigate();
-  const { deliveryData, setDeliveryData, userId } = useRegistrationStore();
+  const { deliveryData, setDeliveryData } = useRegistrationStore();
   const createDeliveryAddressMutation =
     useCreateDeliveryAddressDeliveryAddressesPost();
 
@@ -85,14 +85,11 @@ export const DeliveryStep: React.FC = () => {
           delivery_time_preference: deliveryData.time,
           courier_comment: deliveryData.comment,
         },
-        params: {
-          user_id: userId!,
-        },
       });
 
       navigate(ROUTES.AUTH.PAYMENT);
     } catch (error) {
-      console.log(error);
+      console.log()
     }
   };
 

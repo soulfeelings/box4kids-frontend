@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetUserDeliveryAddressesDeliveryAddressesGetParams = {
-/**
- * Максимальное количество адресов
- */
-limit?: number | null;
+export type GetBoxHistoryToyBoxesHistoryGetParams = {
+limit?: number;
 };

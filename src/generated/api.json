@@ -94,7 +94,7 @@
           "Authentication"
         ],
         "summary": "Verify Otp",
-        "description": "Проверяет OTP код и создает/возвращает пользователя",
+        "description": "Проверяет OTP код и создает/возвращает пользователя с токенами",
         "operationId": "verify_otp_auth_verify_otp_post",
         "requestBody": {
           "content": {
@@ -112,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
+                  "$ref": "#/components/schemas/AuthResponse"
                 }
               }
             }
@@ -130,25 +130,14 @@
         }
       }
     },
-    "/users/profile/{user_id}": {
+    "/users/profile": {
       "get": {
         "tags": [
           "Users"
         ],
         "summary": "Get User Profile",
-        "description": "Получает профиль пользователя с детьми",
-        "operationId": "get_user_profile_users_profile__user_id__get",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
-          }
-        ],
+        "description": "Получает профиль текущего пользователя с детьми",
+        "operationId": "get_user_profile_users_profile_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -159,46 +148,30 @@
                 }
               }
             }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       },
       "put": {
         "tags": [
           "Users"
         ],
         "summary": "Update User Profile",
-        "description": "Обновляет профиль пользователя",
-        "operationId": "update_user_profile_users_profile__user_id__put",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
-          }
-        ],
+        "description": "Обновляет профиль текущего пользователя",
+        "operationId": "update_user_profile_users_profile_put",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UserProfileUpdate"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -221,54 +194,43 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
-    "/users/children/{parent_id}": {
+    "/users/children": {
       "get": {
         "tags": [
           "Users"
         ],
         "summary": "Get User Children",
-        "description": "Получает детей пользователя с интересами и навыками",
-        "operationId": "get_user_children_users_children__parent_id__get",
-        "parameters": [
-          {
-            "name": "parent_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Parent Id"
-            }
-          }
-        ],
+        "description": "Получает детей текущего пользователя с интересами и навыками",
+        "operationId": "get_user_children_users_children_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/ChildResponse"
                   },
-                  "title": "Response Get User Children Users Children  Parent Id  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "type": "array",
+                  "title": "Response Get User Children Users Children Get"
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/subscriptions/": {
@@ -277,7 +239,7 @@
           "Subscriptions"
         ],
         "summary": "Create Subscription Order",
-        "description": "Создает заказ подписки",
+        "description": "Создает заказ подписки для текущего пользователя",
         "operationId": "create_subscription_order_subscriptions__post",
         "requestBody": {
           "content": {
@@ -310,54 +272,43 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
-    "/subscriptions/user/{user_id}": {
+    "/subscriptions/user": {
       "get": {
         "tags": [
           "Subscriptions"
         ],
         "summary": "Get User Subscriptions",
-        "description": "Получает подписки пользователя",
-        "operationId": "get_user_subscriptions_subscriptions_user__user_id__get",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
-          }
-        ],
+        "description": "Получает подписки текущего пользователя",
+        "operationId": "get_user_subscriptions_subscriptions_user_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/SubscriptionWithDetailsResponse"
                   },
-                  "title": "Response Get User Subscriptions Subscriptions User  User Id  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "type": "array",
+                  "title": "Response Get User Subscriptions Subscriptions User Get"
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/subscriptions/{subscription_id}": {
@@ -368,6 +319,11 @@
         "summary": "Get Subscription",
         "description": "Получает подписку по ID",
         "operationId": "get_subscription_subscriptions__subscription_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "subscription_id",
@@ -409,6 +365,11 @@
         "summary": "Update Subscription",
         "description": "Обновляет подписку",
         "operationId": "update_subscription_subscriptions__subscription_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "subscription_id",
@@ -493,7 +454,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/payments/{payment_id}/process": {
@@ -504,6 +470,11 @@
         "summary": "Process Payment",
         "description": "Обрабатывает платеж и активирует подписки (с реалистичной задержкой 5-15 сек)",
         "operationId": "process_payment_payments__payment_id__process_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "payment_id",
@@ -755,28 +726,17 @@
           "Children"
         ],
         "summary": "Create Child",
-        "description": "Создать ребенка",
+        "description": "Создать ребенка для текущего пользователя",
         "operationId": "create_child_children__post",
-        "parameters": [
-          {
-            "name": "parent_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Parent Id"
-            }
-          }
-        ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ChildCreate"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -799,7 +759,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/children/{child_id}": {
@@ -810,6 +775,11 @@
         "summary": "Get Child",
         "description": "Получить ребенка по ID с интересами и навыками",
         "operationId": "get_child_children__child_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "child_id",
@@ -851,6 +821,11 @@
         "summary": "Update Child",
         "description": "Обновить ребенка (включая интересы и навыки)",
         "operationId": "update_child_children__child_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "child_id",
@@ -902,6 +877,11 @@
         "summary": "Delete Child",
         "description": "Удалить ребенка",
         "operationId": "delete_child_children__child_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "child_id",
@@ -1029,18 +1009,14 @@
           "Delivery Addresses"
         ],
         "summary": "Get User Delivery Addresses",
-        "description": "Получить адреса доставки пользователя",
+        "description": "Получить адреса доставки текущего пользователя",
         "operationId": "get_user_delivery_addresses_delivery_addresses__get",
-        "parameters": [
+        "security": [
           {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
-          },
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
           {
             "name": "limit",
             "in": "query",
@@ -1088,17 +1064,11 @@
           "Delivery Addresses"
         ],
         "summary": "Create Delivery Address",
-        "description": "Создать новый адрес доставки",
+        "description": "Создать новый адрес доставки для текущего пользователя",
         "operationId": "create_delivery_address_delivery_addresses__post",
-        "parameters": [
+        "security": [
           {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
+            "HTTPBearer": []
           }
         ],
         "requestBody": {
@@ -1141,8 +1111,13 @@
           "Delivery Addresses"
         ],
         "summary": "Update Delivery Address",
-        "description": "Обновить адрес доставки",
+        "description": "Обновить адрес доставки текущего пользователя",
         "operationId": "update_delivery_address_delivery_addresses__address_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "address_id",
@@ -1151,15 +1126,6 @@
             "schema": {
               "type": "integer",
               "title": "Address Id"
-            }
-          },
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
             }
           }
         ],
@@ -1201,8 +1167,13 @@
           "Delivery Addresses"
         ],
         "summary": "Delete Delivery Address",
-        "description": "Удалить адрес доставки",
+        "description": "Удалить адрес доставки текущего пользователя",
         "operationId": "delete_delivery_address_delivery_addresses__address_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "address_id",
@@ -1211,15 +1182,6 @@
             "schema": {
               "type": "integer",
               "title": "Address Id"
-            }
-          },
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
             }
           }
         ],
@@ -1253,6 +1215,11 @@
         "summary": "Get Current Box",
         "description": "Получить текущий набор ребёнка",
         "operationId": "get_current_box_toy_boxes_current__child_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "child_id",
@@ -1467,24 +1434,20 @@
         }
       }
     },
-    "/toy-boxes/history/{user_id}": {
+    "/toy-boxes/history": {
       "get": {
         "tags": [
           "Toy Boxes"
         ],
         "summary": "Get Box History",
-        "description": "Получить историю наборов пользователя",
-        "operationId": "get_box_history_toy_boxes_history__user_id__get",
-        "parameters": [
+        "description": "Получить историю наборов текущего пользователя",
+        "operationId": "get_box_history_toy_boxes_history_get",
+        "security": [
           {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
-          },
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
           {
             "name": "limit",
             "in": "query",
@@ -1582,6 +1545,34 @@
   },
   "components": {
     "schemas": {
+      "AuthResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          },
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "access_token"
+        ],
+        "title": "AuthResponse"
+      },
       "BatchPaymentCreateRequest": {
         "properties": {
           "subscription_ids": {
@@ -3140,6 +3131,12 @@
           "type"
         ],
         "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   }

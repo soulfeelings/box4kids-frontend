@@ -28,12 +28,15 @@ export const customFetch = async <T>({
 
   const fullUrl = `${baseUrl}${url}${queryString}`;
 
+  // Получаем токен из localStorage
+  const token = localStorage.getItem("access_token");
+
   const requestInit: RequestInit = {
     method,
     headers: {
       "Content-Type": "application/json",
       ...(headers || {}),
-      Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      ...(token && { Authorization: `Bearer ${token}` }),
     },
     body: data !== undefined ? JSON.stringify(data) : undefined,
     signal,
