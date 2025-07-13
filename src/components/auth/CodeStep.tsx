@@ -46,9 +46,10 @@ export const CodeStep: React.FC = () => {
 
   // DEV MODE: Автоматически получаем код при монтировании компонента
   useEffect(() => {
+    let id: NodeJS.Timeout | null = null;
     if (phoneData.phone && !phoneData.code) {
       setIsAutoFilling(true);
-      setTimeout(async () => {
+      id = setTimeout(async () => {
         try {
           const devCode = await getDevCode(phoneData.phone);
           if (devCode) {
@@ -61,6 +62,12 @@ export const CodeStep: React.FC = () => {
         }
       }, 2000);
     }
+
+    return () => {
+      if (id) {
+        clearTimeout(id);
+      }
+    };
   }, [phoneData.phone, phoneData.code, setPhoneData]);
 
   const handleCheckCode = async () => {

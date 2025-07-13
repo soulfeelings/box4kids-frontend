@@ -1,10 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
-import {
-  useSendOtpAuthSendOtpPost,
-  useDevGetCodeAuthDevGetCodePost,
-} from "../../api-client";
+import { useSendOtpAuthSendOtpPost } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
 
 export const PhoneStep: React.FC = () => {
@@ -12,7 +9,6 @@ export const PhoneStep: React.FC = () => {
   const { phoneData, setPhoneData, setError } = useRegistrationStore();
 
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
-  const devCodeMutation = useDevGetCodeAuthDevGetCodePost();
 
   const handleSendCode = async () => {
     setError(null);
@@ -28,26 +24,18 @@ export const PhoneStep: React.FC = () => {
       });
 
       navigate(ROUTES.AUTH.CODE);
-
-      // DEV MODE: Start auto-fill immediately after successful send
-      setTimeout(async () => {
-        try {
-          const devCodeResponse = await devCodeMutation.mutateAsync({
-            data: { phone_number: phoneData.phone },
-          });
-          if (devCodeResponse.code) {
-            setPhoneData({ code: devCodeResponse.code });
-          }
-        } catch (error) {
-          console.error("Dev code auto-fill failed:", error);
-        }
-      }, 2000);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Не удалось отправить код"
       );
     }
   };
+
+  useEffect(() => {
+    return () => {
+      setPhoneData({ code: "" });
+    };
+  }, []);
 
   const isPhoneValid = phoneData.phone.length >= 10;
   const isLoading = sendOtpMutation.isPending;
