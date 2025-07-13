@@ -13,10 +13,10 @@ import { KidsAppInterface } from "./pages/KidsAppInterface";
 // import { SupportPage } from "./pages/SupportPage";
 // import { DeliveryHistoryPage } from "./pages/DeliveryHistoryPage";
 import { UserData } from "./types";
-import { AuthProvider, useAuth } from "./context/AuthContext";
 import { RouteGuard } from "./components/common/RouteGuard";
 import { AppLayout } from "./components/layout/AppLayout";
 import { AuthContainer } from "./components/layout/AuthContainer";
+import { useRegistrationStore } from "./store/registrationStore";
 import { ROUTES } from "./constants/routes";
 
 // Импорт компонентов шагов авторизации
@@ -33,7 +33,7 @@ import { SuccessStep } from "./components/auth/SuccessStep";
 
 // Временный компонент для app маршрутов
 const AppRoutes: React.FC = () => {
-  const { userId, isAuthenticated, logout } = useAuth();
+  const { userId, isAuthenticated, logout } = useRegistrationStore();
   const navigate = useNavigate();
 
   // Если не авторизован - перенаправляем на регистрацию
@@ -142,9 +142,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppWithRoutes />
-      </AuthProvider>
+      <AppWithRoutes />
     </QueryClientProvider>
   );
 }

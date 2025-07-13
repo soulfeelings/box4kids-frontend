@@ -1,21 +1,31 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
+import { useUpdateUserProfileUsersProfileUserIdPut } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
 
 export const RegisterStep: React.FC = () => {
   const navigate = useNavigate();
-  const { registerData, setRegisterData, setUserId } = useRegistrationStore();
+  const { registerData, setRegisterData, userId } = useRegistrationStore();
 
-  // TODO: Заменить на реальный API хук когда будет готов эндпоинт
-  const handleCreateUser = async (name: string) => {
+  const updateUserMutation = useUpdateUserProfileUsersProfileUserIdPut();
+
+  const handleUpdateUser = async (name: string) => {
+    if (!userId) {
+      console.error("User ID is required");
+      return;
+    }
+
     try {
-      // Временная заглушка - в реальном API будет создание пользователя
+      await updateUserMutation.mutateAsync({
+        userId,
+        data: { name },
+      });
+
       setRegisterData({ name });
-      setUserId(Date.now()); // Временный ID
       navigate(ROUTES.AUTH.CHILD);
     } catch (error) {
-      console.error("Create user error:", error);
+      console.error("Update user error:", error);
     }
   };
 
@@ -26,12 +36,14 @@ export const RegisterStep: React.FC = () => {
   const handleRegister = async () => {
     if (!registerData.name.trim()) return;
 
-    await handleCreateUser(registerData.name);
+    await handleUpdateUser(registerData.name);
   };
 
   const handleClose = () => {
     navigate(ROUTES.DEMO);
   };
+
+  const isLoading = updateUserMutation.isPending;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -109,7 +121,7 @@ export const RegisterStep: React.FC = () => {
               placeholder=""
               value={registerData.name}
               onChange={(e) => setRegisterData({ name: e.target.value })}
-              maxLength={32}
+              maxLength={64}
               autoFocus
               style={{ fontFamily: "Nunito, sans-serif" }}
             />
@@ -123,18 +135,19 @@ export const RegisterStep: React.FC = () => {
       <div className="px-4 pb-6">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-            registerData.name.trim()
+            registerData.name.trim() && !isLoading
               ? "text-white shadow-sm"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
-          disabled={!registerData.name.trim()}
+          disabled={!registerData.name.trim() || isLoading}
           onClick={handleRegister}
           style={{
             fontFamily: "Nunito, sans-serif",
-            backgroundColor: registerData.name.trim() ? "#30313D" : undefined,
+            backgroundColor:
+              registerData.name.trim() && !isLoading ? "#30313D" : undefined,
           }}
         >
-          {registerData.name.trim() ? "Продолжить" : "Сохраняем..."}
+          {isLoading ? "Сохраняем..." : "Продолжить"}
         </button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { UserData } from "../types";
-import { useAuth } from "../context/AuthContext";
+import { useRegistrationStore } from "../store/registrationStore";
 
 // Test data scenarios for different states
 const testUserDataScenarios: Record<string, UserData> = {
@@ -105,7 +105,7 @@ const testUserDataScenarios: Record<string, UserData> = {
 
 export const DemoPage: React.FC = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser } = useRegistrationStore();
 
   const handleTestDemo = (scenario: string) => {
     // Сохраняем данные демо-сценария в контекст и переходим на /app

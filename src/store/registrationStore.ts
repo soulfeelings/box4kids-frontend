@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { AUTH_STEPS, AuthStep } from "../constants/auth";
+import { UserData } from "../types";
 
 // Типы для данных каждого шага
 export interface PhoneData {
@@ -71,6 +72,10 @@ interface RegistrationState {
   // ID пользователя после завершения регистрации
   userId: number | null;
 
+  // Аутентификация
+  user: UserData | null;
+  isAuthenticated: boolean;
+
   // Состояние загрузки и ошибок
   isLoading: boolean;
   error: string | null;
@@ -91,6 +96,10 @@ interface RegistrationState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   resetRegistration: () => void;
+
+  // Аутентификация
+  setUser: (user: UserData, userId: number) => void;
+  logout: () => void;
 
   // Для обратной совместимости
   childData: ChildData; // Виртуальное поле для текущего ребенка
@@ -137,6 +146,7 @@ const initialState = {
     status: "",
   },
   userId: null,
+  user: null,
   isLoading: false,
   error: null,
 };
@@ -144,6 +154,11 @@ const initialState = {
 // Создание store
 export const useRegistrationStore = create<RegistrationState>((set, get) => ({
   ...initialState,
+
+  // Computed property для аутентификации
+  get isAuthenticated() {
+    return get().userId !== null;
+  },
 
   // Виртуальное поле для текущего ребенка (обратная совместимость)
   get childData() {
@@ -249,4 +264,9 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
   setError: (error) => set({ error }),
 
   resetRegistration: () => set(initialState),
+
+  // Аутентификация
+  setUser: (user, userId) => set({ user, userId }),
+
+  logout: () => set({ user: null, userId: null }),
 }));

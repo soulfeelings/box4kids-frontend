@@ -7,13 +7,11 @@ import {
   useDevGetCodeAuthDevGetCodePost,
 } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
-import { useAuth } from "../../context/AuthContext";
 
 export const CodeStep: React.FC = () => {
   const navigate = useNavigate();
-  const { phoneData, setPhoneData, setUserId, setError, error } =
+  const { phoneData, setPhoneData, setUserId, setError, error, setUser } =
     useRegistrationStore();
-  const { setUser } = useAuth();
   const [resendTimer, setResendTimer] = useState(60);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
 
@@ -87,17 +85,9 @@ export const CodeStep: React.FC = () => {
       });
 
       setPhoneData({ code: phoneData.code, verified: true });
+      setUserId(response.id);
 
-      // Если пользователь уже существует - переходим в приложение
-      if (response.name) {
-        setUserId(response.id);
-        // @ts-ignore
-        setUser(response, response.id);
-        navigate(ROUTES.APP.ROOT);
-      } else {
-        // Новый пользователь - продолжаем регистрацию
-        navigate(ROUTES.AUTH.WELCOME);
-      }
+      navigate(ROUTES.AUTH.WELCOME);
     } catch (error) {
       setError("Неверный код подтверждения");
     }
