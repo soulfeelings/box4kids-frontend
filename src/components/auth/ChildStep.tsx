@@ -37,7 +37,7 @@ export const ChildStep: React.FC = () => {
   };
 
   // Функция форматирования даты
-  const formatDateInput = (value: string, isFullDate: boolean): string => {
+  const formatDateInput = (value: string): string => {
     const numericValue = value.replace(/\D/g, "");
 
     if (numericValue.length <= 2) {
@@ -50,6 +50,34 @@ export const ChildStep: React.FC = () => {
         4
       )}.${numericValue.slice(4, 8)}`;
     }
+  };
+
+  // Функция конвертации даты из DD.MM.YYYY в YYYY-MM-DD
+  const convertDateToISO = (dateString: string): string => {
+    if (!dateString) return "";
+
+    const parts = dateString.split(".");
+    if (parts.length !== 3) return "";
+
+    const day = parts[0].padStart(2, "0");
+    const month = parts[1].padStart(2, "0");
+    const year = parts[2];
+
+    return `${year}-${month}-${day}`;
+  };
+
+  // Функция конвертации даты из YYYY-MM-DD в DD.MM.YYYY
+  const convertDateFromISO = (isoDateString: string): string => {
+    if (!isoDateString) return "";
+
+    const parts = isoDateString.split("-");
+    if (parts.length !== 3) return "";
+
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+
+    return `${day}.${month}.${year}`;
   };
 
   // Функция валидации даты
@@ -108,7 +136,7 @@ export const ChildStep: React.FC = () => {
       const response = await createChildMutation.mutateAsync({
         data: {
           name: editingChild.name,
-          date_of_birth: editingChild.birthDate,
+          date_of_birth: convertDateToISO(editingChild.birthDate),
           gender: editingChild.gender as Gender,
           has_limitations: editingChild.limitations === "has_limitations",
           comment: editingChild.comment,
@@ -122,7 +150,7 @@ export const ChildStep: React.FC = () => {
       addChild({
         id: response.id,
         name: response.name,
-        birthDate: response.date_of_birth,
+        birthDate: convertDateFromISO(response.date_of_birth),
         gender: response.gender,
         limitations: response.has_limitations ? "has_limitations" : "none",
         comment: response.comment || "",
@@ -258,7 +286,7 @@ export const ChildStep: React.FC = () => {
                 placeholder=""
                 value={editingChild.birthDate}
                 onChange={(e) => {
-                  const formatted = formatDateInput(e.target.value, true);
+                  const formatted = formatDateInput(e.target.value);
                   updateEditingChild({ birthDate: formatted });
                 }}
                 maxLength={10}

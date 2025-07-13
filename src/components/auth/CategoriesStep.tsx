@@ -94,7 +94,7 @@ export const CategoriesStep: React.FC = () => {
       return { emoji: "⭐", label: skill.name, id: skill.id };
     }) || [];
 
-  const toggleInterest = (interestLabel: string, interestId: number) => {
+  const toggleInterest = (interestId: number) => {
     const newInterests = selectedInterests.includes(interestId)
       ? selectedInterests.filter((i) => i !== interestId)
       : [...selectedInterests, interestId];
@@ -102,7 +102,7 @@ export const CategoriesStep: React.FC = () => {
     setSelectedInterests(newInterests);
   };
 
-  const toggleSkill = (skillLabel: string, skillId: number) => {
+  const toggleSkill = (skillId: number) => {
     const newSkills = selectedSkills.includes(skillId)
       ? selectedSkills.filter((s) => s !== skillId)
       : [...selectedSkills, skillId];
@@ -114,36 +114,14 @@ export const CategoriesStep: React.FC = () => {
     selectedInterests.length > 0 && selectedSkills.length > 0;
 
   // Проверяем наличие editingChild и ID ребенка
-  if (!editingChild) {
-    return (
-      <div className="flex flex-col min-h-screen bg-white items-center justify-center">
-        <p className="text-red-500 font-medium">
-          Ошибка: Данные ребенка не найдены. Вернитесь к предыдущему шагу.
-        </p>
-        <button
-          onClick={handleBack}
-          className="mt-4 px-4 py-2 bg-gray-200 rounded-lg"
-        >
-          Назад
-        </button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!editingChild?.id) {
+      navigate(ROUTES.AUTH.CHILD);
+    }
+  }, [editingChild?.id, navigate]);
 
-  if (!editingChild.id) {
-    return (
-      <div className="flex flex-col min-h-screen bg-white items-center justify-center">
-        <p className="text-red-500 font-medium">
-          Ошибка: ID ребенка не найден. Вернитесь к предыдущему шагу.
-        </p>
-        <button
-          onClick={handleBack}
-          className="mt-4 px-4 py-2 bg-gray-200 rounded-lg"
-        >
-          Назад
-        </button>
-      </div>
-    );
+  if (!editingChild?.id) {
+    return null;
   }
 
   return (
@@ -230,7 +208,7 @@ export const CategoriesStep: React.FC = () => {
               {interestItems.map((interest) => (
                 <button
                   key={interest.id}
-                  onClick={() => toggleInterest(interest.label, interest.id)}
+                  onClick={() => toggleInterest(interest.id)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
                     selectedInterests.includes(interest.id)
                       ? "bg-indigo-400 text-white"
@@ -258,7 +236,7 @@ export const CategoriesStep: React.FC = () => {
               {skillItems.map((skill) => (
                 <button
                   key={skill.id}
-                  onClick={() => toggleSkill(skill.label, skill.id)}
+                  onClick={() => toggleSkill(skill.id)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
                     selectedSkills.includes(skill.id)
                       ? "bg-indigo-400 text-white"
