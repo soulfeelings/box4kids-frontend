@@ -111,23 +111,27 @@ function App() {
     "demo"
   );
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const handleNavigateToKidsPage = (data: UserData) => {
+  const handleNavigateToKidsPage = (data: UserData, userId?: number) => {
     setUserData(data);
+    setUserId(userId || 1); // Fallback на тестового пользователя для демо
     setCurrentPage("kids");
   };
 
   const handleTestDemo = (scenario: string) => {
     setUserData(testUserDataScenarios[scenario]);
+    setUserId(1); // Тестовый пользователь для демо
     setCurrentPage("kids");
   };
 
   const handleBackToDemo = () => {
     setCurrentPage("demo");
     setUserData(null);
+    setUserId(null);
   };
 
-  if (currentPage === "kids" && userData) {
+  if (currentPage === "kids" && userId) {
     return (
       <div>
         <div className="fixed top-4 left-4 z-50">
@@ -138,7 +142,7 @@ function App() {
             ← Назад к демо
           </button>
         </div>
-        <KidsAppInterface userData={userData} />
+        <KidsAppInterface userId={userId} />
       </div>
     );
   }

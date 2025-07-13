@@ -1,6 +1,17 @@
-import React, { useState } from 'react';
-import { Star, Home, MessageCircle, MoreHorizontal, ArrowLeft, X, User, Gift, Calendar, Heart } from 'lucide-react';
-import { UserData } from '../types';
+import React, { useState } from "react";
+import {
+  Star,
+  Home,
+  MessageCircle,
+  MoreHorizontal,
+  ArrowLeft,
+  X,
+  User,
+  Gift,
+  Calendar,
+  Heart,
+} from "lucide-react";
+import { UserData } from "../types";
 import {
   NotSubscribedView,
   JustSubscribedView,
@@ -8,16 +19,21 @@ import {
   NextSetDeterminedView,
   FeedbackView,
   ToySetDetailView,
-  ChildrenAndSubscriptionsView
-} from '../components/states';
-import { ProfilePage } from './ProfilePage';
+  ChildrenAndSubscriptionsView,
+} from "../components/states";
+import { ProfilePage } from "./ProfilePage";
+import { useMainScreenData } from "../hooks/useMainScreenData";
+import {
+  transformMainScreenData,
+  transformToyBoxToToys,
+} from "../utils/dataTransformers";
 
 interface KidsAppInterfaceProps {
-  userData: UserData;
+  userId: number; // вместо userData
 }
 
 export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
-  userData,
+  userId,
 }) => {
   const [rating, setRating] = useState<number>(0);
   const [showAllToys, setShowAllToys] = useState<boolean>(false);
@@ -26,13 +42,83 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
+  // Заменить useState на хук
+  const {
+    userProfile,
+    subscriptions,
+    deliveryAddresses,
+    currentToyBoxes,
+    nextToyBoxes,
+    isLoading,
+    error,
+    reload,
+    submitReview,
+  } = useMainScreenData(userId);
+
+  // Преобразовать данные
+  const userData = userProfile
+    ? transformMainScreenData(
+        userProfile,
+        subscriptions,
+        deliveryAddresses,
+        currentToyBoxes,
+        nextToyBoxes
+      )
+    : null;
+
+  // Добавить обработку загрузки и ошибок
+  if (isLoading && !userData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Загружаем данные...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={reload}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Попробовать снова
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">Нет данных для отображения</p>
+      </div>
+    );
+  }
+
   const handleStarClick = (starIndex: number): void => {
     setRating(starIndex + 1);
     setShowFeedback(true);
   };
 
-  // Get toys based on children's interests and subscription types
+  // Get toys based on real API data
   const getCurrentToys = () => {
+    const currentChild = userData.children[0]; // Упрощение для примера
+    if (!currentChild) return [];
+
+    const currentBox = currentToyBoxes.get(currentChild.id);
+
+    if (currentBox) {
+      return transformToyBoxToToys(currentBox);
+    }
+
+    // Fallback на существующую логику если нет API данных
     const toys: Array<{
       icon: string;
       count: number;
@@ -70,66 +156,38 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
 
   // Get all toys for detailed view
   const getAllCurrentToys = () => {
-    const toys: Array<{
-      icon: string;
-      count: number;
-      name: string;
-      color: string;
-    }> = [];
+    // Используем ту же логику что и getCurrentToys, но возвращаем все
+    return getCurrentToys();
+  };
 
-    userData.children.forEach((child) => {
-      if (child.subscription === "premium") {
-        toys.push(
-          { icon: "🔧", count: 2, name: "Конструктор", color: "bg-blue-100" },
-          {
-            icon: "🎨",
-            count: 2,
-            name: "Творческий набор",
-            color: "bg-green-100",
-          },
-          {
-            icon: "🧸",
-            count: 1,
-            name: "Мягкая игрушка",
-            color: "bg-orange-100",
-          },
-          { icon: "🎪", count: 1, name: "Головоломка", color: "bg-pink-100" }
-        );
-      } else if (child.subscription === "base") {
-        toys.push(
-          { icon: "🔧", count: 2, name: "Конструктор", color: "bg-blue-100" },
-          {
-            icon: "🎨",
-            count: 2,
-            name: "Творческий набор",
-            color: "bg-green-100",
-          },
-          {
-            icon: "🧸",
-            count: 1,
-            name: "Мягкая игрушка",
-            color: "bg-orange-100",
-          },
-          { icon: "🎪", count: 1, name: "Головоломка", color: "bg-pink-100" }
-        );
-      }
-    });
+  // Обновить функцию обработки отзывов
+  const handleFeedbackSubmit = async (rating: number, comment: string) => {
+    // Найти ID текущего набора (логика зависит от UI)
+    const currentChild = userData.children[0]; // Упрощение для примера
+    if (!currentChild) return;
 
-    // Remove duplicates and combine counts
-    const toyMap = new Map();
-    toys.forEach((toy) => {
-      const key = toy.name;
-      if (toyMap.has(key)) {
-        toyMap.get(key).count += toy.count;
-      } else {
-        toyMap.set(key, { ...toy });
-      }
-    });
+    const currentBox = currentToyBoxes.get(currentChild.id);
 
-    return Array.from(toyMap.values());
+    if (currentBox) {
+      await submitReview(currentBox.id, rating, comment);
+      // После успешной отправки отзыва закрываем модальное окно
+      setShowFeedback(false);
+      setRating(0);
+      setFeedbackComment("");
+    }
   };
 
   const getNextToys = () => {
+    const currentChild = userData.children[0]; // Упрощение для примера
+    if (!currentChild) return [];
+
+    const nextBox = nextToyBoxes.get(currentChild.id);
+
+    if (nextBox) {
+      return transformToyBoxToToys(nextBox);
+    }
+
+    // Fallback на существующую логику если нет API данных
     const toys: Array<{
       icon: string;
       count: number;
@@ -196,7 +254,11 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
             setShowChildrenScreen(false);
             setShowProfile(false);
           }}
-          className={`p-3 rounded-2xl ${!showAllToys && !showFeedback && !showChildrenScreen && !showProfile ? 'bg-purple-500' : ''}`}
+          className={`p-3 rounded-2xl ${
+            !showAllToys && !showFeedback && !showChildrenScreen && !showProfile
+              ? "bg-purple-500"
+              : ""
+          }`}
         >
           <Home size={24} className="text-white" />
         </button>
@@ -213,14 +275,14 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
         >
           <img src="/illustrations/Icon.png" alt="Icon" className="w-6 h-6" />
         </button>
-        <button 
+        <button
           onClick={() => {
             setShowProfile(true);
             setShowAllToys(false);
             setShowFeedback(false);
             setShowChildrenScreen(false);
           }}
-          className={`p-3 rounded-2xl ${showProfile ? 'bg-purple-500' : ''}`}
+          className={`p-3 rounded-2xl ${showProfile ? "bg-purple-500" : ""}`}
         >
           <MoreHorizontal size={24} className="text-white" />
         </button>
@@ -229,29 +291,37 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
   );
 
   // Determine current screen state
-  const getCurrentScreenState = (): 'not_subscribed' | 'just_subscribed' | 'next_set_not_determined' | 'next_set_determined' => {
+  const getCurrentScreenState = ():
+    | "not_subscribed"
+    | "just_subscribed"
+    | "next_set_not_determined"
+    | "next_set_determined" => {
     // Check if user is not subscribed
-    if (userData.subscriptionStatus === 'not_subscribed') {
-      return 'not_subscribed';
+    if (userData.subscriptionStatus === "not_subscribed") {
+      return "not_subscribed";
     }
-    
+
     // Check if user just subscribed (first 2 hours)
-    if (userData.subscriptionStatus === 'just_subscribed' && userData.subscriptionDate) {
+    if (
+      userData.subscriptionStatus === "just_subscribed" &&
+      userData.subscriptionDate
+    ) {
       const subscriptionTime = new Date(userData.subscriptionDate);
       const now = new Date();
-      const hoursDiff = (now.getTime() - subscriptionTime.getTime()) / (1000 * 60 * 60);
-      
+      const hoursDiff =
+        (now.getTime() - subscriptionTime.getTime()) / (1000 * 60 * 60);
+
       if (hoursDiff <= 2) {
-        return 'just_subscribed';
+        return "just_subscribed";
       }
     }
-    
+
     // Check next set status
-    if (userData.nextSetStatus === 'not_determined') {
-      return 'next_set_not_determined';
+    if (userData.nextSetStatus === "not_determined") {
+      return "next_set_not_determined";
     }
-    
-    return 'next_set_determined';
+
+    return "next_set_determined";
   };
 
   // Format current date for display
@@ -388,20 +458,20 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
       />
     );
   }
-  
+
   const currentScreenState = getCurrentScreenState();
   const currentToys = getCurrentToys();
   const nextToys = getNextToys();
-  
+
   switch (currentScreenState) {
-    case 'not_subscribed':
+    case "not_subscribed":
       return (
         <NotSubscribedView
           userData={userData}
           BottomNavigation={BottomNavigation}
         />
       );
-    case 'just_subscribed':
+    case "just_subscribed":
       return (
         <JustSubscribedView
           userData={userData}
@@ -412,7 +482,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
           getCurrentDate={getCurrentDate}
         />
       );
-    case 'next_set_not_determined':
+    case "next_set_not_determined":
       return (
         <NextSetNotDeterminedView
           userData={userData}
@@ -426,7 +496,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
           formatDeliveryTime={formatDeliveryTime}
         />
       );
-    case 'next_set_determined':
+    case "next_set_determined":
       return (
         <NextSetDeterminedView
           userData={userData}
@@ -457,4 +527,4 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({
         />
       );
   }
-}; 
+};

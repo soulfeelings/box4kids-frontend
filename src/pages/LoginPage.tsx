@@ -1,5 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { UserData } from "../types";
+import {
+  UserResponse,
+  InterestResponse,
+  SkillResponse,
+  InterestsListResponse,
+  SkillsListResponse,
+  ChildResponse,
+  ToyCategoryConfigResponse,
+  SubscriptionPlanResponse,
+  SubscriptionPlansListResponse,
+  SubscriptionCreateRequest,
+  SubscriptionCreateResponse,
+  DeliveryInfoCreate,
+  DeliveryInfoResponse,
+  BatchPaymentCreateRequest,
+  BatchPaymentResponse,
+  PaymentProcessResponse,
+} from "../types/api";
 
 // Step enums for clarity
 enum Step {
@@ -15,118 +33,10 @@ enum Step {
   Success = 9,
 }
 
-// API types
-interface UserResponse {
-  id: number;
-  phone_number: string;
-  name: string | null;
-  role: string;
-}
-
-interface InterestResponse {
-  id: number;
-  name: string;
-}
-
-interface SkillResponse {
-  id: number;
-  name: string;
-}
-
-interface InterestsListResponse {
-  interests: InterestResponse[];
-}
-
-interface SkillsListResponse {
-  skills: SkillResponse[];
-}
-
-interface ChildResponse {
-  id: number;
-  name: string;
-  date_of_birth: string;
-  gender: "male" | "female";
-  has_limitations: boolean;
-  comment: string | null;
-  parent_id: number;
-  interests: InterestResponse[];
-  skills: SkillResponse[];
-  age: number;
-}
-
-interface ToyCategoryConfigResponse {
-  id: number;
-  name: string;
-  description: string | null;
-  icon: string | null;
-  quantity: number;
-}
-
-interface SubscriptionPlanResponse {
-  id: number;
-  name: string;
-  price_monthly: number;
-  toy_count: number;
-  description: string | null;
-  toy_configurations: ToyCategoryConfigResponse[];
-}
-
-interface SubscriptionPlansListResponse {
-  plans: SubscriptionPlanResponse[];
-}
-
-interface SubscriptionCreateRequest {
-  child_id: number;
-  plan_id: number;
-  delivery_info_id?: number;
-}
-
-interface SubscriptionCreateResponse {
-  subscription_id: number;
-  payment_id: number | null;
-  status: string;
-  individual_price: number;
-  message: string;
-}
-
-interface DeliveryInfoCreate {
-  name: string;
-  address: string;
-  delivery_time_preference?: string;
-  courier_comment?: string;
-}
-
-interface DeliveryInfoResponse {
-  id: number;
-  name: string;
-  address: string;
-  delivery_time_preference: string | null;
-  courier_comment: string | null;
-  user_id: number;
-  created_at: string;
-}
-
-interface BatchPaymentCreateRequest {
-  subscription_ids: number[];
-}
-
-interface BatchPaymentResponse {
-  payment_id: number;
-  external_payment_id: string;
-  payment_url: string;
-  amount: number;
-  currency: string;
-  subscription_count: number;
-  message: string;
-}
-
-interface PaymentProcessResponse {
-  status: "success" | "failed";
-  message: string;
-}
+// API types moved to ../types/api.ts
 
 interface LoginPageProps {
-  onNavigateToKidsPage: (data: UserData) => void;
+  onNavigateToKidsPage: (data: UserData, userId?: number) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({
@@ -1332,7 +1242,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       nextSetStatus: "not_determined",
       subscriptionDate: new Date().toISOString(),
     };
-    onNavigateToKidsPage(userData);
+    onNavigateToKidsPage(userData, currentUser?.id);
   };
 
   // Handle adding another child
