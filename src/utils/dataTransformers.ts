@@ -76,6 +76,7 @@ export const transformMainScreenData = (
   const primaryAddress = deliveryAddresses[0];
 
   return {
+    id: userProfile.id,
     name: userProfile.name || "",
     phone: userProfile.phone_number,
     children: transformedChildren,

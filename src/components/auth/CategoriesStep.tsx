@@ -4,59 +4,60 @@ import { useRegistrationStore } from "../../store/registrationStore";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
+  useGetChildChildrenChildIdGet,
   useUpdateChildChildrenChildIdPut,
 } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
-import { X } from "lucide-react";
+import { useChildIdLocation } from "./useChildIdLocation";
 
 export const CategoriesStep: React.FC = () => {
   const navigate = useNavigate();
-  const { editingChild, updateEditingChild, setError } = useRegistrationStore();
+  const childId = useChildIdLocation();
+  const { setError } = useRegistrationStore();
 
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
+  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
+    query: {
+      enabled: !!childId,
+    },
+  });
 
-  const [selectedInterests, setSelectedInterests] = useState<number[]>(
-    editingChild?.interestIds || []
+  const child = getChildMutation.data;
+
+  const [selectedInterestsIds, setSelectedInterestsIds] = useState<number[]>(
+    []
   );
-  const [selectedSkills, setSelectedSkills] = useState<number[]>(
-    editingChild?.skillIds || []
-  );
+  const [selectedSkillsIds, setSelectedSkillsIds] = useState<number[]>([]);
 
   // Синхронизируем состояние с editingChild при изменении
   useEffect(() => {
-    if (editingChild) {
-      setSelectedInterests(editingChild.interestIds || []);
-      setSelectedSkills(editingChild.skillIds || []);
+    if (child) {
+      setSelectedInterestsIds(
+        child.interests?.map((interest) => interest.id) || []
+      );
+      setSelectedSkillsIds(child.skills?.map((skill) => skill.id) || []);
     }
-  }, [editingChild]);
+  }, [child]);
 
   const handleUpdateChildCategories = async (
     interestIds: number[],
     skillIds: number[]
   ) => {
-    if (!editingChild?.id) {
+    if (!childId) {
       setError("ID ребенка не найден");
       return;
     }
 
     try {
       await updateChildMutation.mutateAsync({
-        childId: editingChild.id,
+        childId,
         data: {
-          name: editingChild.name,
-          date_of_birth: editingChild.birthDate,
-          gender: editingChild.gender,
-          has_limitations: editingChild.limitations === "has_limitations",
-          comment: editingChild.comment,
           interest_ids: interestIds,
           skill_ids: skillIds,
         },
       });
-
-      // Обновляем editingChild с интересами и навыками
-      updateEditingChild({ interestIds, skillIds });
 
       // Переходим на следующий шаг
       navigate(ROUTES.AUTH.SUBSCRIPTION);
@@ -95,32 +96,32 @@ export const CategoriesStep: React.FC = () => {
     }) || [];
 
   const toggleInterest = (interestId: number) => {
-    const newInterests = selectedInterests.includes(interestId)
-      ? selectedInterests.filter((i) => i !== interestId)
-      : [...selectedInterests, interestId];
+    const newInterests = selectedInterestsIds.includes(interestId)
+      ? selectedInterestsIds.filter((i) => i !== interestId)
+      : [...selectedInterestsIds, interestId];
 
-    setSelectedInterests(newInterests);
+    setSelectedInterestsIds(newInterests);
   };
 
   const toggleSkill = (skillId: number) => {
-    const newSkills = selectedSkills.includes(skillId)
-      ? selectedSkills.filter((s) => s !== skillId)
-      : [...selectedSkills, skillId];
+    const newSkills = selectedSkillsIds.includes(skillId)
+      ? selectedSkillsIds.filter((s) => s !== skillId)
+      : [...selectedSkillsIds, skillId];
 
-    setSelectedSkills(newSkills);
+    setSelectedSkillsIds(newSkills);
   };
 
   const isCategoriesFormValid =
-    selectedInterests.length > 0 && selectedSkills.length > 0;
+    selectedInterestsIds.length > 0 && selectedSkillsIds.length > 0;
 
   // Проверяем наличие editingChild и ID ребенка
   useEffect(() => {
-    if (!editingChild?.id) {
+    if (!childId) {
       navigate(ROUTES.AUTH.CHILD);
     }
-  }, [editingChild?.id, navigate]);
+  }, [childId, navigate]);
 
-  if (!editingChild?.id) {
+  if (!childId) {
     return null;
   }
 
@@ -210,7 +211,7 @@ export const CategoriesStep: React.FC = () => {
                   key={interest.id}
                   onClick={() => toggleInterest(interest.id)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
-                    selectedInterests.includes(interest.id)
+                    selectedInterestsIds.includes(interest.id)
                       ? "bg-indigo-400 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
@@ -238,7 +239,7 @@ export const CategoriesStep: React.FC = () => {
                   key={skill.id}
                   onClick={() => toggleSkill(skill.id)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
-                    selectedSkills.includes(skill.id)
+                    selectedSkillsIds.includes(skill.id)
                       ? "bg-indigo-400 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
@@ -264,7 +265,7 @@ export const CategoriesStep: React.FC = () => {
           }`}
           disabled={!isCategoriesFormValid || updateChildMutation.isPending}
           onClick={() =>
-            handleUpdateChildCategories(selectedInterests, selectedSkills)
+            handleUpdateChildCategories(selectedInterestsIds, selectedSkillsIds)
           }
           style={{
             fontFamily: "Nunito, sans-serif",

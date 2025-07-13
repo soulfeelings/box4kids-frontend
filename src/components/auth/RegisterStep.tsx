@@ -6,19 +6,19 @@ import { ROUTES } from "../../constants/routes";
 
 export const RegisterStep: React.FC = () => {
   const navigate = useNavigate();
-  const { registerData, setRegisterData, userId } = useRegistrationStore();
+  const { registerData, setRegisterData, user } = useRegistrationStore();
 
   const updateUserMutation = useUpdateUserProfileUsersProfileUserIdPut();
 
   const handleUpdateUser = async (name: string) => {
-    if (!userId) {
-      console.error("User ID is required");
+    if (!user) {
+      console.error("User is required");
       return;
     }
 
     try {
       await updateUserMutation.mutateAsync({
-        userId,
+        userId: user.id,
         data: { name },
       });
 

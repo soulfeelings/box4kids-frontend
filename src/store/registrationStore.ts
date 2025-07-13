@@ -76,18 +76,11 @@ interface RegistrationState {
   phoneData: PhoneData;
   welcomeData: WelcomeData;
   registerData: RegisterData;
-  children: StoredChild[];
-
-  // Редактируемый ребенок
-  editingChild: EditingChild | null;
 
   categoriesData: CategoriesData;
   subscriptionData: SubscriptionData;
   deliveryData: DeliveryData;
   paymentData: PaymentData;
-
-  // ID пользователя после завершения регистрации
-  userId: number | null;
 
   // Аутентификация
   user: UserData | null;
@@ -102,24 +95,17 @@ interface RegistrationState {
   setPhoneData: (data: Partial<PhoneData>) => void;
   setWelcomeData: (data: Partial<WelcomeData>) => void;
   setRegisterData: (data: Partial<RegisterData>) => void;
-  addChild: (child: StoredChild) => void;
-
-  // Методы для работы с editingChild
-  setEditingChild: (child: EditingChild | null) => void;
-  updateEditingChild: (updates: Partial<EditingChild>) => void;
-  resetEditingChild: () => void;
 
   setCategoriesData: (data: Partial<CategoriesData>) => void;
   setSubscriptionData: (data: Partial<SubscriptionData>) => void;
   setDeliveryData: (data: Partial<DeliveryData>) => void;
   setPaymentData: (data: Partial<PaymentData>) => void;
-  setUserId: (id: number) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   resetRegistration: () => void;
 
   // Аутентификация
-  setUser: (user: UserData, userId: number) => void;
+  setUser: (user: UserData) => void;
   logout: () => void;
 }
 
@@ -141,8 +127,6 @@ const initialState = {
     terms: false,
     name: "",
   },
-  children: [], // Пустой массив детей
-  editingChild: null, // Нет редактируемого ребенка
   categoriesData: {
     interests: [],
     skills: [],
@@ -163,7 +147,6 @@ const initialState = {
     paymentId: null,
     status: "",
   },
-  userId: null,
   user: null,
   isLoading: false,
   error: null,
@@ -175,7 +158,7 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
 
   // Computed property для аутентификации
   get isAuthenticated() {
-    return get().userId !== null;
+    return get().user !== null;
   },
 
   // Действия
@@ -195,34 +178,6 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
     set((state) => ({
       registerData: { ...state.registerData, ...data },
     })),
-
-  addChild: (child) =>
-    set((state) => ({
-      children: [...state.children, child],
-    })),
-
-  // Методы для работы с editingChild
-  setEditingChild: (child) => set({ editingChild: child }),
-
-  updateEditingChild: (updates) =>
-    set((state) => ({
-      editingChild: state.editingChild
-        ? { ...state.editingChild, ...updates }
-        : null,
-    })),
-
-  resetEditingChild: () =>
-    set({
-      editingChild: {
-        name: "",
-        birthDate: "",
-        gender: null,
-        limitations: "",
-        comment: "",
-        interestIds: [],
-        skillIds: [],
-      },
-    }),
 
   setCategoriesData: (data) =>
     set((state) => ({
@@ -244,8 +199,6 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
       paymentData: { ...state.paymentData, ...data },
     })),
 
-  setUserId: (id) => set({ userId: id }),
-
   setLoading: (loading) => set({ isLoading: loading }),
 
   setError: (error) => set({ error }),
@@ -253,7 +206,7 @@ export const useRegistrationStore = create<RegistrationState>((set, get) => ({
   resetRegistration: () => set(initialState),
 
   // Аутентификация
-  setUser: (user, userId) => set({ user, userId }),
+  setUser: (user) => set({ user }),
 
-  logout: () => set({ user: null, userId: null }),
+  logout: () => set({ user: null }),
 }));

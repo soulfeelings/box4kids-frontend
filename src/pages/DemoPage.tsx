@@ -7,6 +7,7 @@ import { useRegistrationStore } from "../store/registrationStore";
 const testUserDataScenarios: Record<string, UserData> = {
   // 1. User not subscribed
   notSubscribed: {
+    id: 1,
     name: "Елена",
     phone: "+7 (999) 123-45-67",
     children: [
@@ -31,6 +32,7 @@ const testUserDataScenarios: Record<string, UserData> = {
 
   // 2. User just subscribed (first 2 hours)
   justSubscribed: {
+    id: 1,
     name: "Елена",
     phone: "+7 (999) 123-45-67",
     children: [
@@ -56,6 +58,7 @@ const testUserDataScenarios: Record<string, UserData> = {
 
   // 3. Next set not determined
   nextSetNotDetermined: {
+    id: 1,
     name: "Елена",
     phone: "+7 (999) 123-45-67",
     children: [
@@ -80,6 +83,7 @@ const testUserDataScenarios: Record<string, UserData> = {
 
   // 4. Next set determined (original state)
   nextSetDetermined: {
+    id: 1,
     name: "Елена",
     phone: "+7 (999) 123-45-67",
     children: [
@@ -110,7 +114,7 @@ export const DemoPage: React.FC = () => {
   const handleTestDemo = (scenario: string) => {
     // Сохраняем данные демо-сценария в контекст и переходим на /app
     const userData = testUserDataScenarios[scenario];
-    setUser(userData, 1); // userId = 1 для демо
+    setUser(userData);
     navigate("/app");
   };
 

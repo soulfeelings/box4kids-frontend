@@ -10,7 +10,7 @@ import { ROUTES } from "../../constants/routes";
 
 export const CodeStep: React.FC = () => {
   const navigate = useNavigate();
-  const { phoneData, setPhoneData, setUserId, setError, error, setUser } =
+  const { phoneData, setPhoneData, setError, error, setUser } =
     useRegistrationStore();
   const [resendTimer, setResendTimer] = useState(60);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
@@ -85,7 +85,6 @@ export const CodeStep: React.FC = () => {
       });
 
       setPhoneData({ code: phoneData.code, verified: true });
-      setUserId(response.id);
 
       navigate(ROUTES.AUTH.WELCOME);
     } catch (error) {

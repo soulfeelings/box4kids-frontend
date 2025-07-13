@@ -77,17 +77,23 @@ export const DeliveryStep: React.FC = () => {
 
   const handleDeliverySubmit = async () => {
     if (!isDeliveryFormValid) return;
-    await createDeliveryAddressMutation.mutateAsync({
-      data: {
-        name: deliveryData.address,
-        address: deliveryData.address,
-        delivery_time_preference: deliveryData.time,
-        courier_comment: deliveryData.comment,
-      },
-      params: {
-        user_id: userId!,
-      },
-    });
+    try {
+      await createDeliveryAddressMutation.mutateAsync({
+        data: {
+          name: deliveryData.address,
+          address: deliveryData.address,
+          delivery_time_preference: deliveryData.time,
+          courier_comment: deliveryData.comment,
+        },
+        params: {
+          user_id: userId!,
+        },
+      });
+
+      navigate(ROUTES.AUTH.PAYMENT);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const isDeliveryFormValid =

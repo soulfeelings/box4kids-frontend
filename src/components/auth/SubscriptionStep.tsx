@@ -6,8 +6,10 @@ import {
   useCreateSubscriptionOrderSubscriptionsPost,
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
+  useGetChildChildrenChildIdGet,
 } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
+import { useChildIdLocation } from "./useChildIdLocation";
 
 // Tag component for interests and skills
 const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({
@@ -29,7 +31,8 @@ const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({
 
 export const SubscriptionStep: React.FC = () => {
   const navigate = useNavigate();
-  const { editingChild, subscriptionData, setSubscriptionData, isLoading } =
+  const childId = useChildIdLocation();
+  const { subscriptionData, setSubscriptionData, isLoading } =
     useRegistrationStore();
 
   const { data: plansData, isLoading: isLoadingPlans } =
@@ -38,6 +41,13 @@ export const SubscriptionStep: React.FC = () => {
     useCreateSubscriptionOrderSubscriptionsPost();
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
+  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
+    query: {
+      enabled: !!childId,
+    },
+  });
+
+  const child = getChildMutation.data;
 
   const availablePlans = plansData?.plans || [];
 
@@ -85,7 +95,7 @@ export const SubscriptionStep: React.FC = () => {
   };
 
   const handleSubscriptionSubmit = async () => {
-    if (!subscriptionData.plan || !editingChild?.id) return;
+    if (!subscriptionData.plan || !childId) return;
 
     const selectedPlan = availablePlans.find(
       (plan) => mapPlanNameToType(plan.name) === subscriptionData.plan
@@ -96,7 +106,7 @@ export const SubscriptionStep: React.FC = () => {
     try {
       await createSubscriptionMutation.mutateAsync({
         data: {
-          child_id: editingChild.id,
+          child_id: childId,
           plan_id: selectedPlan.id,
         },
       });
@@ -115,6 +125,16 @@ export const SubscriptionStep: React.FC = () => {
   };
 
   const isSubscriptionValid = subscriptionData.plan !== "";
+
+  useEffect(() => {
+    if (!childId) {
+      navigate(ROUTES.AUTH.CHILD);
+    }
+  }, [childId, navigate]);
+
+  if (!childId) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -168,7 +188,7 @@ export const SubscriptionStep: React.FC = () => {
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Какой набор подойдёт {editingChild?.name}?
+            Какой набор подойдёт {child?.name}?
           </h1>
         </div>
 
@@ -189,7 +209,7 @@ export const SubscriptionStep: React.FC = () => {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full flex items-center justify-center">
                 <span className="font-semibold text-2xl">
-                  {editingChild?.gender === "male" ? "👦🏻" : "👩🏻"}
+                  {child?.gender === "male" ? "👦🏻" : "👩🏻"}
                 </span>
               </div>
               <div>
@@ -197,9 +217,9 @@ export const SubscriptionStep: React.FC = () => {
                   className="font-semibold text-gray-900"
                   style={{ fontFamily: "Nunito, sans-serif" }}
                 >
-                  {editingChild?.name},{" "}
-                  {editingChild?.birthDate
-                    ? calculateAge(editingChild.birthDate)
+                  {child?.name},{" "}
+                  {child?.date_of_birth
+                    ? calculateAge(child.date_of_birth)
                     : ""}
                 </h2>
               </div>
@@ -214,8 +234,8 @@ export const SubscriptionStep: React.FC = () => {
                 Интересы
               </h3>
               <div className="flex flex-wrap gap-2">
-                {editingChild?.interestIds?.map((interestId, idx) => {
-                  const interestName = getInterestName(interestId);
+                {child?.interests?.map((interest, idx) => {
+                  const interestName = getInterestName(interest.id);
                   // Извлекаем эмодзи и текст из названия интереса
                   const match = interestName.match(/^(\S+)\s+(.+)$/);
                   const emoji = match ? match[1] : "🎯";
@@ -240,8 +260,8 @@ export const SubscriptionStep: React.FC = () => {
                 Навыки для развития
               </h3>
               <div className="flex flex-wrap gap-2">
-                {editingChild?.skillIds?.map((skillId, idx) => {
-                  const skillName = getSkillName(skillId);
+                {child?.skills?.map((skill, idx) => {
+                  const skillName = getSkillName(skill.id);
                   // Извлекаем эмодзи и текст из названия навыка
                   const match = skillName.match(/^(\S+)\s+(.+)$/);
                   const emoji = match ? match[1] : "⭐";

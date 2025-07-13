@@ -3,26 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
 import {
   useCreateBatchPaymentPaymentsCreateBatchPost,
-  useProcessPaymentPaymentsPaymentIdProcessPost,
   useGetAllSubscriptionPlansSubscriptionPlansGet,
+  useGetChildChildrenChildIdGet,
 } from "../../api-client";
 import { ROUTES } from "../../constants/routes";
+import { useChildIdLocation } from "./useChildIdLocation";
 
 export const PaymentStep: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    editingChild,
-    subscriptionData,
-    deliveryData,
-    isLoading,
-    setPaymentData,
-  } = useRegistrationStore();
+  const { subscriptionData, deliveryData, isLoading, setPaymentData } =
+    useRegistrationStore();
+
+  const childId = useChildIdLocation();
+  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
+    query: {
+      enabled: !!childId,
+    },
+  });
+  const child = getChildMutation.data;
 
   const { data: plansData } = useGetAllSubscriptionPlansSubscriptionPlansGet();
   const createBatchPaymentMutation =
     useCreateBatchPaymentPaymentsCreateBatchPost();
-  const processPaymentMutation =
-    useProcessPaymentPaymentsPaymentIdProcessPost();
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const availablePlans = plansData?.plans || [];
@@ -159,7 +161,7 @@ export const PaymentStep: React.FC = () => {
               className="text-lg font-semibold text-gray-900 mb-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Набор для {editingChild?.name}
+              Набор для {child?.name}
             </h2>
 
             <div className="space-y-2">

@@ -1,32 +1,68 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRegistrationStore } from "../../store/registrationStore";
 import { ROUTES } from "../../constants/routes";
-import { useCreateChildChildrenPost } from "../../api-client";
+import {
+  updateChildChildrenChildIdPut,
+  useCreateChildChildrenPost,
+  useGetChildChildrenChildIdGet,
+  useUpdateChildChildrenChildIdPut,
+} from "../../api-client";
 import { Gender } from "../../api-client/model/gender";
+import { convertDateToISO, convertDateFromISO } from "../../utils/date/convert";
+import { formatDateInput } from "../../utils/date/format";
+import { validateBirthDate } from "../../utils/date/validate";
+import { useChildIdLocation } from "./useChildIdLocation";
+
+interface ChildData {
+  name: string;
+  date_of_birth: string;
+  gender: Gender;
+  has_limitations: boolean;
+  comment?: string | null;
+}
 
 export const ChildStep: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    userId,
-    addChild,
-    editingChild,
-    updateEditingChild,
-    resetEditingChild,
-  } = useRegistrationStore();
+  const childId = useChildIdLocation();
+  const { userId } = useRegistrationStore();
   const createChildMutation = useCreateChildChildrenPost();
+  const updateChildMutation = useUpdateChildChildrenChildIdPut();
+  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
+    query: {
+      enabled: !!childId,
+    },
+  });
 
-  // Инициализируем editingChild при загрузке компонента
+  const child = getChildMutation.data;
+
+  const [childData, setChildData] = useState<ChildData>({
+    name: "",
+    date_of_birth: "",
+    gender: "male",
+    has_limitations: false,
+    comment: "",
+  });
+
+  const birthDateValidation = validateBirthDate(childData.date_of_birth);
+  const isFormValid =
+    childData.name.trim() &&
+    birthDateValidation.isValid &&
+    childData.gender &&
+    (childData.has_limitations === false ||
+      (childData.has_limitations === true && childData.comment?.trim()));
+
   useEffect(() => {
-    if (!editingChild) {
-      resetEditingChild();
+    if (child) {
+      setChildData({
+        name: child.name,
+        date_of_birth: child.date_of_birth,
+        gender: child.gender,
+        has_limitations: child.has_limitations,
+        comment: child.comment,
+      });
     }
-  }, [editingChild, resetEditingChild]);
-
-  // Если editingChild еще не инициализирован, показываем заглушку
-  if (!editingChild) {
-    return <div>Загрузка...</div>;
-  }
+  }, [child]);
 
   const handleBack = () => {
     navigate(ROUTES.AUTH.REGISTER);
@@ -36,145 +72,47 @@ export const ChildStep: React.FC = () => {
     navigate(ROUTES.DEMO);
   };
 
-  // Функция форматирования даты
-  const formatDateInput = (value: string): string => {
-    const numericValue = value.replace(/\D/g, "");
-
-    if (numericValue.length <= 2) {
-      return numericValue;
-    } else if (numericValue.length <= 4) {
-      return `${numericValue.slice(0, 2)}.${numericValue.slice(2)}`;
-    } else {
-      return `${numericValue.slice(0, 2)}.${numericValue.slice(
-        2,
-        4
-      )}.${numericValue.slice(4, 8)}`;
-    }
-  };
-
-  // Функция конвертации даты из DD.MM.YYYY в YYYY-MM-DD
-  const convertDateToISO = (dateString: string): string => {
-    if (!dateString) return "";
-
-    const parts = dateString.split(".");
-    if (parts.length !== 3) return "";
-
-    const day = parts[0].padStart(2, "0");
-    const month = parts[1].padStart(2, "0");
-    const year = parts[2];
-
-    return `${year}-${month}-${day}`;
-  };
-
-  // Функция конвертации даты из YYYY-MM-DD в DD.MM.YYYY
-  const convertDateFromISO = (isoDateString: string): string => {
-    if (!isoDateString) return "";
-
-    const parts = isoDateString.split("-");
-    if (parts.length !== 3) return "";
-
-    const year = parts[0];
-    const month = parts[1];
-    const day = parts[2];
-
-    return `${day}.${month}.${year}`;
-  };
-
-  // Функция валидации даты
-  const validateBirthDate = (
-    dateString: string
-  ): { isValid: boolean; error: string } => {
-    if (!dateString) return { isValid: false, error: "" };
-
-    const parts = dateString.split(".");
-    if (parts.length !== 3) {
-      return { isValid: false, error: "Неверный формат даты" };
-    }
-
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    if (isNaN(day) || isNaN(month) || isNaN(year)) {
-      return { isValid: false, error: "Неверный формат даты" };
-    }
-
-    if (day < 1 || day > 31) {
-      return { isValid: false, error: "Неверный день" };
-    }
-
-    if (month < 1 || month > 12) {
-      return { isValid: false, error: "Неверный месяц" };
-    }
-
-    if (year < 1900 || year > new Date().getFullYear()) {
-      return { isValid: false, error: "Неверный год" };
-    }
-
-    // Проверка на валидную дату
-    const date = new Date(year, month - 1, day);
-    if (
-      date.getDate() !== day ||
-      date.getMonth() !== month - 1 ||
-      date.getFullYear() !== year
-    ) {
-      return { isValid: false, error: "Такой даты не существует" };
-    }
-
-    // Проверка, что дата не в будущем
-    if (date > new Date()) {
-      return { isValid: false, error: "Дата не может быть в будущем" };
-    }
-
-    return { isValid: true, error: "" };
-  };
-
   const handleChildSubmit = async () => {
     if (!isFormValid) return;
 
-    try {
-      const response = await createChildMutation.mutateAsync({
+    if (childId && child) {
+      await updateChildMutation.mutateAsync({
+        childId,
         data: {
-          name: editingChild.name,
-          date_of_birth: convertDateToISO(editingChild.birthDate),
-          gender: editingChild.gender as Gender,
-          has_limitations: editingChild.limitations === "has_limitations",
-          comment: editingChild.comment,
+          name: childData.name,
+          date_of_birth: convertDateToISO(childData.date_of_birth),
+          gender: childData.gender as Gender,
+          has_limitations: childData.has_limitations,
+          comment: childData.comment,
+        },
+      });
+    } else {
+      await createChildMutation.mutateAsync({
+        data: {
+          name: childData.name,
+          date_of_birth: convertDateToISO(childData.date_of_birth),
+          gender: childData.gender as Gender,
+          has_limitations: childData.has_limitations,
+          comment: childData.comment,
         },
         params: {
           parent_id: userId!,
         },
       });
-
-      // Добавляем созданного ребенка в store
-      addChild({
-        id: response.id,
-        name: response.name,
-        birthDate: convertDateFromISO(response.date_of_birth),
-        gender: response.gender,
-        limitations: response.has_limitations ? "has_limitations" : "none",
-        comment: response.comment || "",
-      });
-
-      // Обновляем editingChild с ID созданного ребенка
-      updateEditingChild({ id: response.id });
-
-      // Переходим на следующий шаг
-      navigate(ROUTES.AUTH.CATEGORIES);
-    } catch (error) {
-      console.error("Ошибка при создании ребенка:", error);
     }
+    // Переходим на следующий шаг
+    navigate(ROUTES.AUTH.CATEGORIES);
   };
 
-  const birthDateValidation = validateBirthDate(editingChild.birthDate);
-  const isFormValid =
-    editingChild.name.trim() &&
-    birthDateValidation.isValid &&
-    editingChild.gender &&
-    editingChild.limitations &&
-    (editingChild.limitations === "none" ||
-      (editingChild.limitations === "has_limitations" &&
-        editingChild.comment.trim()));
+  useEffect(() => {
+    if (!userId) {
+      navigate(ROUTES.AUTH.PHONE);
+    }
+  }, [userId, navigate]);
+
+  if (!userId) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -243,7 +181,7 @@ export const ChildStep: React.FC = () => {
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                editingChild.name
+                childData.name
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -251,9 +189,9 @@ export const ChildStep: React.FC = () => {
               <input
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
                 placeholder=""
-                value={editingChild.name}
+                value={childData.name}
                 onChange={(e) => {
-                  updateEditingChild({ name: e.target.value });
+                  setChildData({ ...childData, name: e.target.value });
                 }}
                 maxLength={32}
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -271,11 +209,11 @@ export const ChildStep: React.FC = () => {
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                editingChild.birthDate && !birthDateValidation.isValid
+                childData.date_of_birth && !birthDateValidation.isValid
                   ? "border-red-400"
-                  : editingChild.birthDate && birthDateValidation.isValid
+                  : childData.date_of_birth && birthDateValidation.isValid
                   ? "border-green-400"
-                  : editingChild.birthDate
+                  : childData.date_of_birth
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -284,16 +222,16 @@ export const ChildStep: React.FC = () => {
                 type="text"
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
                 placeholder=""
-                value={editingChild.birthDate}
+                value={childData.date_of_birth}
                 onChange={(e) => {
                   const formatted = formatDateInput(e.target.value);
-                  updateEditingChild({ birthDate: formatted });
+                  setChildData({ ...childData, date_of_birth: formatted });
                 }}
                 maxLength={10}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
             </div>
-            {editingChild.birthDate && !birthDateValidation.isValid && (
+            {childData.date_of_birth && !birthDateValidation.isValid && (
               <p
                 className="text-sm text-red-400 px-3"
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -313,9 +251,9 @@ export const ChildStep: React.FC = () => {
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() => updateEditingChild({ gender: "male" })}
+                onClick={() => setChildData({ ...childData, gender: "male" })}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  editingChild.gender === "male"
+                  childData.gender === "male"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -324,9 +262,9 @@ export const ChildStep: React.FC = () => {
                 Мужской
               </button>
               <button
-                onClick={() => updateEditingChild({ gender: "female" })}
+                onClick={() => setChildData({ ...childData, gender: "female" })}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  editingChild.gender === "female"
+                  childData.gender === "female"
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -347,9 +285,11 @@ export const ChildStep: React.FC = () => {
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() => updateEditingChild({ limitations: "none" })}
+                onClick={() =>
+                  setChildData({ ...childData, has_limitations: false })
+                }
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  editingChild.limitations === "none"
+                  childData.has_limitations === false
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -359,10 +299,10 @@ export const ChildStep: React.FC = () => {
               </button>
               <button
                 onClick={() =>
-                  updateEditingChild({ limitations: "has_limitations" })
+                  setChildData({ ...childData, has_limitations: true })
                 }
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  editingChild.limitations === "has_limitations"
+                  childData.has_limitations === true
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -383,10 +323,9 @@ export const ChildStep: React.FC = () => {
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                editingChild.limitations === "has_limitations" &&
-                !editingChild.comment.trim()
+                childData.has_limitations === true && !childData.comment?.trim()
                   ? "border-red-400"
-                  : editingChild.comment
+                  : childData.comment
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -394,28 +333,27 @@ export const ChildStep: React.FC = () => {
               <textarea
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
                 placeholder={
-                  editingChild.limitations === "has_limitations"
+                  childData.has_limitations
                     ? "Опишите ограничения ребенка..."
                     : "Дополнительная информация о ребенке..."
                 }
-                value={editingChild.comment}
+                value={childData.comment || ""}
                 onChange={(e) =>
-                  updateEditingChild({ comment: e.target.value })
+                  setChildData({ ...childData, comment: e.target.value })
                 }
                 rows={3}
                 maxLength={200}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
             </div>
-            {editingChild.limitations === "has_limitations" &&
-              !editingChild.comment.trim() && (
-                <p
-                  className="text-sm text-red-400 px-3"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  Напишите ограничения ребенка
-                </p>
-              )}
+            {childData.has_limitations && !childData.comment?.trim() && (
+              <p
+                className="text-sm text-red-400 px-3"
+                style={{ fontFamily: "Nunito, sans-serif" }}
+              >
+                Напишите ограничения ребенка
+              </p>
+            )}
           </div>
         </div>
       </div>
