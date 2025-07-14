@@ -11,7 +11,8 @@ import { PaymentStep } from "./steps/PaymentStep";
 import { useStore } from "../../store/store";
 import { WelcomeStep } from "./steps/WelcomeStep";
 import { ROUTES } from "../../constants/routes";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ValidateSubscriptionsStep } from "./steps/ValidateSubscriptions";
 
 interface OnboardingFlowProps {
   className?: string;
@@ -53,7 +54,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
   useEffect(() => {
     setError(null);
-  }, [currentStep]);
+  }, [currentStep, setError]);
 
   // Проверяем, нужно ли показывать ошибку для текущего шага
   const shouldShowError = currentStep !== AUTH_STEPS.WELCOME;
@@ -103,11 +104,32 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         return (
           <SubscriptionStep
             onBack={() => setCurrentStep(AUTH_STEPS.CATEGORIES)}
-            onNext={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
+            onNext={() => setCurrentStep(AUTH_STEPS.VALIDATE_SUBSCRIPTIONS)}
             onClose={handleClose}
             currentChildToUpdate={currentChildToUpdate}
             onAddNewChild={() => {
               setCurrentChildIdToUpdate(null);
+              setCurrentStep(AUTH_STEPS.CHILD);
+            }}
+          />
+        );
+
+      case AUTH_STEPS.VALIDATE_SUBSCRIPTIONS:
+        return (
+          <ValidateSubscriptionsStep
+            onBack={() => setCurrentStep(AUTH_STEPS.SUBSCRIPTION)}
+            onNext={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
+            onClose={handleClose}
+            onAddNewChild={() => {
+              setCurrentChildIdToUpdate(null);
+              setCurrentStep(AUTH_STEPS.CHILD);
+            }}
+            onEditChildSubscription={(childId) => {
+              setCurrentChildIdToUpdate(childId);
+              setCurrentStep(AUTH_STEPS.SUBSCRIPTION);
+            }}
+            onEditChildData={(childId) => {
+              setCurrentChildIdToUpdate(childId);
               setCurrentStep(AUTH_STEPS.CHILD);
             }}
           />

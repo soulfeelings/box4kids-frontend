@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { AUTH_STEPS, AuthStep } from "../constants/auth";
+import { AuthStep } from "../constants/auth";
 import { UserData } from "../types";
 import { Gender } from "../api-client/model/gender";
 import {
@@ -163,6 +163,7 @@ const initialState = {
     status: "",
   },
   user: null,
+  subscriptionPlans: [],
   isLoading: false,
   isInitDataLoading: false,
   error: null,
@@ -179,6 +180,11 @@ export const useStore = create<State>()(
       isAuthenticated() {
         const token = localStorage.getItem("access_token");
         return !!token;
+      },
+
+      getSubscriptionPlan: (id: number) => {
+        const state = get();
+        return state.subscriptionPlans.find((plan) => plan.id === id) || null;
       },
 
       setPhoneData: (data) =>

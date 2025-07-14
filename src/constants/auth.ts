@@ -5,6 +5,7 @@ export const AUTH_STEPS = {
   CHILD: "child",
   CATEGORIES: "categories",
   SUBSCRIPTION: "subscription",
+  VALIDATE_SUBSCRIPTIONS: "validate_subscriptions",
   DELIVERY: "delivery",
   PAYMENT: "payment",
   SUCCESS: "success",

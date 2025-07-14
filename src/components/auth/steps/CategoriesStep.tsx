@@ -175,7 +175,7 @@ export const CategoriesStep: React.FC<{
         {/* Title */}
         <div className="text-center mt-4 mb-6">
           <h1
-            className="text-xl font-medium text-gray-900"
+            className="text-md font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
             Что интересно вашему ребёнку?
@@ -201,7 +201,7 @@ export const CategoriesStep: React.FC<{
           {/* Interests */}
           <div className="space-y-4">
             <h3
-              className="text-lg font-semibold text-gray-900"
+              className="text-md font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
               Интересы
@@ -228,7 +228,7 @@ export const CategoriesStep: React.FC<{
           {/* Skills */}
           <div className="space-y-4">
             <h3
-              className="text-lg font-semibold text-gray-900"
+              className="text-md font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
               Навыки для развития
