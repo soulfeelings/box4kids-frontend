@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
-import { ROUTES } from "../../constants/routes";
+import { ROUTES } from "../../../constants/routes";
 import {
-  updateChildChildrenChildIdPut,
   useCreateChildChildrenPost,
   useGetChildChildrenChildIdGet,
   useUpdateChildChildrenChildIdPut,
-} from "../../api-client";
-import { Gender } from "../../api-client/model/gender";
-import { convertDateToISO, convertDateFromISO } from "../../utils/date/convert";
-import { formatDateInput } from "../../utils/date/format";
-import { validateBirthDate } from "../../utils/date/validate";
-import { useChildIdLocation } from "./useChildIdLocation";
+} from "../../../api-client/";
+import { Gender } from "../../../api-client/model/gender";
+import {
+  convertDateToISO,
+  convertDateFromISO,
+} from "../../../utils/date/convert";
+import { formatDateInput } from "../../../utils/date/format";
+import { validateBirthDate } from "../../../utils/date/validate";
+import { useChildIdLocation } from "../useChildIdLocation";
 
 interface ChildData {
   name: string;

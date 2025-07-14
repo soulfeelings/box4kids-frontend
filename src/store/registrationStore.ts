@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { AUTH_STEPS, AuthStep } from "../constants/auth";
 import { UserData } from "../types";
 import { Gender } from "../api-client/model/gender";
@@ -107,6 +108,10 @@ interface RegistrationState {
   // Аутентификация
   setUser: (user: UserData) => void;
   logout: () => void;
+
+  // Новые методы для онбординга
+  canAccessStep: (step: AuthStep) => boolean;
+  getNextValidStep: () => AuthStep;
 }
 
 // Начальное состояние
@@ -152,61 +157,142 @@ const initialState = {
   error: null,
 };
 
-// Создание store
-export const useRegistrationStore = create<RegistrationState>((set, get) => ({
-  ...initialState,
+// Создание store с persist middleware для сохранения в localStorage
+export const useRegistrationStore = create<RegistrationState>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
 
-  // Computed property для аутентификации
-  get isAuthenticated() {
-    return get().user !== null;
-  },
+      // Computed property для аутентификации
+      get isAuthenticated() {
+        return get().user !== null;
+      },
 
-  // Действия
-  setCurrentStep: (step) => set({ currentStep: step }),
+      // Действия
+      setCurrentStep: (step) => set({ currentStep: step }),
 
-  setPhoneData: (data) =>
-    set((state) => ({
-      phoneData: { ...state.phoneData, ...data },
-    })),
+      setPhoneData: (data) =>
+        set((state) => ({
+          phoneData: { ...state.phoneData, ...data },
+        })),
 
-  setWelcomeData: (data) =>
-    set((state) => ({
-      welcomeData: { ...state.welcomeData, ...data },
-    })),
+      setWelcomeData: (data) =>
+        set((state) => ({
+          welcomeData: { ...state.welcomeData, ...data },
+        })),
 
-  setRegisterData: (data) =>
-    set((state) => ({
-      registerData: { ...state.registerData, ...data },
-    })),
+      setRegisterData: (data) =>
+        set((state) => ({
+          registerData: { ...state.registerData, ...data },
+        })),
 
-  setCategoriesData: (data) =>
-    set((state) => ({
-      categoriesData: { ...state.categoriesData, ...data },
-    })),
+      setCategoriesData: (data) =>
+        set((state) => ({
+          categoriesData: { ...state.categoriesData, ...data },
+        })),
 
-  setSubscriptionData: (data) =>
-    set((state) => ({
-      subscriptionData: { ...state.subscriptionData, ...data },
-    })),
+      setSubscriptionData: (data) =>
+        set((state) => ({
+          subscriptionData: { ...state.subscriptionData, ...data },
+        })),
 
-  setDeliveryData: (data) =>
-    set((state) => ({
-      deliveryData: { ...state.deliveryData, ...data },
-    })),
+      setDeliveryData: (data) =>
+        set((state) => ({
+          deliveryData: { ...state.deliveryData, ...data },
+        })),
 
-  setPaymentData: (data) =>
-    set((state) => ({
-      paymentData: { ...state.paymentData, ...data },
-    })),
+      setPaymentData: (data) =>
+        set((state) => ({
+          paymentData: { ...state.paymentData, ...data },
+        })),
 
-  setLoading: (loading) => set({ isLoading: loading }),
+      setLoading: (loading) => set({ isLoading: loading }),
 
-  setError: (error) => set({ error }),
+      setError: (error) => set({ error }),
 
-  resetRegistration: () => set(initialState),
+      resetRegistration: () => set(initialState),
 
-  // Аутентификация
-  setUser: (user) => set({ user }),
+      // Аутентификация
+      setUser: (user) => set({ user }),
 
-  logout: () => set({ user: null }),
-}));
+      logout: () => set({ user: null }),
+
+      // Новые методы для онбординга
+      canAccessStep: (step: AuthStep) => {
+        const state = get();
+        switch (step) {
+          case AUTH_STEPS.REGISTER:
+            return (
+              state.phoneData.verified &&
+              !!state.welcomeData.firstName &&
+              !!state.welcomeData.lastName
+            );
+
+          case AUTH_STEPS.CHILD:
+            return (
+              !!state.registerData.email &&
+              state.registerData.terms &&
+              !!state.registerData.name
+            );
+
+          case AUTH_STEPS.CATEGORIES:
+            return true; // Ребенок может быть создан в процессе
+
+          case AUTH_STEPS.SUBSCRIPTION:
+            return state.categoriesData.interestIds.length > 0;
+
+          case AUTH_STEPS.DELIVERY:
+            return (
+              state.subscriptionData.plan !== "" &&
+              state.subscriptionData.plan !== null
+            );
+
+          case AUTH_STEPS.PAYMENT:
+            return (
+              !!state.deliveryData.address &&
+              !!state.deliveryData.date &&
+              !!state.deliveryData.time
+            );
+
+          default:
+            return true;
+        }
+      },
+
+      getNextValidStep: () => {
+        const state = get();
+        const steps = [
+          AUTH_STEPS.REGISTER,
+          AUTH_STEPS.CHILD,
+          AUTH_STEPS.CATEGORIES,
+          AUTH_STEPS.SUBSCRIPTION,
+          AUTH_STEPS.DELIVERY,
+          AUTH_STEPS.PAYMENT,
+        ];
+
+        for (const step of steps) {
+          if (!state.canAccessStep(step)) {
+            return step;
+          }
+        }
+
+        return AUTH_STEPS.PAYMENT; // Последний шаг по умолчанию
+      },
+    }),
+    {
+      name: "registration-store", // Имя ключа в localStorage
+      partialize: (state) => ({
+        // Сохраняем только основные данные, исключая временные состояния
+        currentStep: state.currentStep,
+        phoneData: state.phoneData,
+        welcomeData: state.welcomeData,
+        registerData: state.registerData,
+        categoriesData: state.categoriesData,
+        subscriptionData: state.subscriptionData,
+        deliveryData: state.deliveryData,
+        paymentData: state.paymentData,
+        user: state.user,
+      }),
+    }
+  )
+);

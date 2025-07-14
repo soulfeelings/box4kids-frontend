@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
-import { useUpdateUserProfileUsersProfilePut } from "../../api-client";
-import { ROUTES } from "../../constants/routes";
+import { useRegistrationStore } from "../../../store/registrationStore";
+import { useUpdateUserProfileUsersProfilePut } from "../../../api-client/";
+import { ROUTES } from "../../../constants/routes";
 
 export const RegisterStep: React.FC = () => {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
-import { ROUTES } from "../../constants/routes";
-import { useCreateDeliveryAddressDeliveryAddressesPost } from "../../api-client";
+import { useRegistrationStore } from "../../../store/registrationStore";
+import { ROUTES } from "../../../constants/routes";
+import { useCreateDeliveryAddressDeliveryAddressesPost } from "../../../api-client/";
 
 export const DeliveryStep: React.FC = () => {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ export const DeliveryStep: React.FC = () => {
 
       navigate(ROUTES.AUTH.PAYMENT);
     } catch (error) {
-      console.log()
+      console.log();
     }
   };
 

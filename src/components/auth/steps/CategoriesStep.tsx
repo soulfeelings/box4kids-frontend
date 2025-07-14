@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useRegistrationStore } from "../../../store/registrationStore";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
   useGetChildChildrenChildIdGet,
   useUpdateChildChildrenChildIdPut,
-} from "../../api-client";
-import { ROUTES } from "../../constants/routes";
-import { useChildIdLocation } from "./useChildIdLocation";
+} from "../../../api-client/";
+import { ROUTES } from "../../../constants/routes";
+import { useChildIdLocation } from "../useChildIdLocation";
 
 export const CategoriesStep: React.FC = () => {
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ export const CategoriesStep: React.FC = () => {
   };
 
   const handleClose = () => {
-    navigate(ROUTES.DEMO);
+    navigate(ROUTES.APP.ROOT);
   };
 
   // Map API interests to UI format

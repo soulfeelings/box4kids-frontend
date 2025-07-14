@@ -23,13 +23,8 @@ import { ROUTES } from "./constants/routes";
 import { PhoneStep } from "./components/auth/PhoneStep";
 import { CodeStep } from "./components/auth/CodeStep";
 import { WelcomeStep } from "./components/auth/WelcomeStep";
-import { RegisterStep } from "./components/auth/RegisterStep";
-import { ChildStep } from "./components/auth/ChildStep";
-import { CategoriesStep } from "./components/auth/CategoriesStep";
-import { SubscriptionStep } from "./components/auth/SubscriptionStep";
-import { DeliveryStep } from "./components/auth/DeliveryStep";
-import { PaymentStep } from "./components/auth/PaymentStep";
 import { SuccessStep } from "./components/auth/SuccessStep";
+import OnboardingFlow from "./components/auth/OnboardingFlow";
 
 // Временный компонент для app маршрутов
 const AppRoutes: React.FC = () => {
@@ -94,16 +89,33 @@ const AppWithRoutes: React.FC = () => {
         />
 
         {/* WelcomeStep использует свой fullscreen layout */}
-        <Route path={ROUTES.AUTH.WELCOME} element={<WelcomeStep />} />
+        <Route
+          path={ROUTES.AUTH.WELCOME}
+          element={
+            <RouteGuard>
+              <WelcomeStep />
+            </RouteGuard>
+          }
+        />
 
-        {/* Остальные шаги - пока заглушки, потом добавим с AuthContainer */}
-        <Route path={ROUTES.AUTH.REGISTER} element={<RegisterStep />} />
-        <Route path={ROUTES.AUTH.CHILD} element={<ChildStep />} />
-        <Route path={ROUTES.AUTH.CATEGORIES} element={<CategoriesStep />} />
-        <Route path={ROUTES.AUTH.SUBSCRIPTION} element={<SubscriptionStep />} />
-        <Route path={ROUTES.AUTH.DELIVERY} element={<DeliveryStep />} />
-        <Route path={ROUTES.AUTH.PAYMENT} element={<PaymentStep />} />
-        <Route path={ROUTES.AUTH.SUCCESS} element={<SuccessStep />} />
+        {/* Новый объединенный роут для онбординга */}
+        <Route
+          path={ROUTES.AUTH.ONBOARDING}
+          element={
+            <RouteGuard>
+              <OnboardingFlow />
+            </RouteGuard>
+          }
+        />
+
+        <Route
+          path={ROUTES.AUTH.SUCCESS}
+          element={
+            <RouteGuard>
+              <SuccessStep />
+            </RouteGuard>
+          }
+        />
 
         {/* Приложение - защищенные маршруты */}
         <Route

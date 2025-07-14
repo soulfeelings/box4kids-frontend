@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useRegistrationStore } from "../../../store/registrationStore";
 import {
   useGetAllSubscriptionPlansSubscriptionPlansGet,
   useCreateSubscriptionOrderSubscriptionsPost,
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
   useGetChildChildrenChildIdGet,
-} from "../../api-client";
-import { ROUTES } from "../../constants/routes";
-import { useChildIdLocation } from "./useChildIdLocation";
+} from "../../../api-client/";
+import { ROUTES } from "../../../constants/routes";
+import { useChildIdLocation } from "../useChildIdLocation";
 
 // Tag component for interests and skills
 const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({

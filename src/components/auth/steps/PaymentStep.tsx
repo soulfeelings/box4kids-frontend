@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useRegistrationStore } from "../../../store/registrationStore";
 import {
   useCreateBatchPaymentPaymentsCreateBatchPost,
   useGetAllSubscriptionPlansSubscriptionPlansGet,
   useGetChildChildrenChildIdGet,
-} from "../../api-client";
-import { ROUTES } from "../../constants/routes";
-import { useChildIdLocation } from "./useChildIdLocation";
+} from "../../../api-client/";
+import { ROUTES } from "../../../constants/routes";
+import { useChildIdLocation } from "../useChildIdLocation";
 
 export const PaymentStep: React.FC = () => {
   const navigate = useNavigate();

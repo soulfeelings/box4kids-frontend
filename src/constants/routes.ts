@@ -9,6 +9,7 @@ export const ROUTES = {
     PHONE: "/auth/phone",
     CODE: "/auth/code",
     WELCOME: "/auth/welcome",
+    ONBOARDING: "/auth/onboarding",
     REGISTER: "/auth/register",
     CHILD: "/auth/child",
     CATEGORIES: "/auth/categories",
