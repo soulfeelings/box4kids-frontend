@@ -1,45 +1,37 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../../store/registrationStore";
+import { useStore } from "../../../store/store";
 import { useUpdateUserProfileUsersProfilePut } from "../../../api-client/";
-import { ROUTES } from "../../../constants/routes";
 
-export const RegisterStep: React.FC = () => {
-  const navigate = useNavigate();
-  const { registerData, setRegisterData, user } = useRegistrationStore();
+export const RegisterStep: React.FC<{
+  onBack: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onBack, onNext, onClose }) => {
+  const { registerData, setRegisterData } = useStore();
 
   const updateUserMutation = useUpdateUserProfileUsersProfilePut();
 
   const handleUpdateUser = async (name: string) => {
-    if (!user) {
-      console.error("User is required");
-      return;
-    }
-
     try {
       await updateUserMutation.mutateAsync({
         data: { name },
       });
 
       setRegisterData({ name });
-      navigate(ROUTES.AUTH.CHILD);
+      onNext();
     } catch (error) {
       console.error("Update user error:", error);
     }
   };
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.WELCOME);
+    onBack();
   };
 
   const handleRegister = async () => {
     if (!registerData.name.trim()) return;
 
     await handleUpdateUser(registerData.name);
-  };
-
-  const handleClose = () => {
-    navigate(ROUTES.DEMO);
   };
 
   const isLoading = updateUserMutation.isPending;
@@ -72,7 +64,7 @@ export const RegisterStep: React.FC = () => {
         </span>
 
         <button
-          onClick={handleClose}
+          onClick={onClose}
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
         >
           <svg

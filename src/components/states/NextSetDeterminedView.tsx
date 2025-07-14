@@ -34,7 +34,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
       borderRadius: '0 0 24px 24px',
       aspectRatio: '46%'
     }}>
-      <h1 className="text-xl font-semibold text-gray-800 mb-6">
+      <h1 className="text-xl text-center font-semibold text-gray-800 mb-6">
         Привет, {userData.name}! 🦋
       </h1>
 

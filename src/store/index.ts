@@ -1,2 +1,2 @@
 // Экспорт всех store
-export * from "./registrationStore";
+export * from "./store";

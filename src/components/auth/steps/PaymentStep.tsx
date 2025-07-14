@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../../store/registrationStore";
+import { useStore } from "../../../store/store";
 import {
   useCreateBatchPaymentPaymentsCreateBatchPost,
   useGetAllSubscriptionPlansSubscriptionPlansGet,
   useGetChildChildrenChildIdGet,
 } from "../../../api-client/";
-import { ROUTES } from "../../../constants/routes";
 import { useChildIdLocation } from "../useChildIdLocation";
 
-export const PaymentStep: React.FC = () => {
-  const navigate = useNavigate();
+export const PaymentStep: React.FC<{
+  onBack: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onBack, onNext, onClose }) => {
   const { subscriptionData, deliveryData, isLoading, setPaymentData } =
-    useRegistrationStore();
+    useStore();
 
   const childId = useChildIdLocation();
   const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
@@ -30,11 +31,11 @@ export const PaymentStep: React.FC = () => {
   const availablePlans = plansData?.plans || [];
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.DELIVERY);
+    onBack();
   };
 
   const handleClose = () => {
-    navigate(ROUTES.DEMO);
+    onClose();
   };
 
   const handlePaymentSubmit = async () => {
@@ -56,7 +57,7 @@ export const PaymentStep: React.FC = () => {
       });
 
       // Переходим к успешному завершению или обработке платежа
-      navigate(ROUTES.APP.ROOT); // или другой маршрут для завершения
+      onNext(); // или другой маршрут для завершения
     } catch (error) {
       console.error("Payment error:", error);
     } finally {

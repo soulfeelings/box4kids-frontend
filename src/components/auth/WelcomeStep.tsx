@@ -1,7 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
-import { ROUTES } from "../../constants/routes";
+import { useStore } from "../../store/store";
 
 const welcomeScreens = [
   {
@@ -21,9 +19,11 @@ const welcomeScreens = [
   },
 ];
 
-export const WelcomeStep: React.FC = () => {
-  const navigate = useNavigate();
-  const { welcomeData, setWelcomeData } = useRegistrationStore();
+export const WelcomeStep: React.FC<{
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onNext, onClose }) => {
+  const { welcomeData, setWelcomeData } = useStore();
 
   const w = welcomeScreens[welcomeData.welcomeIndex];
 
@@ -31,12 +31,12 @@ export const WelcomeStep: React.FC = () => {
     if (welcomeData.welcomeIndex < welcomeScreens.length - 1) {
       setWelcomeData({ welcomeIndex: welcomeData.welcomeIndex + 1 });
     } else {
-      navigate(ROUTES.AUTH.REGISTER);
+      onNext();
     }
   };
 
   const handleClose = () => {
-    navigate(ROUTES.AUTH.PHONE);
+    onClose();
   };
 
   return (

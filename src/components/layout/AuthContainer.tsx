@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useStore } from "../../store/store";
 import { ROUTES } from "../../constants/routes";
 
 interface AuthContainerProps {
@@ -34,7 +34,7 @@ const AuthHeader: React.FC = () => {
 };
 
 export const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
-  const { error } = useRegistrationStore();
+  const { error } = useStore();
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

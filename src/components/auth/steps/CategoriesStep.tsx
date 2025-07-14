@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../../store/registrationStore";
+import { useStore } from "../../../store/store";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
   useGetChildChildrenChildIdGet,
   useUpdateChildChildrenChildIdPut,
 } from "../../../api-client/";
-import { ROUTES } from "../../../constants/routes";
 import { useChildIdLocation } from "../useChildIdLocation";
 
-export const CategoriesStep: React.FC = () => {
-  const navigate = useNavigate();
+export const CategoriesStep: React.FC<{
+  onBack: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onBack, onNext, onClose }) => {
   const childId = useChildIdLocation();
-  const { setError } = useRegistrationStore();
+  const { setError } = useStore();
 
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
@@ -60,18 +61,18 @@ export const CategoriesStep: React.FC = () => {
       });
 
       // Переходим на следующий шаг
-      navigate(ROUTES.AUTH.SUBSCRIPTION);
+      onNext();
     } catch (error) {
       setError("Не удалось обновить категории");
     }
   };
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.CHILD);
+    onBack();
   };
 
   const handleClose = () => {
-    navigate(ROUTES.APP.ROOT);
+    onClose();
   };
 
   // Map API interests to UI format
@@ -117,9 +118,9 @@ export const CategoriesStep: React.FC = () => {
   // Проверяем наличие editingChild и ID ребенка
   useEffect(() => {
     if (!childId) {
-      navigate(ROUTES.AUTH.CHILD);
+      onClose();
     }
-  }, [childId, navigate]);
+  }, [childId, onClose]);
 
   if (!childId) {
     return null;

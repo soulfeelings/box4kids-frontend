@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../../store/registrationStore";
+import { useStore } from "../../../store/store";
 import {
   useGetAllSubscriptionPlansSubscriptionPlansGet,
   useCreateSubscriptionOrderSubscriptionsPost,
@@ -8,7 +7,6 @@ import {
   useGetAllSkillsSkillsGet,
   useGetChildChildrenChildIdGet,
 } from "../../../api-client/";
-import { ROUTES } from "../../../constants/routes";
 import { useChildIdLocation } from "../useChildIdLocation";
 
 // Tag component for interests and skills
@@ -29,11 +27,13 @@ const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({
   </span>
 );
 
-export const SubscriptionStep: React.FC = () => {
-  const navigate = useNavigate();
+export const SubscriptionStep: React.FC<{
+  onBack: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onBack, onNext, onClose }) => {
   const childId = useChildIdLocation();
-  const { subscriptionData, setSubscriptionData, isLoading } =
-    useRegistrationStore();
+  const { subscriptionData, setSubscriptionData, isLoading } = useStore();
 
   const { data: plansData, isLoading: isLoadingPlans } =
     useGetAllSubscriptionPlansSubscriptionPlansGet();
@@ -63,11 +63,11 @@ export const SubscriptionStep: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.CATEGORIES);
+    onBack();
   };
 
   const handleClose = () => {
-    navigate(ROUTES.DEMO);
+    onClose();
   };
 
   // Вычисление возраста
@@ -118,23 +118,13 @@ export const SubscriptionStep: React.FC = () => {
       });
 
       // Переходим к следующему шагу
-      navigate(ROUTES.AUTH.DELIVERY);
+      onNext();
     } catch (error) {
       console.error("Failed to create subscription:", error);
     }
   };
 
   const isSubscriptionValid = subscriptionData.plan !== "";
-
-  useEffect(() => {
-    if (!childId) {
-      navigate(ROUTES.AUTH.CHILD);
-    }
-  }, [childId, navigate]);
-
-  if (!childId) {
-    return null;
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

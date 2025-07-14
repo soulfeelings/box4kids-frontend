@@ -58,6 +58,10 @@ export const customFetch = async <T>({
   if (!response.ok) {
     if (response.status === 401) {
       console.warn("[customFetch] Unauthorized (401)");
+
+      localStorage.clear();
+      window.location.href = "/";
+      return undefined as T;
     }
 
     let errorMessage = `API error ${response.status}`;

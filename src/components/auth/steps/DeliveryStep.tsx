@@ -1,21 +1,22 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../../store/registrationStore";
-import { ROUTES } from "../../../constants/routes";
+import { useStore } from "../../../store/store";
 import { useCreateDeliveryAddressDeliveryAddressesPost } from "../../../api-client/";
 
-export const DeliveryStep: React.FC = () => {
-  const navigate = useNavigate();
-  const { deliveryData, setDeliveryData } = useRegistrationStore();
+export const DeliveryStep: React.FC<{
+  onBack: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onBack, onNext, onClose }) => {
+  const { deliveryData, setDeliveryData } = useStore();
   const createDeliveryAddressMutation =
     useCreateDeliveryAddressDeliveryAddressesPost();
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.SUBSCRIPTION);
+    onBack();
   };
 
   const handleClose = () => {
-    navigate(ROUTES.DEMO);
+    onClose();
   };
 
   const timeOptions = [
@@ -87,7 +88,7 @@ export const DeliveryStep: React.FC = () => {
         },
       });
 
-      navigate(ROUTES.AUTH.PAYMENT);
+      onNext();
     } catch (error) {
       console.log();
     }

@@ -6,16 +6,8 @@ export const ROUTES = {
 
   // Авторизация
   AUTH: {
-    PHONE: "/auth/phone",
-    CODE: "/auth/code",
-    WELCOME: "/auth/welcome",
+    OTP: "/auth/otp",
     ONBOARDING: "/auth/onboarding",
-    REGISTER: "/auth/register",
-    CHILD: "/auth/child",
-    CATEGORIES: "/auth/categories",
-    SUBSCRIPTION: "/auth/subscription",
-    DELIVERY: "/auth/delivery",
-    PAYMENT: "/auth/payment",
     SUCCESS: "/auth/success",
   },
 

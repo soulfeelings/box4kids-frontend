@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useStore } from "../../store/store";
 import {
   useVerifyOtpAuthVerifyOtpPost,
   useSendOtpAuthSendOtpPost,
   useDevGetCodeAuthDevGetCodePost,
 } from "../../api-client";
-import { ROUTES } from "../../constants/routes";
 
-export const CodeStep: React.FC = () => {
-  const navigate = useNavigate();
-  const { phoneData, setPhoneData, setError, error, setUser } =
-    useRegistrationStore();
+interface CodeStepProps {
+  onBack: () => void;
+  onSuccess: () => void;
+}
+
+export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
+  const { phoneData, setPhoneData, setError, error } = useStore();
   const [resendTimer, setResendTimer] = useState(60);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
 
@@ -90,15 +91,9 @@ export const CodeStep: React.FC = () => {
         localStorage.setItem("refresh_token", response.refresh_token);
       }
 
-      // Обновляем состояние
-      setPhoneData({ code: phoneData.code, verified: true });
-
-      // TODO: Сохранить пользователя в store если нужно
-      // setUser(response.user);
-
       console.log("✅ Аутентификация успешна:", response.user);
 
-      navigate(ROUTES.AUTH.WELCOME);
+      onSuccess();
     } catch (error) {
       setError("Неверный код подтверждения");
     }
@@ -135,7 +130,7 @@ export const CodeStep: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.PHONE);
+    onBack();
   };
 
   const isCodeValid = phoneData.code.length === 4;

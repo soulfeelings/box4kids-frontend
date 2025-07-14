@@ -16,16 +16,14 @@ import {
   useGetCurrentBoxToyBoxesCurrentChildIdGet,
   useGetNextBoxToyBoxesNextChildIdGet,
 } from "../api-client";
-import {
-  transformMainScreenData,
-  transformToyBoxToToys,
-} from "../utils/dataTransformers";
-import { error } from "console";
 import { Home, MoreHorizontal } from "lucide-react";
+import { useStore } from "../store/store";
+import { Navigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
-interface KidsAppInterfaceProps {}
+interface AppInterfaceProps {}
 
-export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
+export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
   const [showAllToys, setShowAllToys] = useState<boolean>(false);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
@@ -33,64 +31,10 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
-  // Заменить useState на хуки
-  const { data: userProfile, isLoading: profileLoading } =
-    useGetUserProfileUsersProfileGet();
-  const { data: subscriptions, isLoading: subscriptionsLoading } =
-    useGetUserSubscriptionsSubscriptionsUserGet();
-  const { data: deliveryAddresses, isLoading: deliveryLoading } =
-    useGetUserDeliveryAddressesDeliveryAddressesGet();
+  const { user } = useStore();
 
-  // Для коробок нужно получить детей из профиля
-  const firstChildId = userProfile?.children?.[0]?.id;
-  const { data: currentToyBox } = useGetCurrentBoxToyBoxesCurrentChildIdGet(
-    firstChildId || 0,
-    {
-      query: { enabled: !!firstChildId },
-    }
-  );
-  const { data: nextToyBox } = useGetNextBoxToyBoxesNextChildIdGet(
-    firstChildId || 0,
-    {
-      query: { enabled: !!firstChildId },
-    }
-  );
-
-  const isLoading = profileLoading || subscriptionsLoading || deliveryLoading;
-
-  // Преобразовать данные
-  const userData =
-    userProfile && subscriptions
-      ? transformMainScreenData(
-          // @ts-ignore
-          userProfile,
-          subscriptions,
-          deliveryAddresses?.addresses || [],
-          currentToyBox
-            ? new Map([[firstChildId || 0, currentToyBox]])
-            : new Map(),
-          nextToyBox ? new Map([[firstChildId || 0, nextToyBox]]) : new Map()
-        )
-      : null;
-
-  // Добавить обработку загрузки и ошибок
-  if (isLoading && !userData) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Загружаем данные...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userData) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">Нет данных для отображения</p>
-      </div>
-    );
+  if (!user) {
+    return <Navigate to={ROUTES.HOME} replace />;
   }
 
   const handleStarClick = (starIndex: number): void => {
@@ -100,7 +44,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
 
   // Get toys based on real API data
   const getCurrentToys = () => {
-    const currentChild = userData.children[0]; // Упрощение для примера
+    const currentChild = user?.children[0]; // Упрощение для примера
     if (!currentChild) return [];
 
     // const currentBox = currentToyBoxes.get(currentChild.id);
@@ -117,7 +61,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
       color: string;
     }> = [];
 
-    userData.children.forEach((child) => {
+    user?.children.forEach((child) => {
       if (child.subscription === "premium") {
         toys.push(
           { icon: "🔧", count: 3, name: "Конструктор", color: "#F8CAAF" },
@@ -154,7 +98,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
   // Обновить функцию обработки отзывов
   const handleFeedbackSubmit = async (rating: number, comment: string) => {
     // Найти ID текущего набора (логика зависит от UI)
-    const currentChild = userData.children[0]; // Упрощение для примера
+    const currentChild = user?.children[0]; // Упрощение для примера
     if (!currentChild) return;
 
     // const currentBox = currentToyBoxes.get(currentChild.id);
@@ -169,7 +113,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
   };
 
   const getNextToys = () => {
-    const currentChild = userData.children[0]; // Упрощение для примера
+    const currentChild = user?.children[0]; // Упрощение для примера
     if (!currentChild) return [];
 
     // const nextBox = nextToyBoxes.get(currentChild.id);
@@ -186,7 +130,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
       color: string;
     }> = [];
 
-    userData.children.forEach((child) => {
+    user?.children.forEach((child) => {
       // Add toys based on interests
       if (child.interests.includes("Конструкторы")) {
         toys.push({
@@ -288,16 +232,16 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
     | "next_set_not_determined"
     | "next_set_determined" => {
     // Check if user is not subscribed
-    if (userData.subscriptionStatus === "not_subscribed") {
+    if (user?.subscriptionStatus === "not_subscribed") {
       return "not_subscribed";
     }
 
     // Check if user just subscribed (first 2 hours)
     if (
-      userData.subscriptionStatus === "just_subscribed" &&
-      userData.subscriptionDate
+      user?.subscriptionStatus === "just_subscribed" &&
+      user?.subscriptionDate
     ) {
-      const subscriptionTime = new Date(userData.subscriptionDate);
+      const subscriptionTime = new Date(user?.subscriptionDate);
       const now = new Date();
       const hoursDiff =
         (now.getTime() - subscriptionTime.getTime()) / (1000 * 60 * 60);
@@ -308,7 +252,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
     }
 
     // Check next set status
-    if (userData.nextSetStatus === "not_determined") {
+    if (user?.nextSetStatus === "not_determined") {
       return "next_set_not_determined";
     }
 
@@ -410,7 +354,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
   if (showProfile) {
     return (
       <ProfilePage
-        userData={userData}
+        userData={user}
         setShowProfile={setShowProfile}
         BottomNavigation={BottomNavigation}
       />
@@ -432,7 +376,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
   if (showChildrenScreen) {
     return (
       <ChildrenAndSubscriptionsView
-        userData={userData}
+        userData={user}
         setShowChildrenScreen={setShowChildrenScreen}
         BottomNavigation={BottomNavigation}
         getAge={getAge}
@@ -458,14 +402,14 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
     case "not_subscribed":
       return (
         <NotSubscribedView
-          userData={userData}
+          userData={user}
           BottomNavigation={BottomNavigation}
         />
       );
     case "just_subscribed":
       return (
         <JustSubscribedView
-          userData={userData}
+          userData={user}
           BottomNavigation={BottomNavigation}
           formatDeliveryDate={formatDeliveryDate}
           formatDeliveryTime={formatDeliveryTime}
@@ -476,7 +420,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
     case "next_set_not_determined":
       return (
         <NextSetNotDeterminedView
-          userData={userData}
+          userData={user}
           BottomNavigation={BottomNavigation}
           currentToys={currentToys}
           rating={rating}
@@ -490,7 +434,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
     case "next_set_determined":
       return (
         <NextSetDeterminedView
-          userData={userData}
+          userData={user}
           BottomNavigation={BottomNavigation}
           currentToys={currentToys}
           nextToys={nextToys}
@@ -505,7 +449,7 @@ export const KidsAppInterface: React.FC<KidsAppInterfaceProps> = ({}) => {
     default:
       return (
         <NextSetDeterminedView
-          userData={userData}
+          userData={user}
           BottomNavigation={BottomNavigation}
           currentToys={currentToys}
           nextToys={nextToys}

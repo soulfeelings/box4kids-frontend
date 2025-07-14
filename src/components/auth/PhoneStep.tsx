@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useStore } from "../../store/store";
 import { useSendOtpAuthSendOtpPost } from "../../api-client";
-import { ROUTES } from "../../constants/routes";
 
-export const PhoneStep: React.FC = () => {
-  const navigate = useNavigate();
-  const { phoneData, setPhoneData, setError } = useRegistrationStore();
+interface PhoneStepProps {
+  onSuccess: () => void;
+}
+
+export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
+  const { phoneData, setPhoneData, setError } = useStore();
 
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
 
@@ -23,7 +24,7 @@ export const PhoneStep: React.FC = () => {
         data: { phone_number: phoneData.phone },
       });
 
-      navigate(ROUTES.AUTH.CODE);
+      onSuccess();
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Не удалось отправить код"

@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useRegistrationStore } from "../../store/registrationStore";
+import { useStore } from "../../store/store";
 import { ROUTES } from "../../constants/routes";
 
 interface RouteGuardProps {
@@ -8,11 +8,10 @@ interface RouteGuardProps {
 }
 
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { isAuthenticated } = useRegistrationStore();
+  const { isAuthenticated } = useStore();
 
-  // Проверяем завершенную регистрацию
-  if (!isAuthenticated) {
-    return <Navigate to={ROUTES.AUTH.PHONE} replace />;
+  if (!isAuthenticated()) {
+    return <Navigate to={ROUTES.AUTH.OTP} replace />;
   }
 
   return <>{children}</>;

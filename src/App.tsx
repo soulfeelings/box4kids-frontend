@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -8,93 +8,41 @@ import {
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DemoPage } from "./pages/DemoPage";
-import { KidsAppInterface } from "./pages/KidsAppInterface";
+import { AppInterface } from "./pages/AppInterface";
 // import { ProfilePage } from "./pages/ProfilePage";
 // import { SupportPage } from "./pages/SupportPage";
 // import { DeliveryHistoryPage } from "./pages/DeliveryHistoryPage";
 import { UserData } from "./types";
+import { LoadingComponent } from "./components/common/LoadingComponent";
+import { ErrorComponent } from "./components/common/ErrorComponent";
 import { RouteGuard } from "./components/common/RouteGuard";
 import { AppLayout } from "./components/layout/AppLayout";
 import { AuthContainer } from "./components/layout/AuthContainer";
-import { useRegistrationStore } from "./store/registrationStore";
+import { useStore } from "./store/store";
 import { ROUTES } from "./constants/routes";
 
 // Импорт компонентов шагов авторизации
-import { PhoneStep } from "./components/auth/PhoneStep";
-import { CodeStep } from "./components/auth/CodeStep";
+import { OtpStep } from "./components/auth/OtpStep";
 import { WelcomeStep } from "./components/auth/WelcomeStep";
 import { SuccessStep } from "./components/auth/SuccessStep";
-import OnboardingFlow from "./components/auth/OnboardingFlow";
-
-// Временный компонент для app маршрутов
-const AppRoutes: React.FC = () => {
-  const { isAuthenticated, logout } = useRegistrationStore();
-  const navigate = useNavigate();
-
-  // Если не авторизован - перенаправляем на регистрацию
-  if (!isAuthenticated) {
-    return <Navigate to={ROUTES.AUTH.PHONE} replace />;
-  }
-
-  const handleBackToDemo = () => {
-    logout(); // Очищаем состояние
-    navigate(ROUTES.DEMO);
-  };
-
-  return (
-    <div>
-      <div className="fixed top-4 left-4 z-50">
-        <button
-          onClick={handleBackToDemo}
-          className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          ← Назад к демо
-        </button>
-      </div>
-      <KidsAppInterface />
-    </div>
-  );
-};
+import { OnboardingFlow } from "./components/auth/OnboardingFlow";
+import { DataGuard } from "./components/common/DataGuard";
 
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Главная страница - редирект на /demo */}
-        <Route
-          path={ROUTES.HOME}
-          element={<Navigate to={ROUTES.DEMO} replace />}
-        />
-
         {/* Демонстрация состояний */}
         <Route path={ROUTES.DEMO} element={<DemoPage />} />
 
         {/* Авторизация - компоненты напрямую с AuthContainer */}
         <Route
-          path={ROUTES.AUTH.PHONE}
+          path={ROUTES.AUTH.OTP}
           element={
             <AuthContainer>
-              <PhoneStep />
+              <OtpStep />
             </AuthContainer>
-          }
-        />
-        <Route
-          path={ROUTES.AUTH.CODE}
-          element={
-            <AuthContainer>
-              <CodeStep />
-            </AuthContainer>
-          }
-        />
-
-        {/* WelcomeStep использует свой fullscreen layout */}
-        <Route
-          path={ROUTES.AUTH.WELCOME}
-          element={
-            <RouteGuard>
-              <WelcomeStep />
-            </RouteGuard>
           }
         />
 
@@ -122,11 +70,13 @@ const AppWithRoutes: React.FC = () => {
           path={ROUTES.APP.ROOT}
           element={
             <RouteGuard>
-              <AppLayout />
+              <DataGuard>
+                <AppLayout />
+              </DataGuard>
             </RouteGuard>
           }
         >
-          <Route index element={<AppRoutes />} />
+          <Route index element={<AppInterface />} />
           {/* TODO: Адаптировать для router */}
           {/* <Route path="profile" element={<ProfilePage />} /> */}
           {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
@@ -134,11 +84,46 @@ const AppWithRoutes: React.FC = () => {
         </Route>
 
         {/* Fallback - перенаправление на регистрацию */}
-        <Route path="*" element={<Navigate to={ROUTES.AUTH.PHONE} replace />} />
+        <Route
+          path={ROUTES.HOME}
+          element={
+            <RouteGuard>
+              <InitialPage />
+            </RouteGuard>
+          }
+        />
+        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
     </BrowserRouter>
   );
 };
+
+function InitialPage() {
+  const ref = useRef(false);
+  const { isInitDataLoading, initDataError, user, fetchInitData } = useStore();
+
+  useEffect(() => {
+    if (!ref.current) {
+      ref.current = true;
+      fetchInitData();
+    }
+  }, []);
+
+  if (isInitDataLoading || !ref.current) {
+    return <LoadingComponent />;
+  }
+
+  if (initDataError) {
+    return <ErrorComponent errorMessage={initDataError} />;
+  }
+
+  // Если есть имя значит юзер уже открывал онбординг и каким то образом ушел с него, мы больше ему его не показываем
+  if (user?.name) {
+    return <Navigate to={ROUTES.APP.ROOT} replace />;
+  }
+
+  return <Navigate to={ROUTES.AUTH.ONBOARDING} replace />;
+}
 
 // Создаем QueryClient
 const queryClient = new QueryClient({

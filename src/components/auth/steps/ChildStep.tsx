@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../../constants/routes";
 import {
   useCreateChildChildrenPost,
   useGetChildChildrenChildIdGet,
@@ -23,8 +21,11 @@ interface ChildData {
   comment?: string | null;
 }
 
-export const ChildStep: React.FC = () => {
-  const navigate = useNavigate();
+export const ChildStep: React.FC<{
+  onBack: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}> = ({ onBack, onNext, onClose }) => {
   const childId = useChildIdLocation();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
@@ -65,11 +66,11 @@ export const ChildStep: React.FC = () => {
   }, [child]);
 
   const handleBack = () => {
-    navigate(ROUTES.AUTH.REGISTER);
+    onBack();
   };
 
   const handleClose = () => {
-    navigate(ROUTES.DEMO);
+    onClose();
   };
 
   const handleChildSubmit = async () => {
@@ -98,7 +99,7 @@ export const ChildStep: React.FC = () => {
       });
     }
     // Переходим на следующий шаг
-    navigate(ROUTES.AUTH.CATEGORIES);
+    onNext();
   };
 
   return (
