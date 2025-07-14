@@ -5,7 +5,6 @@
  * API для Box4Kids - сервис аренды игрушек для детей
  * OpenAPI spec version: 0.1.0
  */
-import type { DeliveryInfoResponseDeliveryTimePreference } from './deliveryInfoResponseDeliveryTimePreference';
 import type { DeliveryInfoResponseCourierComment } from './deliveryInfoResponseCourierComment';
 
 /**
@@ -16,8 +15,10 @@ export interface DeliveryInfoResponse {
   name: string;
   /** Полный адрес доставки */
   address: string;
+  /** Дата доставки */
+  date: string;
   /** Предпочтительное время доставки */
-  delivery_time_preference?: DeliveryInfoResponseDeliveryTimePreference;
+  time: string;
   /** Комментарий для курьера */
   courier_comment?: DeliveryInfoResponseCourierComment;
   id: number;

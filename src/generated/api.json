@@ -1862,16 +1862,14 @@
             "title": "Address",
             "description": "Полный адрес доставки"
           },
-          "delivery_time_preference": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Delivery Time Preference",
+          "date": {
+            "type": "string",
+            "title": "Date",
+            "description": "Дата доставки"
+          },
+          "time": {
+            "type": "string",
+            "title": "Time",
             "description": "Предпочтительное время доставки"
           },
           "courier_comment": {
@@ -1890,7 +1888,9 @@
         "type": "object",
         "required": [
           "name",
-          "address"
+          "address",
+          "date",
+          "time"
         ],
         "title": "DeliveryInfoCreate",
         "description": "Схема для создания нового адреса доставки"
@@ -1924,16 +1924,14 @@
             "title": "Address",
             "description": "Полный адрес доставки"
           },
-          "delivery_time_preference": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Delivery Time Preference",
+          "date": {
+            "type": "string",
+            "title": "Date",
+            "description": "Дата доставки"
+          },
+          "time": {
+            "type": "string",
+            "title": "Time",
             "description": "Предпочтительное время доставки"
           },
           "courier_comment": {
@@ -1966,6 +1964,8 @@
         "required": [
           "name",
           "address",
+          "date",
+          "time",
           "id",
           "user_id",
           "created_at"
@@ -1999,7 +1999,7 @@
             "title": "Address",
             "description": "Полный адрес доставки"
           },
-          "delivery_time_preference": {
+          "date": {
             "anyOf": [
               {
                 "type": "string"
@@ -2008,7 +2008,19 @@
                 "type": "null"
               }
             ],
-            "title": "Delivery Time Preference",
+            "title": "Date",
+            "description": "Дата доставки"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time",
             "description": "Предпочтительное время доставки"
           },
           "courier_comment": {

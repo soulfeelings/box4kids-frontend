@@ -7,7 +7,8 @@
  */
 import type { DeliveryInfoUpdateName } from './deliveryInfoUpdateName';
 import type { DeliveryInfoUpdateAddress } from './deliveryInfoUpdateAddress';
-import type { DeliveryInfoUpdateDeliveryTimePreference } from './deliveryInfoUpdateDeliveryTimePreference';
+import type { DeliveryInfoUpdateDate } from './deliveryInfoUpdateDate';
+import type { DeliveryInfoUpdateTime } from './deliveryInfoUpdateTime';
 import type { DeliveryInfoUpdateCourierComment } from './deliveryInfoUpdateCourierComment';
 
 /**
@@ -18,8 +19,10 @@ export interface DeliveryInfoUpdate {
   name?: DeliveryInfoUpdateName;
   /** Полный адрес доставки */
   address?: DeliveryInfoUpdateAddress;
+  /** Дата доставки */
+  date?: DeliveryInfoUpdateDate;
   /** Предпочтительное время доставки */
-  delivery_time_preference?: DeliveryInfoUpdateDeliveryTimePreference;
+  time?: DeliveryInfoUpdateTime;
   /** Комментарий для курьера */
   courier_comment?: DeliveryInfoUpdateCourierComment;
 }

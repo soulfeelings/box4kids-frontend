@@ -340,14 +340,13 @@ export const useStore = create<State>()(
               skills: child.skills.map((skill) => skill.id),
               subscriptions: child.subscriptions,
             })),
-            deliveryAddress: deliveryAddresses.addresses[0]?.address || "",
-            // TODO: add delivery date
-            // convertDateFromISO(
-            //   deliveryAddresses.addresses[0]?.delivery_date || ""
-            // )
-            deliveryDate: "00.00.0000",
-            deliveryTime:
-              deliveryAddresses.addresses[0]?.delivery_time_preference || "",
+            deliveryAddresses: deliveryAddresses.addresses.map((address) => ({
+              name: address.name,
+              address: address.address,
+              date: address.date,
+              time: address.time,
+              comment: address.courier_comment || null,
+            })),
             subscriptionStatus:
               userSubscriptions.length > 0 ? "active" : "not_subscribed",
             nextSetStatus: "not_determined",

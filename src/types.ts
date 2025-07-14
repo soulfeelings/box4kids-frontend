@@ -15,15 +15,21 @@ export interface UserChildData {
   subscriptions: SubscriptionResponse[];
 }
 
+export interface DeliveryAddressData {
+  name: string;
+  address: string;
+  date: string;
+  time: string;
+  comment: string | null;
+}
+
 // Interface for user data
 export interface UserData {
   id: number;
   name: string;
   phone: string;
   children: Array<UserChildData>;
-  deliveryAddress: string;
-  deliveryDate: string;
-  deliveryTime: string;
+  deliveryAddresses: Array<DeliveryAddressData>;
   // New fields for different states
   subscriptionStatus: "not_subscribed" | "just_subscribed" | "active";
   nextSetStatus: "not_determined" | "determined";

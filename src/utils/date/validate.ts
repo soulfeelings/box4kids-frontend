@@ -44,5 +44,9 @@ export const validateBirthDate = (
     return { isValid: false, error: "Дата не может быть в будущем" };
   }
 
+  if (new Date().getFullYear() - year > 18) {
+    return { isValid: false, error: "Ребёнок не может быть старше 18 лет" };
+  }
+
   return { isValid: true, error: "" };
 };

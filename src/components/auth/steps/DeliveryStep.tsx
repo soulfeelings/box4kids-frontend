@@ -83,7 +83,8 @@ export const DeliveryStep: React.FC<{
         data: {
           name: deliveryData.address,
           address: deliveryData.address,
-          delivery_time_preference: deliveryData.time,
+          date: deliveryData.date,
+          time: deliveryData.time,
           courier_comment: deliveryData.comment,
         },
       });

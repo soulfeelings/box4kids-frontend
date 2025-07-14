@@ -28,7 +28,8 @@ export const ChildStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate?: UserChildData;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
-  const { setCurrentChildIdToUpdate, user, addChild, updateChild } = useStore();
+  const { setCurrentChildIdToUpdate, user, addChild, updateChild, setError } =
+    useStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
@@ -103,52 +104,57 @@ export const ChildStep: React.FC<{
       return;
     }
 
-    if (currentChildToUpdate) {
-      const updatedChild = await updateChildMutation.mutateAsync({
-        childId: currentChildToUpdate.id,
-        data: {
-          name: childData.name,
-          date_of_birth: convertDateToISO(childData.date_of_birth),
-          gender: childData.gender as Gender,
-          has_limitations: childData.limitations,
-          comment: childData.comment,
-        },
-      });
+    try {
+      if (currentChildToUpdate) {
+        const updatedChild = await updateChildMutation.mutateAsync({
+          childId: currentChildToUpdate.id,
+          data: {
+            name: childData.name,
+            date_of_birth: convertDateToISO(childData.date_of_birth),
+            gender: childData.gender as Gender,
+            has_limitations: childData.limitations,
+            comment: childData.comment,
+          },
+        });
 
-      updateChild(updatedChild.id, {
-        name: updatedChild.name,
-        date_of_birth: convertDateFromISO(updatedChild.date_of_birth),
-        gender: updatedChild.gender,
-        limitations: updatedChild.has_limitations,
-        comment: updatedChild.comment,
-      });
-    } else {
-      const newChild = await createChildMutation.mutateAsync({
-        data: {
-          name: childData.name,
-          date_of_birth: convertDateToISO(childData.date_of_birth),
-          gender: childData.gender as Gender,
-          has_limitations: childData.limitations,
-          comment: childData.comment,
-        },
-      });
+        updateChild(updatedChild.id, {
+          name: updatedChild.name,
+          date_of_birth: convertDateFromISO(updatedChild.date_of_birth),
+          gender: updatedChild.gender,
+          limitations: updatedChild.has_limitations,
+          comment: updatedChild.comment,
+        });
+      } else {
+        const newChild = await createChildMutation.mutateAsync({
+          data: {
+            name: childData.name,
+            date_of_birth: convertDateToISO(childData.date_of_birth),
+            gender: childData.gender as Gender,
+            has_limitations: childData.limitations,
+            comment: childData.comment,
+          },
+        });
 
-      // add child to store
-      addChild({
-        id: newChild.id,
-        name: newChild.name,
-        date_of_birth: convertDateFromISO(newChild.date_of_birth),
-        gender: newChild.gender,
-        limitations: newChild.has_limitations,
-        comment: newChild.comment || "",
-        interests: newChild.interests.map((interest) => interest.id),
-        skills: newChild.skills.map((skill) => skill.id),
-        subscriptions: newChild.subscriptions,
-      });
-      setCurrentChildIdToUpdate(newChild.id);
+        // add child to store
+        addChild({
+          id: newChild.id,
+          name: newChild.name,
+          date_of_birth: convertDateFromISO(newChild.date_of_birth),
+          gender: newChild.gender,
+          limitations: newChild.has_limitations,
+          comment: newChild.comment || "",
+          interests: newChild.interests.map((interest) => interest.id),
+          skills: newChild.skills.map((skill) => skill.id),
+          subscriptions: newChild.subscriptions,
+        });
+        setCurrentChildIdToUpdate(newChild.id);
+        // Переходим на следующий шаг
+        onNext();
+      }
+    } catch (error) {
+      console.error("Failed to update child:", error);
+      setError("Не удалось обновить ребёнка");
     }
-    // Переходим на следующий шаг
-    onNext();
   };
 
   return (
