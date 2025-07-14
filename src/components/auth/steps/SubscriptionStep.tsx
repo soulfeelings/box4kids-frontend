@@ -74,6 +74,11 @@ export const SubscriptionStep: React.FC<{
       // Переходим к следующему шагу
       onNext();
     } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Неизвестная ошибка");
+      }
       console.error("Failed to create subscription:", error);
     }
   };
@@ -145,7 +150,7 @@ export const SubscriptionStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            "Какой набор подойдёт {currentChildToUpdate?.name || "ребёнку"}?"
+            Какой набор подойдёт {currentChildToUpdate?.name || "ребёнку"}?
           </h1>
         </div>
 

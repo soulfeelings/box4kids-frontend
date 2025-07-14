@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
-import { useCreateBatchPaymentPaymentsCreateBatchPost } from "../../../api-client/";
+import {
+  useCreateBatchPaymentPaymentsCreateBatchPost,
+  useProcessPaymentPaymentsPaymentIdProcessPost,
+} from "../../../api-client/";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { SubscriptionPlanResponse } from "../../../api-client/model/subscriptionPlanResponse";
 import { ToyCategoryConfigResponse } from "../../../api-client/model/toyCategoryConfigResponse";
@@ -10,17 +13,13 @@ export const PaymentStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
-  const {
-    getSelectedDeliveryAddressId,
-    isLoading,
-    setPaymentData,
-    user,
-    setError,
-    subscriptionPlans,
-  } = useStore();
+  const { isLoading, setPaymentData, user, setError, subscriptionPlans } =
+    useStore();
 
   const createBatchPaymentMutation =
     useCreateBatchPaymentPaymentsCreateBatchPost();
+  const processPaymentMutation =
+    useProcessPaymentPaymentsPaymentIdProcessPost();
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
@@ -55,6 +54,10 @@ export const PaymentStep: React.FC<{
       });
 
       // Переходим к успешному завершению или обработке платежа
+      await processPaymentMutation.mutateAsync({
+        paymentId: paymentResponse.payment_id,
+      });
+
       onNext(); // или другой маршрут для завершения
     } catch (error) {
       console.error("Payment error:", error);

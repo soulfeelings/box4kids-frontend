@@ -17,7 +17,10 @@ import { InterestResponse } from "../api-client/model/interestResponse";
 import { SkillResponse } from "../api-client/model/skillResponse";
 import { convertDateFromISO } from "../utils/date/convert";
 import { SubscriptionResponse } from "../api-client/model/subscriptionResponse";
-import { SubscriptionPlanResponse } from "../api-client/model";
+import {
+  SubscriptionPlanResponse,
+  SubscriptionStatus,
+} from "../api-client/model";
 
 type InterestId = InterestResponse["id"];
 type SkillId = SkillResponse["id"];
@@ -106,6 +109,7 @@ interface State {
   setPhoneData: (data: Partial<PhoneData>) => void;
   setWelcomeData: (data: Partial<WelcomeData>) => void;
   getSubscriptionPlan: (id: number) => SubscriptionPlanResponse | null;
+  getAllChildrenSubscriptionsIds: () => number[];
 
   setCategoriesData: (data: Partial<CategoriesData>) => void;
   setPaymentData: (data: Partial<PaymentData>) => void;
@@ -185,6 +189,20 @@ export const useStore = create<State>()(
         return state.subscriptionPlans.find((plan) => plan.id === id) || null;
       },
 
+      getAllChildrenSubscriptionsIds: (onlyPending: boolean = true) => {
+        const state = get();
+        return (
+          state.user?.children.flatMap((child) =>
+            child.subscriptions
+              .filter((subscription) =>
+                onlyPending
+                  ? subscription.status === SubscriptionStatus.pending_payment
+                  : true
+              )
+              .map((subscription) => subscription.id)
+          ) || []
+        );
+      },
       setPhoneData: (data) =>
         set((state) => ({
           phoneData: { ...state.phoneData, ...data },

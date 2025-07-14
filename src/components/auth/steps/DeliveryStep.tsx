@@ -1,7 +1,19 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
-import { useCreateDeliveryAddressDeliveryAddressesPost } from "../../../api-client/";
+import {
+  useCreateDeliveryAddressDeliveryAddressesPost,
+  useUpdateSubscriptionSubscriptionsSubscriptionIdPatch,
+} from "../../../api-client/";
 import { DeliveryAddressCards } from "../../../features/DeliveryAddressCards";
+import { generateDateOptions } from "../../../utils/date/generateDateOptions";
+
+const timeOptions = [
+  { value: "", label: "Выберите время" },
+  { value: "9-12", label: "9:00 - 12:00" },
+  { value: "12-15", label: "12:00 - 15:00" },
+  { value: "15-18", label: "15:00 - 18:00" },
+  { value: "18-21", label: "18:00 - 21:00" },
+];
 
 export const DeliveryStep: React.FC<{
   onBack: () => void;
@@ -13,9 +25,12 @@ export const DeliveryStep: React.FC<{
     getSelectedDeliveryAddressId,
     setSelectedDeliveryAddressId,
     addDeliveryAddress,
+    getAllChildrenSubscriptionsIds,
   } = useStore();
   const createDeliveryAddressMutation =
     useCreateDeliveryAddressDeliveryAddressesPost();
+  const updateSubscriptionMutation =
+    useUpdateSubscriptionSubscriptionsSubscriptionIdPatch();
 
   const selectedAddressId = getSelectedDeliveryAddressId();
   const [isCreatingNew, setIsCreatingNew] = useState(
@@ -72,67 +87,26 @@ export const DeliveryStep: React.FC<{
     onClose();
   };
 
-  const timeOptions = [
-    { value: "", label: "Выберите время" },
-    { value: "9-12", label: "9:00 - 12:00" },
-    { value: "12-15", label: "12:00 - 15:00" },
-    { value: "15-18", label: "15:00 - 18:00" },
-    { value: "18-21", label: "18:00 - 21:00" },
-  ];
+  const dateOptions = useMemo(() => generateDateOptions(), []);
 
-  // Generate date options for next 14 days
-  const generateDateOptions = () => {
-    const options = [{ value: "", label: "Выберите дату" }];
-    const today = new Date();
-
-    for (let i = 0; i < 14; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-
-      const day = date.getDate().toString().padStart(2, "0");
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-
-      const value = `${day}.${month}`;
-      const dayOfWeek = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"][
-        date.getDay()
-      ];
-      const monthName = [
-        "янв",
-        "фев",
-        "мар",
-        "апр",
-        "мая",
-        "июн",
-        "июл",
-        "авг",
-        "сен",
-        "окт",
-        "ноя",
-        "дек",
-      ][date.getMonth()];
-
-      let label;
-      if (i === 0) {
-        label = `Сегодня, ${day} ${monthName}`;
-      } else if (i === 1) {
-        label = `Завтра, ${day} ${monthName}`;
-      } else {
-        label = `${dayOfWeek}, ${day} ${monthName}`;
-      }
-
-      options.push({ value, label });
+  const updateSubscriptionsDeliveryInfoId = async (deliveryInfoId: number) => {
+    const subscriptionsIds = getAllChildrenSubscriptionsIds();
+    for (const subscriptionId of subscriptionsIds) {
+      await Promise.all([
+        await updateSubscriptionMutation.mutateAsync({
+          subscriptionId,
+          data: { delivery_info_id: deliveryInfoId },
+        }),
+      ]);
     }
-
-    return options;
   };
-
-  const dateOptions = generateDateOptions();
 
   const handleDeliverySubmit = async () => {
     if (!isDeliveryFormValid) return;
 
     // Если выбран существующий адрес, просто продолжаем
     if (selectedAddressId !== null) {
+      await updateSubscriptionsDeliveryInfoId(selectedAddressId);
       onNext();
       return;
     }
@@ -158,6 +132,8 @@ export const DeliveryStep: React.FC<{
         time: response.time,
         comment: response.courier_comment || "",
       });
+
+      await updateSubscriptionsDeliveryInfoId(response.id);
 
       onNext();
     } catch (error) {

@@ -72,7 +72,11 @@ export const customFetch = async <T>({
     let errorMessage = `API error ${response.status}`;
     try {
       const errorJson = await response.json();
-      errorMessage = errorJson?.message || errorMessage;
+      errorMessage =
+        errorJson?.message ||
+        errorJson?.detail ||
+        errorJson?.error ||
+        errorMessage;
     } catch {}
 
     console.error("[customFetch] ❌", response.status, errorMessage);

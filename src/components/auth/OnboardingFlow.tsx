@@ -148,7 +148,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         return (
           <PaymentStep
             onBack={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
-            onNext={() => navigate(ROUTES.APP.ROOT)}
+            onNext={() => window.location.assign("/")}
             onClose={handleClose}
           />
         );
