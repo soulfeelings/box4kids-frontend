@@ -12,7 +12,6 @@ import { AppInterface } from "./pages/AppInterface";
 // import { ProfilePage } from "./pages/ProfilePage";
 // import { SupportPage } from "./pages/SupportPage";
 // import { DeliveryHistoryPage } from "./pages/DeliveryHistoryPage";
-import { UserData } from "./types";
 import { LoadingComponent } from "./components/common/LoadingComponent";
 import { ErrorComponent } from "./components/common/ErrorComponent";
 import { RouteGuard } from "./components/common/RouteGuard";
