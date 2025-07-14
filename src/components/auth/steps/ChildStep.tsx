@@ -139,7 +139,7 @@ export const ChildStep: React.FC<{
         comment: newChild.comment || "",
         interests: [],
         skills: [],
-        subscription: "",
+        subscriptions: [],
       });
       setCurrentChildIdToUpdate(newChild.id);
     }

@@ -89,8 +89,8 @@ export const ChildrenAndSubscriptionsView: React.FC<
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">Тариф</p>
               <p className="text-gray-800 font-medium">
-                {child.subscription === "base" ? "Базовый" : "Премиум"} • 6
-                игрушек • 535₽/мес
+                {child.subscriptions[0].plan_id === 1 ? "Базовый" : "Премиум"} •
+                6 игрушек • 535₽/мес
               </p>
             </div>
           </div>

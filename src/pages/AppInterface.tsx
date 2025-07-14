@@ -61,19 +61,19 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       color: string;
     }> = [];
 
-    user?.children.forEach((child) => {
-      if (child.subscription === "premium") {
-        toys.push(
-          { icon: "🔧", count: 3, name: "Конструктор", color: "#F8CAAF" },
-          { icon: "🎨", count: 2, name: "Творческий набор", color: "#F8CAAF" }
-        );
-      } else if (child.subscription === "base") {
-        toys.push(
-          { icon: "🔧", count: 2, name: "Конструктор", color: "#F8CAAF" },
-          { icon: "🎨", count: 2, name: "Творческий набор", color: "#F8CAAF" }
-        );
-      }
-    });
+    // user?.children.forEach((child) => {
+    //   if (child.subscription === "premium") {
+    //     toys.push(
+    //       { icon: "🔧", count: 3, name: "Конструктор", color: "#F8CAAF" },
+    //       { icon: "🎨", count: 2, name: "Творческий набор", color: "#F8CAAF" }
+    //     );
+    //   } else if (child.subscription === "base") {
+    //     toys.push(
+    //       { icon: "🔧", count: 2, name: "Конструктор", color: "#F8CAAF" },
+    //       { icon: "🎨", count: 2, name: "Творческий набор", color: "#F8CAAF" }
+    //     );
+    //   }
+    // });
 
     // Remove duplicates and combine counts
     const toyMap = new Map();

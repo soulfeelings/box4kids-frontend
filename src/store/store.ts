@@ -16,6 +16,8 @@ import { retryAsync } from "../utils/retry";
 import { InterestResponse } from "../api-client/model/interestResponse";
 import { SkillResponse } from "../api-client/model/skillResponse";
 import { convertDateFromISO } from "../utils/date/convert";
+import { SubscriptionResponse } from "../api-client/model/subscriptionResponse";
+import { SubscriptionPlanResponse } from "../api-client/model";
 
 type InterestId = InterestResponse["id"];
 type SkillId = SkillResponse["id"];
@@ -71,7 +73,7 @@ export interface CreateChildData {
   comment: string;
   interests: InterestId[];
   skills: SkillId[];
-  subscription: "base" | "premium" | "";
+  subscriptions: SubscriptionResponse[];
 }
 
 export interface UpdateChildData {
@@ -82,7 +84,7 @@ export interface UpdateChildData {
   comment?: string | null;
   interests?: InterestId[];
   skills?: SkillId[];
-  subscription?: "base" | "premium" | "";
+  subscriptions?: SubscriptionResponse[];
 }
 
 // Основное состояние store
@@ -92,13 +94,13 @@ interface State {
   welcomeData: WelcomeData;
 
   categoriesData: CategoriesData;
-  subscriptionData: SubscriptionData;
   deliveryData: DeliveryData;
   paymentData: PaymentData;
 
   // Аутентификация
   user: UserData | null;
   isAuthenticated: () => boolean;
+  subscriptionPlans: SubscriptionPlanResponse[];
 
   // Состояние загрузки и ошибок
   isLoading: boolean;
@@ -110,9 +112,9 @@ interface State {
   // Действия
   setPhoneData: (data: Partial<PhoneData>) => void;
   setWelcomeData: (data: Partial<WelcomeData>) => void;
+  getSubscriptionPlan: (id: number) => SubscriptionPlanResponse | null;
 
   setCategoriesData: (data: Partial<CategoriesData>) => void;
-  setSubscriptionData: (data: Partial<SubscriptionData>) => void;
   setDeliveryData: (data: Partial<DeliveryData>) => void;
   setPaymentData: (data: Partial<PaymentData>) => void;
   setLoading: (loading: boolean) => void;
@@ -150,16 +152,6 @@ const initialState = {
     lastName: "",
     welcomeIndex: 0,
   },
-  categoriesData: {
-    interests: [],
-    skills: [],
-    interestIds: [],
-    skillIds: [],
-  },
-  subscriptionData: {
-    plan: "" as const,
-    subscriptionId: null,
-  },
   deliveryData: {
     address: "",
     date: "",
@@ -176,6 +168,7 @@ const initialState = {
   error: null,
   initDataError: null,
   currentChildIdToUpdate: null,
+  subscriptionPlans: [],
 };
 
 // Создание store с persist middleware для сохранения в localStorage
@@ -187,6 +180,10 @@ export const useStore = create<State>()(
       isAuthenticated() {
         const token = localStorage.getItem("access_token");
         return !!token;
+      },
+
+      getSubscriptionPlan: (id: number) => {
+        return get().subscriptionPlans.find((plan) => plan.id === id) || null;
       },
 
       setPhoneData: (data) =>
@@ -202,11 +199,6 @@ export const useStore = create<State>()(
       setCategoriesData: (data) =>
         set((state) => ({
           categoriesData: { ...state.categoriesData, ...data },
-        })),
-
-      setSubscriptionData: (data) =>
-        set((state) => ({
-          subscriptionData: { ...state.subscriptionData, ...data },
         })),
 
       setDeliveryData: (data) =>
@@ -302,64 +294,6 @@ export const useStore = create<State>()(
         });
       },
 
-      // Новые методы для онбординга
-      canAccessStep: (step: AuthStep) => {
-        const state = get();
-        switch (step) {
-          case AUTH_STEPS.UPDATE_NAME:
-            return (
-              state.phoneData.verified &&
-              !!state.welcomeData.firstName &&
-              !!state.welcomeData.lastName
-            );
-
-          case AUTH_STEPS.CHILD:
-            return !!state.user?.name;
-
-          case AUTH_STEPS.CATEGORIES:
-            return true; // Ребенок может быть создан в процессе
-
-          case AUTH_STEPS.SUBSCRIPTION:
-            return state.categoriesData.interests.length > 0;
-
-          case AUTH_STEPS.DELIVERY:
-            return (
-              state.subscriptionData.plan !== "" &&
-              state.subscriptionData.plan !== null
-            );
-
-          case AUTH_STEPS.PAYMENT:
-            return (
-              !!state.deliveryData.address &&
-              !!state.deliveryData.date &&
-              !!state.deliveryData.time
-            );
-
-          default:
-            return true;
-        }
-      },
-
-      getNextValidStep: () => {
-        const state = get();
-        const steps = [
-          AUTH_STEPS.UPDATE_NAME,
-          AUTH_STEPS.CHILD,
-          AUTH_STEPS.CATEGORIES,
-          AUTH_STEPS.SUBSCRIPTION,
-          AUTH_STEPS.DELIVERY,
-          AUTH_STEPS.PAYMENT,
-        ];
-
-        for (const step of steps) {
-          if (!state.canAccessStep(step)) {
-            return step;
-          }
-        }
-
-        return AUTH_STEPS.PAYMENT; // Последний шаг по умолчанию
-      },
-
       // Инициализация данных
       fetchInitData: async () => {
         set({ isInitDataLoading: true, initDataError: null });
@@ -403,11 +337,7 @@ export const useStore = create<State>()(
               comment: child.comment || "",
               interests: child.interests.map((interest) => interest.id),
               skills: child.skills.map((skill) => skill.id),
-              subscription:
-                userSubscriptions.find((sub: any) => sub.child_id === child.id)
-                  ?.plan_name === "premium"
-                  ? "premium"
-                  : "base",
+              subscriptions: child.subscriptions,
             })),
             deliveryAddress: deliveryAddresses.addresses[0]?.address || "",
             // TODO: add delivery date
@@ -425,6 +355,7 @@ export const useStore = create<State>()(
 
           // Сохраняем данные в store
           set({ user: userData });
+          set({ subscriptionPlans: subscriptionPlans.plans });
 
           // Обновляем справочные данные
           set((state) => ({

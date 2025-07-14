@@ -9,6 +9,7 @@ import type { Gender } from './gender';
 import type { ChildResponseComment } from './childResponseComment';
 import type { InterestResponse } from './interestResponse';
 import type { SkillResponse } from './skillResponse';
+import type { SubscriptionResponse } from './subscriptionResponse';
 
 export interface ChildResponse {
   id: number;
@@ -20,6 +21,7 @@ export interface ChildResponse {
   parent_id: number;
   interests: InterestResponse[];
   skills: SkillResponse[];
+  subscriptions: SubscriptionResponse[];
   /** Вычисляет возраст ребенка на основе даты рождения.
 
 Примечание: Вычисление происходит только по датам без учета времени и часовых поясов.

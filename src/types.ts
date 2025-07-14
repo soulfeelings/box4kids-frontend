@@ -1,6 +1,7 @@
 import { Gender } from "./api-client/model/gender";
 import { InterestResponse } from "./api-client/model/interestResponse";
 import { SkillResponse } from "./api-client/model/skillResponse";
+import { SubscriptionResponse } from "./api-client/model/subscriptionResponse";
 
 export interface UserChildData {
   id: number;
@@ -11,7 +12,7 @@ export interface UserChildData {
   comment: string | null;
   interests: InterestResponse["id"][];
   skills: SkillResponse["id"][];
-  subscription: "base" | "premium" | "";
+  subscriptions: SubscriptionResponse[];
 }
 
 // Interface for user data

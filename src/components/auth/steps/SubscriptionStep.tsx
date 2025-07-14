@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../../store/store";
-import {
-  useGetAllSubscriptionPlansSubscriptionPlansGet,
-  useCreateSubscriptionOrderSubscriptionsPost,
-} from "../../../api-client/";
+import { useCreateSubscriptionOrderSubscriptionsPost } from "../../../api-client/";
 import { UserChildData } from "../../../types";
 import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 
@@ -32,15 +29,26 @@ export const SubscriptionStep: React.FC<{
   currentChildToUpdate?: UserChildData;
   onAddNewChild?: () => void;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate, onAddNewChild }) => {
-  const { subscriptionData, setSubscriptionData, isLoading, setError } =
-    useStore();
+  const [subscriptionId, setSubscriptionId] = useState<number | null>(
+    currentChildToUpdate?.subscriptions[0].plan_id || null
+  );
 
-  const { data: plansData, isLoading: isLoadingPlans } =
-    useGetAllSubscriptionPlansSubscriptionPlansGet();
+  useEffect(() => {
+    if (currentChildToUpdate?.subscriptions[0].plan_id) {
+      setSubscriptionId(currentChildToUpdate?.subscriptions[0].plan_id);
+    }
+  }, [currentChildToUpdate]);
+
+  const {
+    isLoading,
+    setError,
+    getSubscriptionPlan,
+    updateChild,
+    subscriptionPlans,
+  } = useStore();
+
   const createSubscriptionMutation =
     useCreateSubscriptionOrderSubscriptionsPost();
-
-  const availablePlans = plansData?.plans || [];
 
   const handleBack = () => {
     onBack();
@@ -50,41 +58,25 @@ export const SubscriptionStep: React.FC<{
     onClose();
   };
 
-  // Вычисление возраста
-  const calculateAge = (birthDate: string): string => {
-    const [day, month, year] = birthDate.split(".").map(Number);
-    const birth = new Date(year, month - 1, day);
-    const today = new Date();
-
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    return `${age} лет`;
-  };
-
   // Маппинг названия плана к типу
   const mapPlanNameToType = (planName: string): "base" | "premium" => {
     return planName.toLowerCase().includes("базовый") ? "base" : "premium";
   };
 
   const handleSubscriptionSubmit = async () => {
-    if (!subscriptionData.plan || !currentChildToUpdate?.id) {
-      setError("Не удалось создать подписку");
+    if (!currentChildToUpdate?.id) {
+      setError("Не выбран ребенок");
       return;
     }
-    const selectedPlan = availablePlans.find(
-      (plan) => mapPlanNameToType(plan.name) === subscriptionData.plan
-    );
 
-    if (!selectedPlan) {
+    if (!subscriptionId) {
       setError("Не выбран план подписки");
+      return;
+    }
+
+    const subscriptionPlan = getSubscriptionPlan(subscriptionId);
+    if (!subscriptionPlan) {
+      setError("Не загрузились планы подписки");
       return;
     }
 
@@ -92,14 +84,25 @@ export const SubscriptionStep: React.FC<{
       await createSubscriptionMutation.mutateAsync({
         data: {
           child_id: currentChildToUpdate?.id,
-          plan_id: selectedPlan.id,
+          plan_id: subscriptionPlan.id,
         },
       });
 
       // Обновляем данные подписки в store
-      setSubscriptionData({
-        subscriptionId: selectedPlan.id,
-        plan: subscriptionData.plan,
+      updateChild(currentChildToUpdate?.id, {
+        subscriptions: [
+          {
+            id: subscriptionId,
+            plan_id: subscriptionPlan.id,
+            child_id: currentChildToUpdate?.id,
+            delivery_info_id: null,
+            status: currentChildToUpdate.subscriptions[0].status,
+            discount_percent:
+              currentChildToUpdate.subscriptions[0].discount_percent,
+            created_at: currentChildToUpdate.subscriptions[0].created_at,
+            expires_at: currentChildToUpdate.subscriptions[0].expires_at,
+          },
+        ],
       });
 
       // Переходим к следующему шагу
@@ -109,7 +112,7 @@ export const SubscriptionStep: React.FC<{
     }
   };
 
-  const isSubscriptionValid = subscriptionData.plan !== "";
+  const isSubscriptionValid = subscriptionId !== null;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -180,9 +183,9 @@ export const SubscriptionStep: React.FC<{
           </div>
 
           {/* Subscription plans */}
-          {availablePlans.map((plan) => {
+          {subscriptionPlans.map((plan) => {
             const planType = mapPlanNameToType(plan.name);
-            const isSelected = subscriptionData.plan === planType;
+            const isSelected = subscriptionId === plan.id;
 
             return (
               <div
@@ -195,7 +198,7 @@ export const SubscriptionStep: React.FC<{
                 style={{
                   backgroundColor: "#F2F2F2",
                 }}
-                onClick={() => setSubscriptionData({ plan: planType })}
+                onClick={() => setSubscriptionId(plan.id)}
               >
                 <div className="flex items-center gap-2 mb-4">
                   <h3
@@ -265,7 +268,7 @@ export const SubscriptionStep: React.FC<{
                     fontFamily: "Nunito, sans-serif",
                     backgroundColor: isSelected ? undefined : "#E3E3E3",
                   }}
-                  disabled={isLoadingPlans || isLoading}
+                  disabled={isLoading}
                 >
                   {isSelected ? "Выбрано" : "Выбрать"}
                 </button>
@@ -287,25 +290,19 @@ export const SubscriptionStep: React.FC<{
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-            isSubscriptionValid && !isLoadingPlans && !isLoading
+            isSubscriptionValid && !isLoading
               ? "text-white shadow-sm"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
           style={{
             fontFamily: "Nunito, sans-serif",
             backgroundColor:
-              isSubscriptionValid && !isLoadingPlans && !isLoading
-                ? "#30313D"
-                : undefined,
+              isSubscriptionValid && !isLoading ? "#30313D" : undefined,
           }}
-          disabled={!isSubscriptionValid || isLoadingPlans || isLoading}
+          disabled={!isSubscriptionValid || isLoading}
           onClick={handleSubscriptionSubmit}
         >
-          {isLoading
-            ? "Создаем подписку..."
-            : isLoadingPlans
-            ? "Загружаем планы..."
-            : "Перейти к оформлению"}
+          {isLoading ? "Создаем подписку..." : "Перейти к оформлению"}
         </button>
       </div>
     </div>

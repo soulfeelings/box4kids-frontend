@@ -1731,6 +1731,13 @@
             "type": "array",
             "title": "Skills"
           },
+          "subscriptions": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionResponse"
+            },
+            "type": "array",
+            "title": "Subscriptions"
+          },
           "age": {
             "type": "integer",
             "title": "Age",
@@ -1749,6 +1756,7 @@
           "parent_id",
           "interests",
           "skills",
+          "subscriptions",
           "age"
         ],
         "title": "ChildResponse"
