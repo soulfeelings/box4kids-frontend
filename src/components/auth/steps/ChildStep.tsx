@@ -4,7 +4,10 @@ import {
   useUpdateChildChildrenChildIdPut,
 } from "../../../api-client/";
 import { Gender } from "../../../api-client/model/gender";
-import { convertDateToISO } from "../../../utils/date/convert";
+import {
+  convertDateFromISO,
+  convertDateToISO,
+} from "../../../utils/date/convert";
 import { formatDateInput } from "../../../utils/date/format";
 import { validateBirthDate } from "../../../utils/date/validate";
 import { useStore } from "../../../store";
@@ -101,7 +104,7 @@ export const ChildStep: React.FC<{
     }
 
     if (currentChildToUpdate) {
-      await updateChildMutation.mutateAsync({
+      const updatedChild = await updateChildMutation.mutateAsync({
         childId: currentChildToUpdate.id,
         data: {
           name: childData.name,
@@ -112,12 +115,12 @@ export const ChildStep: React.FC<{
         },
       });
 
-      updateChild(currentChildToUpdate.id, {
-        name: childData.name,
-        date_of_birth: childData.date_of_birth,
-        gender: childData.gender as Gender,
-        limitations: childData.limitations,
-        comment: childData.comment ?? null,
+      updateChild(updatedChild.id, {
+        name: updatedChild.name,
+        date_of_birth: convertDateFromISO(updatedChild.date_of_birth),
+        gender: updatedChild.gender,
+        limitations: updatedChild.has_limitations,
+        comment: updatedChild.comment,
       });
     } else {
       const newChild = await createChildMutation.mutateAsync({
@@ -129,17 +132,18 @@ export const ChildStep: React.FC<{
           comment: childData.comment,
         },
       });
+
       // add child to store
       addChild({
         id: newChild.id,
         name: newChild.name,
-        date_of_birth: newChild.date_of_birth,
+        date_of_birth: convertDateFromISO(newChild.date_of_birth),
         gender: newChild.gender,
         limitations: newChild.has_limitations,
         comment: newChild.comment || "",
-        interests: [],
-        skills: [],
-        subscriptions: [],
+        interests: newChild.interests.map((interest) => interest.id),
+        skills: newChild.skills.map((skill) => skill.id),
+        subscriptions: newChild.subscriptions,
       });
       setCurrentChildIdToUpdate(newChild.id);
     }

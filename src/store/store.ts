@@ -168,7 +168,6 @@ const initialState = {
   error: null,
   initDataError: null,
   currentChildIdToUpdate: null,
-  subscriptionPlans: [],
 };
 
 // Создание store с persist middleware для сохранения в localStorage
@@ -180,10 +179,6 @@ export const useStore = create<State>()(
       isAuthenticated() {
         const token = localStorage.getItem("access_token");
         return !!token;
-      },
-
-      getSubscriptionPlan: (id: number) => {
-        return get().subscriptionPlans.find((plan) => plan.id === id) || null;
       },
 
       setPhoneData: (data) =>
