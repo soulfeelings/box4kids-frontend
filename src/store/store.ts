@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { AuthStep } from "../constants/auth";
-import { UserData } from "../types";
+import { UserData, DeliveryAddressData } from "../types";
 import { Gender } from "../api-client/model/gender";
 import {
   getUserProfileUsersProfileGet,
@@ -51,13 +51,6 @@ export interface SubscriptionData {
   subscriptionId: number | null;
 }
 
-export interface DeliveryData {
-  address: string;
-  date: string;
-  time: string;
-  comment?: string;
-}
-
 export interface PaymentData {
   paymentId: number | null;
   status: string;
@@ -94,7 +87,6 @@ interface State {
   welcomeData: WelcomeData;
 
   categoriesData: CategoriesData;
-  deliveryData: DeliveryData;
   paymentData: PaymentData;
 
   // Аутентификация
@@ -115,7 +107,6 @@ interface State {
   getSubscriptionPlan: (id: number) => SubscriptionPlanResponse | null;
 
   setCategoriesData: (data: Partial<CategoriesData>) => void;
-  setDeliveryData: (data: Partial<DeliveryData>) => void;
   setPaymentData: (data: Partial<PaymentData>) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -131,6 +122,15 @@ interface State {
   addChild: (childData: CreateChildData) => void;
   removeChild: (childId: number) => void;
   updateChild: (childId: number, updateData: UpdateChildData) => void;
+
+  // Управление адресами доставки
+  getUserDeliveryAddresses: () => DeliveryAddressData[];
+  addDeliveryAddress: (addressData: DeliveryAddressData) => void;
+  updateDeliveryAddress: (
+    id: number,
+    addressData: Partial<DeliveryAddressData>
+  ) => void;
+  removeDeliveryAddress: (id: number) => void;
 
   // Новые методы для онбординга
   canAccessStep: (step: AuthStep) => boolean;
@@ -151,12 +151,6 @@ const initialState = {
     firstName: "",
     lastName: "",
     welcomeIndex: 0,
-  },
-  deliveryData: {
-    address: "",
-    date: "",
-    time: "",
-    comment: "",
   },
   paymentData: {
     paymentId: null,
@@ -200,11 +194,6 @@ export const useStore = create<State>()(
       setCategoriesData: (data) =>
         set((state) => ({
           categoriesData: { ...state.categoriesData, ...data },
-        })),
-
-      setDeliveryData: (data) =>
-        set((state) => ({
-          deliveryData: { ...state.deliveryData, ...data },
         })),
 
       setPaymentData: (data) =>
@@ -295,6 +284,88 @@ export const useStore = create<State>()(
         });
       },
 
+      // Управление адресами доставки
+      getUserDeliveryAddresses: () => {
+        const user = get().user;
+        return user?.deliveryAddresses || [];
+      },
+
+      addDeliveryAddress: (addressData: DeliveryAddressData) => {
+        const user = get().user;
+        if (!user) {
+          console.error("addDeliveryAddress: User not found");
+          return;
+        }
+
+        set({
+          user: {
+            ...user,
+            deliveryAddresses: [...user.deliveryAddresses, addressData],
+          },
+        });
+      },
+
+      updateDeliveryAddress: (
+        id: number,
+        addressData: Partial<DeliveryAddressData>
+      ) => {
+        const user = get().user;
+        if (!user) {
+          console.error("updateDeliveryAddress: User not found");
+          return;
+        }
+
+        const addressIndex = user.deliveryAddresses.findIndex(
+          (address) => address.id === id
+        );
+        if (addressIndex === -1) {
+          console.error(
+            `updateDeliveryAddress: Address with id ${id} not found`
+          );
+          return;
+        }
+
+        const updatedAddresses = [...user.deliveryAddresses];
+        updatedAddresses[addressIndex] = {
+          ...updatedAddresses[addressIndex],
+          ...addressData,
+        };
+
+        set({
+          user: {
+            ...user,
+            deliveryAddresses: updatedAddresses,
+          },
+        });
+      },
+
+      removeDeliveryAddress: (id: number) => {
+        const user = get().user;
+        if (!user) {
+          console.error("removeDeliveryAddress: User not found");
+          return;
+        }
+
+        const addressExists = user.deliveryAddresses.some(
+          (address) => address.id === id
+        );
+        if (!addressExists) {
+          console.error(
+            `removeDeliveryAddress: Address with id ${id} not found`
+          );
+          return;
+        }
+
+        set({
+          user: {
+            ...user,
+            deliveryAddresses: user.deliveryAddresses.filter(
+              (address) => address.id !== id
+            ),
+          },
+        });
+      },
+
       // Инициализация данных
       fetchInitData: async () => {
         set({ isInitDataLoading: true, initDataError: null });
@@ -341,6 +412,7 @@ export const useStore = create<State>()(
               subscriptions: child.subscriptions,
             })),
             deliveryAddresses: deliveryAddresses.addresses.map((address) => ({
+              id: address.id,
               name: address.name,
               address: address.address,
               date: address.date,

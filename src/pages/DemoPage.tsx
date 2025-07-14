@@ -25,6 +25,7 @@ const testUserDataScenarios: Record<string, UserData> = {
     ],
     deliveryAddresses: [
       {
+        id: 1,
         name: "г. Москва, ул. Тверская, д. 1, кв. 10",
         address: "г. Москва, ул. Тверская, д. 1, кв. 10",
         date: "24.04",
@@ -56,6 +57,7 @@ const testUserDataScenarios: Record<string, UserData> = {
     ],
     deliveryAddresses: [
       {
+        id: 1,
         name: "г. Москва, ул. Тверская, д. 1, кв. 10",
         address: "г. Москва, ул. Тверская, д. 1, кв. 10",
         date: "24.04",
@@ -88,6 +90,7 @@ const testUserDataScenarios: Record<string, UserData> = {
     ],
     deliveryAddresses: [
       {
+        id: 1,
         name: "г. Москва, ул. Тверская, д. 1, кв. 10",
         address: "г. Москва, ул. Тверская, д. 1, кв. 10",
         date: "24.04",
@@ -119,6 +122,7 @@ const testUserDataScenarios: Record<string, UserData> = {
     ],
     deliveryAddresses: [
       {
+        id: 1,
         name: "г. Москва, ул. Тверская, д. 1, кв. 10",
         address: "г. Москва, ул. Тверская, д. 1, кв. 10",
         date: "24.04",

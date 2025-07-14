@@ -111,7 +111,7 @@ export const NextSetNotDeterminedView: React.FC<NextSetNotDeterminedViewProps> =
       <div className="p-4 mb-4" style={{ backgroundColor: '#F2F2F2', borderRadius: '16px' }}>
         <div>
           <p className="text-gray-600 text-sm mb-1">Доставка</p>
-          <p className="text-gray-800 font-medium">{formatDeliveryDate(userData.deliveryDate)} • {formatDeliveryTime(userData.deliveryTime)}</p>
+          <p className="text-gray-800 font-medium">{formatDeliveryDate(userData.deliveryAddresses[0].date)} • {formatDeliveryTime(userData.deliveryAddresses[0].time)}</p>
         </div>
       </div>
 

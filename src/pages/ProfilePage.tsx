@@ -3,8 +3,6 @@ import { ChevronRight, ArrowLeft } from "lucide-react";
 import { UserData } from "../types";
 import { DeliveryHistoryPage } from "./DeliveryHistoryPage";
 import { SupportPage } from "./SupportPage";
-import { ROUTES } from "../constants";
-import { useNavigate } from "react-router-dom";
 
 interface ProfilePageProps {
   userData: UserData;
@@ -108,7 +106,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   setShowProfile,
   BottomNavigation,
 }) => {
-  const navigate = useNavigate();
   const [showDeliveryHistory, setShowDeliveryHistory] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
 
@@ -231,9 +228,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <ProfileItem
           label="Доставка"
           isDelivery={true}
-          deliveryAddress={userData.deliveryAddress}
-          deliveryDate={formatDeliveryDate(userData.deliveryDate)}
-          deliveryTime={formatDeliveryTime(userData.deliveryTime)}
+          deliveryAddress={userData.deliveryAddresses[0].address}
+          deliveryDate={formatDeliveryDate(userData.deliveryAddresses[0].date)}
+          deliveryTime={formatDeliveryTime(userData.deliveryAddresses[0].time)}
           customRadius="rounded-[24px]"
         />
 

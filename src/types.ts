@@ -16,6 +16,7 @@ export interface UserChildData {
 }
 
 export interface DeliveryAddressData {
+  id: number;
   name: string;
   address: string;
   date: string;
