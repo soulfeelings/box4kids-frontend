@@ -1,5 +1,5 @@
-import React from "react";
-import { useStore } from "../../store/store";
+import React, { useEffect } from "react";
+import { useStore } from "../../../store/store";
 
 const welcomeScreens = [
   {
@@ -38,6 +38,10 @@ export const WelcomeStep: React.FC<{
   const handleClose = () => {
     onClose();
   };
+
+  useEffect(() => {
+    localStorage.setItem("hasSeenWelcome", "true");
+  }, []);
 
   return (
     <div

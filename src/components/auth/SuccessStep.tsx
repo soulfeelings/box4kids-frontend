@@ -76,9 +76,6 @@ export const SuccessStep: React.FC = () => {
           Перейти на главную
         </button>
       </div>
-
-      {/* Синий элемент справа */}
-      <div className="fixed right-0 top-1/2 transform -translate-y-1/2 w-1 h-24 bg-indigo-400 rounded-l-full"></div>
     </div>
   );
 };

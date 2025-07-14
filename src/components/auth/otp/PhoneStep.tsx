@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { useStore } from "../../store/store";
-import { useSendOtpAuthSendOtpPost } from "../../api-client";
+import { useStore } from "../../../store/store";
+import { useSendOtpAuthSendOtpPost } from "../../../api-client";
 
 interface PhoneStepProps {
   onSuccess: () => void;
 }
+
+const PHONE_MIN_LENGTH = 1; // TODO: change to normal value
 
 export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
   const { phoneData, setPhoneData, setError } = useStore();
@@ -14,7 +16,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
   const handleSendCode = async () => {
     setError(null);
 
-    if (phoneData.phone.length < 7) {
+    if (phoneData.phone.length < PHONE_MIN_LENGTH) {
       setError("Введите корректный номер телефона");
       return;
     }
@@ -38,7 +40,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
     };
   }, []);
 
-  const isPhoneValid = phoneData.phone.length >= 10;
+  const isPhoneValid = phoneData.phone.length >= PHONE_MIN_LENGTH;
   const isLoading = sendOtpMutation.isPending;
 
   return (

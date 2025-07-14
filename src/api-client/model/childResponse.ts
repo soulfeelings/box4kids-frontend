@@ -18,8 +18,8 @@ export interface ChildResponse {
   has_limitations: boolean;
   comment: ChildResponseComment;
   parent_id: number;
-  interests?: InterestResponse[];
-  skills?: SkillResponse[];
+  interests: InterestResponse[];
+  skills: SkillResponse[];
   /** Вычисляет возраст ребенка на основе даты рождения.
 
 Примечание: Вычисление происходит только по датам без учета времени и часовых поясов.

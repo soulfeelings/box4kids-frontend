@@ -51,6 +51,11 @@ export const customFetch = async <T>({
   try {
     response = await fetch(fullUrl, requestInit);
   } catch (err) {
+    if (err instanceof Error && err.message.includes("signal is aborted")) {
+      console.error("[customFetch] AbortError");
+      return undefined as T;
+    }
+
     console.error("[customFetch] Network error:", err);
     throw new Error("Network error");
   }

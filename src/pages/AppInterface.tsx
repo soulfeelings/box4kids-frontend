@@ -132,7 +132,8 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
 
     user?.children.forEach((child) => {
       // Add toys based on interests
-      if (child.interests.includes("Конструкторы")) {
+      // TODO: change to real interests
+      if (child.interests.includes(1)) {
         toys.push({
           icon: "🔧",
           count: 2,
@@ -140,7 +141,8 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
           color: "bg-orange-200",
         });
       }
-      if (child.interests.includes("Творчество")) {
+      // TODO: change to real interests
+      if (child.interests.includes(2)) {
         toys.push({
           icon: "🎨",
           count: 2,

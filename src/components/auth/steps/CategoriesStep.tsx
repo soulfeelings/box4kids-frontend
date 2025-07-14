@@ -1,31 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useStore } from "../../../store/store";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
-  useGetChildChildrenChildIdGet,
   useUpdateChildChildrenChildIdPut,
 } from "../../../api-client/";
-import { useChildIdLocation } from "../useChildIdLocation";
+import { UserChildData } from "../../../types";
 
 export const CategoriesStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-}> = ({ onBack, onNext, onClose }) => {
-  const childId = useChildIdLocation();
+  currentChildToUpdate?: UserChildData;
+}> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
+  const { updateChild } = useStore();
   const { setError } = useStore();
 
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
-  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
-    query: {
-      enabled: !!childId,
-    },
-  });
-
-  const child = getChildMutation.data;
 
   const [selectedInterestsIds, setSelectedInterestsIds] = useState<number[]>(
     []
@@ -34,38 +27,72 @@ export const CategoriesStep: React.FC<{
 
   // Синхронизируем состояние с editingChild при изменении
   useEffect(() => {
-    if (child) {
-      setSelectedInterestsIds(
-        child.interests?.map((interest) => interest.id) || []
-      );
-      setSelectedSkillsIds(child.skills?.map((skill) => skill.id) || []);
+    if (currentChildToUpdate) {
+      setSelectedInterestsIds(currentChildToUpdate.interests || []);
+      setSelectedSkillsIds(currentChildToUpdate.skills || []);
     }
-  }, [child]);
+  }, [currentChildToUpdate]);
+
+  const dataHasChanged = useMemo(() => {
+    if (!currentChildToUpdate) {
+      return false;
+    }
+
+    const interestsChanged =
+      selectedInterestsIds.length !== currentChildToUpdate.interests.length ||
+      selectedInterestsIds.some(
+        (interestId) => !currentChildToUpdate.interests.includes(interestId)
+      );
+
+    const skillsChanged =
+      selectedSkillsIds.length !== currentChildToUpdate.skills.length ||
+      selectedSkillsIds.some(
+        (skillId) => !currentChildToUpdate.skills.includes(skillId)
+      );
+
+    return interestsChanged || skillsChanged;
+  }, [selectedInterestsIds, selectedSkillsIds, currentChildToUpdate]);
 
   const handleUpdateChildCategories = async (
     interestIds: number[],
     skillIds: number[]
   ) => {
-    if (!childId) {
+    if (!currentChildToUpdate) {
       setError("ID ребенка не найден");
+      return;
+    }
+
+    if (!dataHasChanged) {
+      onNext();
       return;
     }
 
     try {
       await updateChildMutation.mutateAsync({
-        childId,
+        childId: currentChildToUpdate.id,
         data: {
           interest_ids: interestIds,
           skill_ids: skillIds,
         },
       });
 
+      updateChild(currentChildToUpdate.id, {
+        interests: interestIds,
+        skills: skillIds,
+      });
+
       // Переходим на следующий шаг
       onNext();
     } catch (error) {
-      setError("Не удалось обновить категории");
+      setError("Не удалось обновить категори и");
     }
   };
+
+  useEffect(() => {
+    if (!currentChildToUpdate) {
+      setError("ID ребенка не найден");
+    }
+  }, [currentChildToUpdate]);
 
   const handleBack = () => {
     onBack();
@@ -76,25 +103,9 @@ export const CategoriesStep: React.FC<{
   };
 
   // Map API interests to UI format
-  const interestItems =
-    interestsData?.interests.map((interest) => {
-      // Extract emoji and label from API response like "🧱 Конструкторы"
-      const match = interest.name.match(/^(\S+)\s+(.+)$/);
-      if (match) {
-        return { emoji: match[1], label: match[2], id: interest.id };
-      }
-      return { emoji: "🎯", label: interest.name, id: interest.id };
-    }) || [];
+  const interestItems = interestsData?.interests || [];
 
-  const skillItems =
-    skillsData?.skills.map((skill) => {
-      // Extract emoji and label from API response like "✋ Моторика"
-      const match = skill.name.match(/^(\S+)\s+(.+)$/);
-      if (match) {
-        return { emoji: match[1], label: match[2], id: skill.id };
-      }
-      return { emoji: "⭐", label: skill.name, id: skill.id };
-    }) || [];
+  const skillItems = skillsData?.skills || [];
 
   const toggleInterest = (interestId: number) => {
     const newInterests = selectedInterestsIds.includes(interestId)
@@ -114,17 +125,6 @@ export const CategoriesStep: React.FC<{
 
   const isCategoriesFormValid =
     selectedInterestsIds.length > 0 && selectedSkillsIds.length > 0;
-
-  // Проверяем наличие editingChild и ID ребенка
-  useEffect(() => {
-    if (!childId) {
-      onClose();
-    }
-  }, [childId, onClose]);
-
-  if (!childId) {
-    return null;
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -219,8 +219,7 @@ export const CategoriesStep: React.FC<{
                   style={{ fontFamily: "Nunito, sans-serif" }}
                   disabled={updateChildMutation.isPending}
                 >
-                  <span className="text-base">{interest.emoji}</span>
-                  <span>{interest.label}</span>
+                  <span>{interest.name}</span>
                 </button>
               ))}
             </div>
@@ -247,8 +246,7 @@ export const CategoriesStep: React.FC<{
                   style={{ fontFamily: "Nunito, sans-serif" }}
                   disabled={updateChildMutation.isPending}
                 >
-                  <span className="text-base">{skill.emoji}</span>
-                  <span>{skill.label}</span>
+                  <span>{skill.name}</span>
                 </button>
               ))}
             </div>

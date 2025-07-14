@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PhoneStep } from "./PhoneStep";
 import { CodeStep } from "./CodeStep";
-import { ROUTES } from "../../constants/routes";
+import { ROUTES } from "../../../constants/routes";
 
 type OtpStepType = "phone" | "code";
 

@@ -105,6 +105,8 @@ export * from './updateDeliveryAddressDeliveryAddressesAddressIdPutParams';
 export * from './userProfileResponse';
 export * from './userProfileResponseName';
 export * from './userProfileUpdate';
+export * from './userProfileUpdateRequest';
+export * from './userProfileUpdateResponse';
 export * from './userResponse';
 export * from './userResponseName';
 export * from './validationError';

@@ -62,7 +62,8 @@ import type {
   ToyBoxReviewsResponse,
   ToyCategoriesListResponse,
   UserProfileResponse,
-  UserProfileUpdate
+  UserProfileUpdateRequest,
+  UserProfileUpdateResponse
 } from './model';
 
 import { customFetch } from './customFetch';
@@ -358,14 +359,14 @@ export function useGetUserProfileUsersProfileGet<TData = Awaited<ReturnType<type
  * @summary Update User Profile
  */
 export const updateUserProfileUsersProfilePut = (
-    userProfileUpdate: UserProfileUpdate,
+    userProfileUpdateRequest: UserProfileUpdateRequest,
  ) => {
       
       
-      return customFetch<UserProfileResponse>(
+      return customFetch<UserProfileUpdateResponse>(
       {url: `/users/profile`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: userProfileUpdate
+      data: userProfileUpdateRequest
     },
       );
     }
@@ -373,8 +374,8 @@ export const updateUserProfileUsersProfilePut = (
 
 
 export const getUpdateUserProfileUsersProfilePutMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, TError,{data: UserProfileUpdate}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, TError,{data: UserProfileUpdate}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, TError,{data: UserProfileUpdateRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, TError,{data: UserProfileUpdateRequest}, TContext> => {
 
 const mutationKey = ['updateUserProfileUsersProfilePut'];
 const {mutation: mutationOptions} = options ?
@@ -386,7 +387,7 @@ const {mutation: mutationOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, {data: UserProfileUpdate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, {data: UserProfileUpdateRequest}> = (props) => {
           const {data} = props ?? {};
 
           return  updateUserProfileUsersProfilePut(data,)
@@ -398,18 +399,18 @@ const {mutation: mutationOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateUserProfileUsersProfilePutMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>>
-    export type UpdateUserProfileUsersProfilePutMutationBody = UserProfileUpdate
+    export type UpdateUserProfileUsersProfilePutMutationBody = UserProfileUpdateRequest
     export type UpdateUserProfileUsersProfilePutMutationError = HTTPValidationError
 
     /**
  * @summary Update User Profile
  */
 export const useUpdateUserProfileUsersProfilePut = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, TError,{data: UserProfileUpdate}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>, TError,{data: UserProfileUpdateRequest}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateUserProfileUsersProfilePut>>,
         TError,
-        {data: UserProfileUpdate},
+        {data: UserProfileUpdateRequest},
         TContext
       > => {
 

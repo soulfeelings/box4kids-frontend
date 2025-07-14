@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useCreateChildChildrenPost,
-  useGetChildChildrenChildIdGet,
   useUpdateChildChildrenChildIdPut,
 } from "../../../api-client/";
 import { Gender } from "../../../api-client/model/gender";
-import {
-  convertDateToISO,
-  convertDateFromISO,
-} from "../../../utils/date/convert";
+import { convertDateToISO } from "../../../utils/date/convert";
 import { formatDateInput } from "../../../utils/date/format";
 import { validateBirthDate } from "../../../utils/date/validate";
-import { useChildIdLocation } from "../useChildIdLocation";
+import { useStore } from "../../../store";
+import { UserChildData } from "../../../types";
+import { ChoseChildCards } from "../../../features/ChoseChildCards";
 
 interface ChildData {
   name: string;
   date_of_birth: string;
   gender: Gender;
-  has_limitations: boolean;
+  limitations: boolean;
   comment?: string | null;
 }
 
@@ -25,45 +23,65 @@ export const ChildStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-}> = ({ onBack, onNext, onClose }) => {
-  const childId = useChildIdLocation();
+  currentChildToUpdate?: UserChildData;
+}> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
+  const { setCurrentChildIdToUpdate, user, addChild, updateChild } = useStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
-  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
-    query: {
-      enabled: !!childId,
-    },
-  });
-
-  const child = getChildMutation.data;
 
   const [childData, setChildData] = useState<ChildData>({
-    name: "",
-    date_of_birth: "",
-    gender: "male",
-    has_limitations: false,
-    comment: "",
+    name: currentChildToUpdate?.name || "",
+    date_of_birth: currentChildToUpdate?.date_of_birth || "",
+    gender: currentChildToUpdate?.gender || "male",
+    limitations: currentChildToUpdate?.limitations || false,
+    comment: currentChildToUpdate?.comment || "",
   });
+
+  useEffect(() => {
+    if (currentChildToUpdate) {
+      setChildData({
+        name: currentChildToUpdate?.name || "",
+        date_of_birth: currentChildToUpdate?.date_of_birth || "",
+        gender: currentChildToUpdate?.gender || "male",
+        limitations: currentChildToUpdate?.limitations || false,
+        comment: currentChildToUpdate?.comment || "",
+      });
+    } else {
+      setChildData({
+        name: "",
+        date_of_birth: "",
+        gender: "male",
+        limitations: false,
+        comment: "",
+      });
+    }
+  }, [currentChildToUpdate]);
+
+  const handleChildSelect = (childId: number) => {
+    setCurrentChildIdToUpdate(childId);
+  };
+
+  const handleAddNewChild = () => {
+    setCurrentChildIdToUpdate(null);
+  };
 
   const birthDateValidation = validateBirthDate(childData.date_of_birth);
   const isFormValid =
     childData.name.trim() &&
     birthDateValidation.isValid &&
     childData.gender &&
-    (childData.has_limitations === false ||
-      (childData.has_limitations === true && childData.comment?.trim()));
+    (childData.limitations === false ||
+      (childData.limitations === true && childData.comment?.trim()));
 
-  useEffect(() => {
-    if (child) {
-      setChildData({
-        name: child.name,
-        date_of_birth: child.date_of_birth,
-        gender: child.gender,
-        has_limitations: child.has_limitations,
-        comment: child.comment,
-      });
-    }
-  }, [child]);
+  const isFormChanged = useMemo(() => {
+    return (
+      childData.name !== currentChildToUpdate?.name ||
+      childData.date_of_birth !== currentChildToUpdate?.date_of_birth ||
+      childData.gender !== currentChildToUpdate?.gender ||
+      childData.limitations !== currentChildToUpdate?.limitations ||
+      childData.comment !== currentChildToUpdate?.comment
+    );
+  }, [childData, currentChildToUpdate]);
 
   const handleBack = () => {
     onBack();
@@ -76,27 +94,54 @@ export const ChildStep: React.FC<{
   const handleChildSubmit = async () => {
     if (!isFormValid) return;
 
-    if (childId && child) {
+    if (!isFormChanged) {
+      console.log("isFormChanged: false");
+      onNext();
+      return;
+    }
+
+    if (currentChildToUpdate) {
       await updateChildMutation.mutateAsync({
-        childId,
+        childId: currentChildToUpdate.id,
         data: {
           name: childData.name,
           date_of_birth: convertDateToISO(childData.date_of_birth),
           gender: childData.gender as Gender,
-          has_limitations: childData.has_limitations,
+          has_limitations: childData.limitations,
           comment: childData.comment,
         },
+      });
+
+      updateChild(currentChildToUpdate.id, {
+        name: childData.name,
+        date_of_birth: childData.date_of_birth,
+        gender: childData.gender as Gender,
+        limitations: childData.limitations,
+        comment: childData.comment ?? null,
       });
     } else {
-      await createChildMutation.mutateAsync({
+      const newChild = await createChildMutation.mutateAsync({
         data: {
           name: childData.name,
           date_of_birth: convertDateToISO(childData.date_of_birth),
           gender: childData.gender as Gender,
-          has_limitations: childData.has_limitations,
+          has_limitations: childData.limitations,
           comment: childData.comment,
         },
       });
+      // add child to store
+      addChild({
+        id: newChild.id,
+        name: newChild.name,
+        date_of_birth: newChild.date_of_birth,
+        gender: newChild.gender,
+        limitations: newChild.has_limitations,
+        comment: newChild.comment || "",
+        interests: [],
+        skills: [],
+        subscription: "",
+      });
+      setCurrentChildIdToUpdate(newChild.id);
     }
     // Переходим на следующий шаг
     onNext();
@@ -158,6 +203,18 @@ export const ChildStep: React.FC<{
           </h1>
         </div>
 
+        {/* Children Cards */}
+        {user && (
+          <ChoseChildCards
+            user={user}
+            handleChildSelect={handleChildSelect}
+            selectedChildId={currentChildToUpdate?.id || null}
+            handleAddNewChild={handleAddNewChild}
+            isCreatingNew={!currentChildToUpdate}
+          />
+        )}
+
+        {/* Form - only show if creating new or editing existing */}
         <div className="space-y-6">
           {/* Child Name */}
           <div className="flex flex-col gap-1">
@@ -197,11 +254,7 @@ export const ChildStep: React.FC<{
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                childData.date_of_birth && !birthDateValidation.isValid
-                  ? "border-red-400"
-                  : childData.date_of_birth && birthDateValidation.isValid
-                  ? "border-green-400"
-                  : childData.date_of_birth
+                childData.date_of_birth && birthDateValidation.isValid
                   ? "border-[#7782F5]"
                   : "border-gray-200 focus-within:border-[#7782F5]"
               }`}
@@ -274,10 +327,10 @@ export const ChildStep: React.FC<{
             <div className="flex gap-3">
               <button
                 onClick={() =>
-                  setChildData({ ...childData, has_limitations: false })
+                  setChildData({ ...childData, limitations: false })
                 }
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  childData.has_limitations === false
+                  childData.limitations === false
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -287,10 +340,10 @@ export const ChildStep: React.FC<{
               </button>
               <button
                 onClick={() =>
-                  setChildData({ ...childData, has_limitations: true })
+                  setChildData({ ...childData, limitations: true })
                 }
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                  childData.has_limitations === true
+                  childData.limitations === true
                     ? "bg-indigo-400 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -311,7 +364,7 @@ export const ChildStep: React.FC<{
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-                childData.has_limitations === true && !childData.comment?.trim()
+                childData.limitations === true && !childData.comment?.trim()
                   ? "border-red-400"
                   : childData.comment
                   ? "border-[#7782F5]"
@@ -321,7 +374,7 @@ export const ChildStep: React.FC<{
               <textarea
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
                 placeholder={
-                  childData.has_limitations
+                  childData.limitations
                     ? "Опишите ограничения ребенка..."
                     : "Дополнительная информация о ребенке..."
                 }
@@ -334,7 +387,7 @@ export const ChildStep: React.FC<{
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
             </div>
-            {childData.has_limitations && !childData.comment?.trim() && (
+            {childData.limitations && !childData.comment?.trim() && (
               <p
                 className="text-sm text-red-400 px-3"
                 style={{ fontFamily: "Nunito, sans-serif" }}

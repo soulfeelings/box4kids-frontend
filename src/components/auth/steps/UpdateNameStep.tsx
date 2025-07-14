@@ -1,37 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { useStore } from "../../../store/store";
-import { useUpdateUserProfileUsersProfilePut } from "../../../api-client/";
+import { useUpdateUserProfileUsersProfilePut } from "../../../api-client";
 
-export const RegisterStep: React.FC<{
+export const UpdateNameStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-}> = ({ onBack, onNext, onClose }) => {
-  const { registerData, setRegisterData } = useStore();
+  userName?: string;
+}> = ({ onBack, onNext, onClose, userName }) => {
+  const [name, setName] = useState(userName ?? "");
+  const { setUserName } = useStore();
 
   const updateUserMutation = useUpdateUserProfileUsersProfilePut();
 
   const handleUpdateUser = async (name: string) => {
     try {
-      await updateUserMutation.mutateAsync({
+      if (userName === name) {
+        onNext();
+        return;
+      }
+
+      const userUpdated = await updateUserMutation.mutateAsync({
         data: { name },
       });
 
-      setRegisterData({ name });
+      setUserName(userUpdated.name);
+
       onNext();
     } catch (error) {
       console.error("Update user error:", error);
     }
-  };
-
-  const handleBack = () => {
-    onBack();
-  };
-
-  const handleRegister = async () => {
-    if (!registerData.name.trim()) return;
-
-    await handleUpdateUser(registerData.name);
   };
 
   const isLoading = updateUserMutation.isPending;
@@ -41,7 +39,7 @@ export const RegisterStep: React.FC<{
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16">
         <button
-          onClick={handleBack}
+          onClick={onBack}
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
         >
           <svg
@@ -102,7 +100,7 @@ export const RegisterStep: React.FC<{
           </label>
           <div
             className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-              registerData.name
+              name
                 ? "border-[#7782F5]"
                 : "border-gray-200 focus-within:border-[#7782F5]"
             }`}
@@ -110,8 +108,8 @@ export const RegisterStep: React.FC<{
             <input
               className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
               placeholder=""
-              value={registerData.name}
-              onChange={(e) => setRegisterData({ name: e.target.value })}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               maxLength={64}
               autoFocus
               style={{ fontFamily: "Nunito, sans-serif" }}
@@ -126,16 +124,15 @@ export const RegisterStep: React.FC<{
       <div className="px-4 pb-6">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-            registerData.name.trim() && !isLoading
+            name.trim() && !isLoading
               ? "text-white shadow-sm"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
-          disabled={!registerData.name.trim() || isLoading}
-          onClick={handleRegister}
+          disabled={!name.trim() || isLoading}
+          onClick={() => handleUpdateUser(name)}
           style={{
             fontFamily: "Nunito, sans-serif",
-            backgroundColor:
-              registerData.name.trim() && !isLoading ? "#30313D" : undefined,
+            backgroundColor: name.trim() && !isLoading ? "#30313D" : undefined,
           }}
         >
           {isLoading ? "Сохраняем..." : "Продолжить"}

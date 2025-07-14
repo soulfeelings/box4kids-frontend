@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { useStore } from "../../store/store";
+import { useStore } from "../../../store/store";
 import {
   useVerifyOtpAuthVerifyOtpPost,
   useSendOtpAuthSendOtpPost,
   useDevGetCodeAuthDevGetCodePost,
-} from "../../api-client";
+} from "../../../api-client";
 
 interface CodeStepProps {
   onBack: () => void;
   onSuccess: () => void;
 }
 
+const SECONDS_TO_RESEND_CODE = 60;
+
 export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
   const { phoneData, setPhoneData, setError, error } = useStore();
-  const [resendTimer, setResendTimer] = useState(60);
+  const [resendTimer, setResendTimer] = useState(SECONDS_TO_RESEND_CODE);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
 
   const verifyOtpMutation = useVerifyOtpAuthVerifyOtpPost();
@@ -107,7 +109,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         data: { phone_number: phoneData.phone },
       });
 
-      setResendTimer(60);
+      setResendTimer(SECONDS_TO_RESEND_CODE);
       setError(null);
 
       // DEV MODE: Автоматически получаем код после повторной отправки

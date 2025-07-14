@@ -5,11 +5,10 @@
  * API для Box4Kids - сервис аренды игрушек для детей
  * OpenAPI spec version: 0.1.0
  */
-import type { UserProfileResponseName } from './userProfileResponseName';
 
-export interface UserProfileResponse {
+export interface UserProfileUpdateResponse {
   id: number;
   phone_number: string;
-  name?: UserProfileResponseName;
+  name: string;
   role: string;
 }

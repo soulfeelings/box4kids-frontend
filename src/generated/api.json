@@ -167,7 +167,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserProfileUpdate"
+                "$ref": "#/components/schemas/UserProfileUpdateRequest"
               }
             }
           },
@@ -179,7 +179,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfileResponse"
+                  "$ref": "#/components/schemas/UserProfileUpdateResponse"
                 }
               }
             }
@@ -1722,16 +1722,14 @@
               "$ref": "#/components/schemas/InterestResponse"
             },
             "type": "array",
-            "title": "Interests",
-            "default": []
+            "title": "Interests"
           },
           "skills": {
             "items": {
               "$ref": "#/components/schemas/SkillResponse"
             },
             "type": "array",
-            "title": "Skills",
-            "default": []
+            "title": "Skills"
           },
           "age": {
             "type": "integer",
@@ -1749,6 +1747,8 @@
           "has_limitations",
           "comment",
           "parent_id",
+          "interests",
+          "skills",
           "age"
         ],
         "title": "ChildResponse"
@@ -3033,14 +3033,6 @@
           "role": {
             "type": "string",
             "title": "Role"
-          },
-          "children": {
-            "items": {
-              "$ref": "#/components/schemas/ChildResponse"
-            },
-            "type": "array",
-            "title": "Children",
-            "default": []
           }
         },
         "type": "object",
@@ -3051,7 +3043,7 @@
         ],
         "title": "UserProfileResponse"
       },
-      "UserProfileUpdate": {
+      "UserProfileUpdateRequest": {
         "properties": {
           "name": {
             "type": "string",
@@ -3063,7 +3055,35 @@
         "required": [
           "name"
         ],
-        "title": "UserProfileUpdate"
+        "title": "UserProfileUpdateRequest"
+      },
+      "UserProfileUpdateResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "phone_number": {
+            "type": "string",
+            "title": "Phone Number"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "phone_number",
+          "name",
+          "role"
+        ],
+        "title": "UserProfileUpdateResponse"
       },
       "UserResponse": {
         "properties": {

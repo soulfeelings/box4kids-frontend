@@ -1,6 +1,10 @@
-import React from 'react';
-import { ArrowLeft, User } from 'lucide-react';
-import { UserData } from '../../types';
+import React from "react";
+import { ArrowLeft, User } from "lucide-react";
+import { UserData } from "../../types";
+import { AddNewChildBanner } from "../../features/AddNewChildBanner";
+import { ROUTES } from "../../constants/routes";
+import { useNavigate } from "react-router-dom";
+import { AUTH_STEPS } from "../../constants/auth";
 
 interface ChildrenAndSubscriptionsViewProps {
   userData: UserData;
@@ -9,27 +13,29 @@ interface ChildrenAndSubscriptionsViewProps {
   getAge: (birthDate: string) => number;
 }
 
-export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsViewProps> = ({
-  userData,
-  setShowChildrenScreen,
-  BottomNavigation,
-  getAge
-}) => {
+export const ChildrenAndSubscriptionsView: React.FC<
+  ChildrenAndSubscriptionsViewProps
+> = ({ userData, setShowChildrenScreen, BottomNavigation, getAge }) => {
   const child = userData.children[0]; // Assuming first child for now
-  
+  const navigate = useNavigate();
+
   return (
-    <div className="w-full min-h-screen" style={{ fontFamily: 'Nunito, sans-serif', backgroundColor: '#FFE8C8' }}>
+    <div
+      className="w-full min-h-screen"
+      style={{ fontFamily: "Nunito, sans-serif", backgroundColor: "#FFE8C8" }}
+    >
       {/* Header */}
-      <div className="p-4 flex items-center justify-center relative" style={{ backgroundColor: '#FFE8C8' }}>
-        <button 
+      <div
+        className="p-4 flex items-center justify-center relative"
+        style={{ backgroundColor: "#FFE8C8" }}
+      >
+        <button
           onClick={() => setShowChildrenScreen(false)}
           className="absolute left-4 p-1"
         >
           <ArrowLeft size={24} className="text-gray-600" />
         </button>
-        <h1 className="text-lg font-semibold text-gray-800">
-          Дети и наборы
-        </h1>
+        <h1 className="text-lg font-semibold text-gray-800">Дети и наборы</h1>
       </div>
 
       {/* Content */}
@@ -43,7 +49,9 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
                 <User size={20} className="text-orange-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">{child.name}, {getAge(child.birthDate)} лет</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {child.name}, {getAge(child.date_of_birth)} лет
+                </h3>
               </div>
             </div>
 
@@ -52,7 +60,10 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
               <p className="text-sm text-gray-600 mb-2">Интересы</p>
               <div className="flex flex-wrap gap-2">
                 {child.interests.map((interest, index) => (
-                  <span key={index} className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm">
+                  <span
+                    key={index}
+                    className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm"
+                  >
                     {interest}
                   </span>
                 ))}
@@ -64,7 +75,10 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
               <p className="text-sm text-gray-600 mb-2">Навыки для развития</p>
               <div className="flex flex-wrap gap-2">
                 {child.skills.map((skill, index) => (
-                  <span key={index} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">
+                  <span
+                    key={index}
+                    className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm"
+                  >
                     {skill}
                   </span>
                 ))}
@@ -75,14 +89,17 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">Тариф</p>
               <p className="text-gray-800 font-medium">
-                {child.subscription === 'base' ? 'Базовый' : 'Премиум'} • 6 игрушек • 535₽/мес
+                {child.subscription === "base" ? "Базовый" : "Премиум"} • 6
+                игрушек • 535₽/мес
               </p>
             </div>
           </div>
 
           {/* Toy Set Composition */}
           <div className="mb-6">
-            <h4 className="text-gray-800 font-medium mb-3">Состав набора игрушек</h4>
+            <h4 className="text-gray-800 font-medium mb-3">
+              Состав набора игрушек
+            </h4>
             <div className="space-y-3">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -125,20 +142,17 @@ export const ChildrenAndSubscriptionsView: React.FC<ChildrenAndSubscriptionsView
           </div>
         </div>
 
-        {/* Add child button */}
-        <div className="rounded-2xl p-4 text-center" style={{ backgroundColor: '#747EEC' }}>
-          <p className="text-white font-medium mb-2">
-            Добавьте еще одного ребенка
-          </p>
-          <p className="text-white text-sm mb-3">
-            и получите скидку 20% на следующий набор
-          </p>
-          <button className="bg-white px-6 py-2 rounded-lg font-medium text-sm" style={{ color: '#747EEC' }}>
-            Добавить ребенка
-          </button>
-        </div>
+        <AddNewChildBanner
+          onClick={() => {
+            navigate(ROUTES.AUTH.ONBOARDING, {
+              state: {
+                step: AUTH_STEPS.CHILD,
+              },
+            });
+          }}
+        />
       </div>
       <BottomNavigation />
     </div>
   );
-}; 
+};

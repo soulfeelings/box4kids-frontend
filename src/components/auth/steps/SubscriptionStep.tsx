@@ -3,11 +3,9 @@ import { useStore } from "../../../store/store";
 import {
   useGetAllSubscriptionPlansSubscriptionPlansGet,
   useCreateSubscriptionOrderSubscriptionsPost,
-  useGetAllInterestsInterestsGet,
-  useGetAllSkillsSkillsGet,
-  useGetChildChildrenChildIdGet,
 } from "../../../api-client/";
-import { useChildIdLocation } from "../useChildIdLocation";
+import { UserChildData } from "../../../types";
+import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 
 // Tag component for interests and skills
 const Tag: React.FC<{ children: React.ReactNode; selected?: boolean }> = ({
@@ -31,36 +29,18 @@ export const SubscriptionStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-}> = ({ onBack, onNext, onClose }) => {
-  const childId = useChildIdLocation();
-  const { subscriptionData, setSubscriptionData, isLoading } = useStore();
+  currentChildToUpdate?: UserChildData;
+  onAddNewChild?: () => void;
+}> = ({ onBack, onNext, onClose, currentChildToUpdate, onAddNewChild }) => {
+  const { subscriptionData, setSubscriptionData, isLoading, setError } =
+    useStore();
 
   const { data: plansData, isLoading: isLoadingPlans } =
     useGetAllSubscriptionPlansSubscriptionPlansGet();
   const createSubscriptionMutation =
     useCreateSubscriptionOrderSubscriptionsPost();
-  const { data: interestsData } = useGetAllInterestsInterestsGet();
-  const { data: skillsData } = useGetAllSkillsSkillsGet();
-  const getChildMutation = useGetChildChildrenChildIdGet(childId as number, {
-    query: {
-      enabled: !!childId,
-    },
-  });
-
-  const child = getChildMutation.data;
 
   const availablePlans = plansData?.plans || [];
-
-  // Функции для получения названий по ID
-  const getInterestName = (id: number) => {
-    const interest = interestsData?.interests.find((i) => i.id === id);
-    return interest?.name || `Интерес ${id}`;
-  };
-
-  const getSkillName = (id: number) => {
-    const skill = skillsData?.skills.find((s) => s.id === id);
-    return skill?.name || `Навык ${id}`;
-  };
 
   const handleBack = () => {
     onBack();
@@ -95,18 +75,23 @@ export const SubscriptionStep: React.FC<{
   };
 
   const handleSubscriptionSubmit = async () => {
-    if (!subscriptionData.plan || !childId) return;
-
+    if (!subscriptionData.plan || !currentChildToUpdate?.id) {
+      setError("Не удалось создать подписку");
+      return;
+    }
     const selectedPlan = availablePlans.find(
       (plan) => mapPlanNameToType(plan.name) === subscriptionData.plan
     );
 
-    if (!selectedPlan) return;
+    if (!selectedPlan) {
+      setError("Не выбран план подписки");
+      return;
+    }
 
     try {
       await createSubscriptionMutation.mutateAsync({
         data: {
-          child_id: childId,
+          child_id: currentChildToUpdate?.id,
           plan_id: selectedPlan.id,
         },
       });
@@ -178,7 +163,7 @@ export const SubscriptionStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Какой набор подойдёт {child?.name}?
+            Какой набор подойдёт {currentChildToUpdate?.name}?
           </h1>
         </div>
 
@@ -193,95 +178,6 @@ export const SubscriptionStep: React.FC<{
               состав набора? Просто обновите интересы ребёнка
             </p>
           </div>
-
-          {/* Child Info */}
-          <div className="bg-gray-50 rounded-xl p-4 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                <span className="font-semibold text-2xl">
-                  {child?.gender === "male" ? "👦🏻" : "👩🏻"}
-                </span>
-              </div>
-              <div>
-                <h2
-                  className="font-semibold text-gray-900"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  {child?.name},{" "}
-                  {child?.date_of_birth
-                    ? calculateAge(child.date_of_birth)
-                    : ""}
-                </h2>
-              </div>
-            </div>
-
-            {/* Интересы */}
-            <div className="mb-4">
-              <h3
-                className="text-sm font-medium text-gray-600 mb-2"
-                style={{ fontFamily: "Nunito, sans-serif" }}
-              >
-                Интересы
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {child?.interests?.map((interest, idx) => {
-                  const interestName = getInterestName(interest.id);
-                  // Извлекаем эмодзи и текст из названия интереса
-                  const match = interestName.match(/^(\S+)\s+(.+)$/);
-                  const emoji = match ? match[1] : "🎯";
-                  const name = match ? match[2] : interestName;
-
-                  return (
-                    <Tag key={idx} selected={true}>
-                      <span className="mr-1">{emoji}</span>
-                      {name}
-                    </Tag>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Навыки */}
-            <div>
-              <h3
-                className="text-sm font-medium text-gray-600 mb-2"
-                style={{ fontFamily: "Nunito, sans-serif" }}
-              >
-                Навыки для развития
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {child?.skills?.map((skill, idx) => {
-                  const skillName = getSkillName(skill.id);
-                  // Извлекаем эмодзи и текст из названия навыка
-                  const match = skillName.match(/^(\S+)\s+(.+)$/);
-                  const emoji = match ? match[1] : "⭐";
-                  const name = match ? match[2] : skillName;
-
-                  return (
-                    <Tag key={idx} selected={true}>
-                      <span className="mr-1">{emoji}</span>
-                      {name}
-                    </Tag>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Loading plans indicator */}
-          {isLoadingPlans && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center gap-2">
-                <div className="animate-spin w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full"></div>
-                <span
-                  className="text-gray-600 font-medium"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  Загружаем планы подписки...
-                </span>
-              </div>
-            </div>
-          )}
 
           {/* Subscription plans */}
           {availablePlans.map((plan) => {
@@ -376,6 +272,14 @@ export const SubscriptionStep: React.FC<{
               </div>
             );
           })}
+
+          {onAddNewChild && (
+            <AddNewChildBanner
+              onClick={() => {
+                onAddNewChild();
+              }}
+            />
+          )}
         </div>
       </div>
 

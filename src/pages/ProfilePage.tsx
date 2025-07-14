@@ -264,8 +264,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div
           className="mt-6"
           onClick={() => {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
+            localStorage.clear();
             window.location.href = "/";
           }}
         >

@@ -22,8 +22,7 @@ import { useStore } from "./store/store";
 import { ROUTES } from "./constants/routes";
 
 // Импорт компонентов шагов авторизации
-import { OtpStep } from "./components/auth/OtpStep";
-import { WelcomeStep } from "./components/auth/WelcomeStep";
+import { OtpStep } from "./components/auth/otp/OtpStep";
 import { SuccessStep } from "./components/auth/SuccessStep";
 import { OnboardingFlow } from "./components/auth/OnboardingFlow";
 import { DataGuard } from "./components/common/DataGuard";
@@ -51,7 +50,9 @@ const AppWithRoutes: React.FC = () => {
           path={ROUTES.AUTH.ONBOARDING}
           element={
             <RouteGuard>
-              <OnboardingFlow />
+              <DataGuard>
+                <OnboardingFlow />
+              </DataGuard>
             </RouteGuard>
           }
         />
@@ -118,9 +119,9 @@ function InitialPage() {
   }
 
   // Если есть имя значит юзер уже открывал онбординг и каким то образом ушел с него, мы больше ему его не показываем
-  if (user?.name) {
-    return <Navigate to={ROUTES.APP.ROOT} replace />;
-  }
+  // if (user?.name) {
+  //   return <Navigate to={ROUTES.APP.ROOT} replace />;
+  // }
 
   return <Navigate to={ROUTES.AUTH.ONBOARDING} replace />;
 }
