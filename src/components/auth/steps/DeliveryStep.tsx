@@ -8,15 +8,19 @@ export const DeliveryStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
-  const { user } = useStore();
+  const {
+    user,
+    getSelectedDeliveryAddressId,
+    setSelectedDeliveryAddressId,
+    addDeliveryAddress,
+  } = useStore();
   const createDeliveryAddressMutation =
     useCreateDeliveryAddressDeliveryAddressesPost();
 
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
-    null
-  );
+  const selectedAddressId = getSelectedDeliveryAddressId();
   const [isCreatingNew, setIsCreatingNew] = useState(
-    !user?.deliveryAddresses || user.deliveryAddresses.length === 0
+    (!user?.deliveryAddresses || user.deliveryAddresses.length === 0) &&
+      selectedAddressId === null
   );
 
   const [deliveryData, setDeliveryData] = useState({
@@ -28,7 +32,7 @@ export const DeliveryStep: React.FC<{
   });
 
   const handleAddressSelect = (id: number) => {
-    setSelectedAddressId(id);
+    setSelectedDeliveryAddressId(id);
     setIsCreatingNew(false);
 
     // Заполняем данные выбранного адреса
@@ -47,7 +51,7 @@ export const DeliveryStep: React.FC<{
   };
 
   const handleAddNewAddress = () => {
-    setSelectedAddressId(null);
+    setSelectedDeliveryAddressId(null);
     setIsCreatingNew(true);
 
     // Очищаем форму для создания нового адреса
@@ -135,7 +139,7 @@ export const DeliveryStep: React.FC<{
 
     // Если создается новый адрес, отправляем запрос
     try {
-      await createDeliveryAddressMutation.mutateAsync({
+      const response = await createDeliveryAddressMutation.mutateAsync({
         data: {
           name: deliveryData.name,
           address: deliveryData.address,
@@ -143,6 +147,16 @@ export const DeliveryStep: React.FC<{
           time: deliveryData.time,
           courier_comment: deliveryData.comment,
         },
+      });
+
+      // Добавляем созданный адрес в store с ID из ответа
+      addDeliveryAddress({
+        id: response.id,
+        name: response.name,
+        address: response.address,
+        date: response.date,
+        time: response.time,
+        comment: response.courier_comment || "",
       });
 
       onNext();
@@ -225,9 +239,7 @@ export const DeliveryStep: React.FC<{
         )}
 
         {/* Show form when creating new address or no saved addresses */}
-        {(isCreatingNew ||
-          !user?.deliveryAddresses ||
-          user.deliveryAddresses.length === 0) && (
+        {isCreatingNew && (
           <div className="space-y-6">
             {/* Адрес */}
             <div>

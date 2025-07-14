@@ -100,6 +100,7 @@ interface State {
   error: string | null;
   initDataError: string | null;
   currentChildIdToUpdate: number | null;
+  selectedDeliveryAddressId: number | null;
 
   // Действия
   setPhoneData: (data: Partial<PhoneData>) => void;
@@ -131,6 +132,8 @@ interface State {
     addressData: Partial<DeliveryAddressData>
   ) => void;
   removeDeliveryAddress: (id: number) => void;
+  getSelectedDeliveryAddressId: () => number | null;
+  setSelectedDeliveryAddressId: (id: number | null) => void;
 
   // Новые методы для онбординга
   canAccessStep: (step: AuthStep) => boolean;
@@ -163,6 +166,7 @@ const initialState = {
   error: null,
   initDataError: null,
   currentChildIdToUpdate: null,
+  selectedDeliveryAddressId: null,
 };
 
 // Создание store с persist middleware для сохранения в localStorage
@@ -302,6 +306,7 @@ export const useStore = create<State>()(
             ...user,
             deliveryAddresses: [...user.deliveryAddresses, addressData],
           },
+          selectedDeliveryAddressId: addressData.id,
         });
       },
 
@@ -364,6 +369,14 @@ export const useStore = create<State>()(
             ),
           },
         });
+      },
+
+      getSelectedDeliveryAddressId: () => {
+        return get().selectedDeliveryAddressId;
+      },
+
+      setSelectedDeliveryAddressId: (id: number | null) => {
+        set({ selectedDeliveryAddressId: id });
       },
 
       // Инициализация данных
@@ -460,6 +473,7 @@ export const useStore = create<State>()(
       name: "registration-store",
       partialize: (state: State) => ({
         currentChildIdToUpdate: state.currentChildIdToUpdate,
+        selectedDeliveryAddressId: state.selectedDeliveryAddressId,
       }),
     }
   )
