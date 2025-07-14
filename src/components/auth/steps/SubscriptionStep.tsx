@@ -57,7 +57,7 @@ export const SubscriptionStep: React.FC<{
     }
 
     try {
-      await createSubscriptionMutation.mutateAsync({
+      const subscription = await createSubscriptionMutation.mutateAsync({
         data: {
           child_id: targetChild.id,
           plan_id: subscriptionPlan.id,
@@ -65,24 +65,9 @@ export const SubscriptionStep: React.FC<{
       });
 
       // Обновляем данные подписки в store
+      // не должно быть больше одной подписки на ребенка
       updateChild(targetChild.id, {
-        subscriptions: [
-          {
-            id: subscriptionId,
-            plan_id: subscriptionPlan.id,
-            child_id: targetChild.id,
-            delivery_info_id: null,
-            status: targetChild.subscriptions[0]?.status || "active",
-            discount_percent:
-              targetChild.subscriptions[0]?.discount_percent || 0,
-            created_at:
-              targetChild.subscriptions[0]?.created_at ||
-              new Date().toISOString(),
-            expires_at:
-              targetChild.subscriptions[0]?.expires_at ||
-              new Date().toISOString(),
-          },
-        ],
+        subscriptions: [subscription],
       });
 
       // Если мы были в режиме редактирования, выходим из него

@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowLeft, User } from "lucide-react";
-import { UserData } from "../../types";
+import { UserChildData, UserData } from "../../types";
 import { AddNewChildBanner } from "../../features/AddNewChildBanner";
 import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ interface ChildrenAndSubscriptionsViewProps {
 export const ChildrenAndSubscriptionsView: React.FC<
   ChildrenAndSubscriptionsViewProps
 > = ({ userData, setShowChildrenScreen, BottomNavigation, getAge }) => {
-  const child = userData.children[0]; // Assuming first child for now
+  const child: UserChildData | null = userData.children[0] || null; // Assuming first child for now
   const navigate = useNavigate();
 
   return (
@@ -50,7 +50,7 @@ export const ChildrenAndSubscriptionsView: React.FC<
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  {child.name}, {getAge(child.date_of_birth)} лет
+                  {child?.name}, {getAge(child?.date_of_birth)} лет
                 </h3>
               </div>
             </div>
@@ -59,7 +59,7 @@ export const ChildrenAndSubscriptionsView: React.FC<
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">Интересы</p>
               <div className="flex flex-wrap gap-2">
-                {child.interests.map((interest, index) => (
+                {child?.interests.map((interest, index) => (
                   <span
                     key={index}
                     className="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm"
@@ -74,7 +74,7 @@ export const ChildrenAndSubscriptionsView: React.FC<
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">Навыки для развития</p>
               <div className="flex flex-wrap gap-2">
-                {child.skills.map((skill, index) => (
+                {child?.skills.map((skill, index) => (
                   <span
                     key={index}
                     className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm"
@@ -89,8 +89,8 @@ export const ChildrenAndSubscriptionsView: React.FC<
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">Тариф</p>
               <p className="text-gray-800 font-medium">
-                {child.subscriptions[0].plan_id === 1 ? "Базовый" : "Премиум"} •
-                6 игрушек • 535₽/мес
+                {child?.subscriptions[0].plan_id === 1 ? "Базовый" : "Премиум"}{" "}
+                • 6 игрушек • 535₽/мес
               </p>
             </div>
           </div>

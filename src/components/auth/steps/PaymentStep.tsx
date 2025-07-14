@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
 import { useCreateBatchPaymentPaymentsCreateBatchPost } from "../../../api-client/";
+import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
+import { SubscriptionPlanResponse } from "../../../api-client/model/subscriptionPlanResponse";
+import { ToyCategoryConfigResponse } from "../../../api-client/model/toyCategoryConfigResponse";
 
 export const PaymentStep: React.FC<{
   onBack: () => void;
@@ -13,6 +16,7 @@ export const PaymentStep: React.FC<{
     setPaymentData,
     user,
     setError,
+    subscriptionPlans,
   } = useStore();
 
   const createBatchPaymentMutation =
@@ -23,13 +27,10 @@ export const PaymentStep: React.FC<{
   const allChildrenSubscriptionsIds = user?.children.flatMap((child) =>
     child.subscriptions.map((subscription) => subscription.id)
   );
+  console.log(allChildrenSubscriptionsIds);
 
   const handleBack = () => {
     onBack();
-  };
-
-  const handleClose = () => {
-    onClose();
   };
 
   const handlePaymentSubmit = async () => {
@@ -43,7 +44,7 @@ export const PaymentStep: React.FC<{
       // Создаем платеж
       const paymentResponse = await createBatchPaymentMutation.mutateAsync({
         data: {
-          subscription_ids: [subscriptionData.subscriptionId],
+          subscription_ids: allChildrenSubscriptionsIds,
         },
       });
 
@@ -62,41 +63,53 @@ export const PaymentStep: React.FC<{
     }
   };
 
-  // Маппинг названия плана к типу
-  const mapPlanNameToType = (planName: string): "base" | "premium" => {
-    return planName.toLowerCase().includes("базовый") ? "base" : "premium";
+  // Получение плана по ID
+  const getPlanById = (planId: number): SubscriptionPlanResponse | null => {
+    return subscriptionPlans.find((plan) => plan.id === planId) || null;
   };
 
-  // Получение реальной цены из загруженных планов
-  const getSubscriptionPrice = (): number => {
-    if (!subscriptionData.plan || availablePlans.length === 0) {
-      return 0;
-    }
+  // Получение элементов плана
+  const getPlanItems = (plan: SubscriptionPlanResponse | null) => {
+    if (!plan) return [];
 
-    const selectedPlan = availablePlans.find(
-      (plan) => mapPlanNameToType(plan.name) === subscriptionData.plan
+    return (
+      plan?.toy_configurations?.map((config: ToyCategoryConfigResponse) => ({
+        icon: config.icon || "🎯",
+        count: config.quantity,
+        name: config.name,
+        color: "#A4B9ED",
+      })) || []
     );
-
-    return selectedPlan?.price_monthly || 0;
   };
 
-  // Получение количества игрушек из плана
-  const getToyCount = (): number => {
-    if (!subscriptionData.plan || availablePlans.length === 0) {
-      return 0;
-    }
+  // Получение детей из store
+  const children = user?.children || [];
 
-    const selectedPlan = availablePlans.find(
-      (plan) => mapPlanNameToType(plan.name) === subscriptionData.plan
-    );
+  // Подсчет общей цены с учетом скидок
+  const totalPrice = useMemo(
+    () =>
+      children.reduce((sum, child) => {
+        const pendingSubscription = child.subscriptions.filter(
+          (subscription) =>
+            subscription.status === SubscriptionStatus.pending_payment
+        );
+        if (pendingSubscription.length > 0) {
+          let price = 0;
 
-    return selectedPlan?.toy_count || 0;
-  };
+          for (const subscription of pendingSubscription) {
+            const plan = getPlanById(subscription.plan_id);
+            price += plan?.price_monthly || 0;
+          }
 
-  const price = getSubscriptionPrice();
-  const toyCount = getToyCount();
-  const selectedAddress = user?.deliveryAddresses.find(
-    (address) => address.id === getSelectedDeliveryAddressId()
+          // Округляем цену
+          price = Math.round(price);
+
+          return sum + price;
+        }
+
+        return sum;
+      }, 0),
+    [children]
   );
 
   return (
@@ -127,7 +140,7 @@ export const PaymentStep: React.FC<{
         </span>
 
         <button
-          onClick={handleClose}
+          onClick={onClose}
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
         >
           <svg
@@ -156,86 +169,102 @@ export const PaymentStep: React.FC<{
         </div>
 
         <div className="space-y-6">
-          {/* Набор для ребенка */}
-          <div className="bg-gray-100 rounded-xl p-4">
-            <h2
-              className="text-lg font-semibold text-gray-900 mb-3"
-              style={{ fontFamily: "Nunito, sans-serif" }}
-            >
-              Набор для {child?.name}
-            </h2>
+          {/* Наборы для детей */}
+          {children.map((child, index) => {
+            const subscription = child.subscriptions.filter(
+              (sub) => sub.status === SubscriptionStatus.pending_payment
+            );
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span
-                  className="text-gray-700"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  Тариф
-                </span>
-                <span
-                  className="text-gray-900 font-medium"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  {subscriptionData.plan === "premium" ? "Премиум" : "Базовый"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span
-                  className="text-gray-700"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  Игрушек в наборе
-                </span>
-                <span
-                  className="text-gray-900 font-medium"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  {toyCount} шт
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span
-                  className="text-gray-700"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  Стоимость
-                </span>
-                <span
-                  className="text-gray-900 font-medium"
-                  style={{ fontFamily: "Nunito, sans-serif" }}
-                >
-                  ${price} / мес.
-                </span>
-              </div>
-            </div>
-          </div>
+            if (subscription.length === 0) {
+              setError("Нет доступных подписок");
+              return null;
+            }
 
-          {/* Адрес доставки */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h3
-              className="text-sm font-medium text-gray-600 mb-2"
-              style={{ fontFamily: "Nunito, sans-serif" }}
-            >
-              Адрес доставки
-            </h3>
-            <p
-              className="text-gray-900"
-              style={{ fontFamily: "Nunito, sans-serif" }}
-            >
-              {selectedAddress?.address}
-            </p>
-            <p
-              className="text-gray-600 text-sm mt-1"
-              style={{ fontFamily: "Nunito, sans-serif" }}
-            >
-              {selectedAddress?.date} в {selectedAddress?.time}
-            </p>
-          </div>
+            if (subscription.length > 1) {
+              setError(
+                "У ребенка не может быть несколько подписок, обратитесь к администратору"
+              );
+              return null;
+            }
+
+            const plan = getPlanById(subscription[0].plan_id);
+            if (!plan) {
+              setError(
+                "Не удалось получить план подписки, обратитесь к администратору"
+              );
+              return null;
+            }
+
+            const planItems = getPlanItems(plan);
+
+            return (
+              <div key={child.id} className="bg-gray-100 rounded-xl p-4">
+                <h2
+                  className="text-lg font-semibold text-gray-900 mb-3"
+                  style={{ fontFamily: "Nunito, sans-serif" }}
+                >
+                  Набор для {child.name}
+                </h2>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span
+                      className="text-gray-700"
+                      style={{ fontFamily: "Nunito, sans-serif" }}
+                    >
+                      Игрушек в наборе
+                    </span>
+                    <span
+                      className="text-gray-900 font-medium"
+                      style={{ fontFamily: "Nunito, sans-serif" }}
+                    >
+                      {planItems.reduce(
+                        (sum: number, item: any) => sum + item.count,
+                        0
+                      )}{" "}
+                      шт
+                    </span>
+                  </div>
+                  {/* Скидка (если есть) */}
+                  {/* {subscription?.discount_percent &&
+                    subscription.discount_percent > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span
+                          className="text-gray-700"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          Скидка
+                        </span>
+                        <span
+                          className="text-red-500 font-medium"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          -{subscription.discount_percent}%
+                        </span>
+                      </div>
+                    )} */}
+                  <div className="flex justify-between items-center">
+                    <span
+                      className="text-gray-700"
+                      style={{ fontFamily: "Nunito, sans-serif" }}
+                    >
+                      Стоимость
+                    </span>
+                    <span
+                      className="text-gray-900 font-medium"
+                      style={{ fontFamily: "Nunito, sans-serif" }}
+                    >
+                      ${plan.price_monthly} / мес.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
 
           {/* Общая сумма */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center py-2">
+          <div className="bg-gray-100 rounded-xl p-4 mb-6">
+            <div className="flex justify-between items-center">
               <span
                 className="text-xl font-semibold text-gray-900"
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -246,7 +275,7 @@ export const PaymentStep: React.FC<{
                 className="text-xl font-bold text-gray-900"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                ${price} / мес.
+                ${totalPrice} / мес.
               </span>
             </div>
           </div>
@@ -254,7 +283,7 @@ export const PaymentStep: React.FC<{
           {/* Информация об отмене */}
           <div className="mb-8">
             <p
-              className="text-gray-500 text-sm leading-relaxed"
+              className="text-gray-500 text-sm text-center leading-relaxed"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
               Можно отменить или поставить подписку на паузу в любое время через
@@ -269,18 +298,20 @@ export const PaymentStep: React.FC<{
         <button
           className="w-full py-4 text-white rounded-full font-medium text-lg hover:opacity-80 transition-all mb-3"
           onClick={handlePaymentSubmit}
-          disabled={isLoading || paymentProcessing || !price}
+          disabled={isLoading || paymentProcessing || !totalPrice}
           style={{
             fontFamily: "Nunito, sans-serif",
             backgroundColor:
-              isLoading || paymentProcessing || !price ? "#9ca3af" : "#30313D",
+              isLoading || paymentProcessing || !totalPrice
+                ? "#9ca3af"
+                : "#30313D",
           }}
         >
           {isLoading
             ? "Создаем платеж..."
             : paymentProcessing
             ? "Обрабатываем платеж..."
-            : !price
+            : !totalPrice
             ? "Загружаем данные..."
             : "Оплатить и активировать"}
         </button>

@@ -50,7 +50,6 @@ import type {
   PhoneRequest,
   SkillsListResponse,
   SubscriptionCreateRequest,
-  SubscriptionCreateResponse,
   SubscriptionPlansListResponse,
   SubscriptionResponse,
   SubscriptionUpdateRequest,
@@ -518,7 +517,7 @@ export const createSubscriptionOrderSubscriptionsPost = (
 ) => {
       
       
-      return customFetch<SubscriptionCreateResponse>(
+      return customFetch<SubscriptionResponse>(
       {url: `/subscriptions/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: subscriptionCreateRequest, signal

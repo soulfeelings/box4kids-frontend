@@ -150,7 +150,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
             onBack={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
             onNext={() => navigate(ROUTES.APP.ROOT)}
             onClose={handleClose}
-            childId={currentChildToUpdate?.id}
           />
         );
 

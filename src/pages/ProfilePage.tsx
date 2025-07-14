@@ -228,9 +228,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <ProfileItem
           label="Доставка"
           isDelivery={true}
-          deliveryAddress={userData.deliveryAddresses[0].address}
-          deliveryDate={formatDeliveryDate(userData.deliveryAddresses[0].date)}
-          deliveryTime={formatDeliveryTime(userData.deliveryAddresses[0].time)}
+          deliveryAddress={userData.deliveryAddresses[0]?.address}
+          deliveryDate={formatDeliveryDate(userData.deliveryAddresses[0]?.date)}
+          deliveryTime={formatDeliveryTime(userData.deliveryAddresses[0]?.time)}
           customRadius="rounded-[24px]"
         />
 

@@ -257,7 +257,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionCreateResponse"
+                  "$ref": "#/components/schemas/SubscriptionResponse"
                 }
               }
             }
@@ -2325,46 +2325,6 @@
         ],
         "title": "SubscriptionCreateRequest",
         "description": "Схема для создания подписки"
-      },
-      "SubscriptionCreateResponse": {
-        "properties": {
-          "subscription_id": {
-            "type": "integer",
-            "title": "Subscription Id"
-          },
-          "payment_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Payment Id"
-          },
-          "status": {
-            "$ref": "#/components/schemas/SubscriptionStatus"
-          },
-          "individual_price": {
-            "type": "number",
-            "title": "Individual Price"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          }
-        },
-        "type": "object",
-        "required": [
-          "subscription_id",
-          "payment_id",
-          "status",
-          "individual_price",
-          "message"
-        ],
-        "title": "SubscriptionCreateResponse",
-        "description": "Схема ответа при создании заказа"
       },
       "SubscriptionPlanResponse": {
         "properties": {
