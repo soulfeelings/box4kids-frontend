@@ -1,7 +1,13 @@
-export const AddNewChildBanner = ({ onClick }: { onClick: () => void }) => {
+export const AddNewChildBanner = ({
+  onClick,
+  className,
+}: {
+  onClick: () => void;
+  className?: string;
+}) => {
   return (
     <div
-      className="rounded-2xl p-4 text-center"
+      className={`rounded-2xl p-4 text-center ${className}`}
       style={{ backgroundColor: "#747EEC" }}
       onClick={onClick}
     >

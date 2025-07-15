@@ -63,15 +63,18 @@ export const ChildrenAndSubscriptionsView: React.FC = () => {
           />
         )}
 
-        <AddNewChildBanner
-          onClick={() => {
-            navigate(ROUTES.AUTH.ONBOARDING, {
-              state: {
-                step: AUTH_STEPS.CHILD,
-              },
-            });
-          }}
-        />
+        {user?.children.length !== 0 && (
+          <AddNewChildBanner
+            className="mb-4"
+            onClick={() => {
+              navigate(ROUTES.AUTH.ONBOARDING, {
+                state: {
+                  step: AUTH_STEPS.CHILD,
+                },
+              });
+            }}
+          />
+        )}
       </div>
       <BottomNavigation />
     </div>
