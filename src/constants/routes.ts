@@ -19,7 +19,7 @@ export const ROUTES = {
     EDIT_CHILD: "/app/edit-child/:childId",
     DELIVERY_HISTORY: "/app/delivery-history",
     SUPPORT: "/app/support",
-    CANCEL_SUBSCRIPTION: "/app/cancel-subscription",
+    CANCEL_SUBSCRIPTION: "/app/cancel-subscription/:childId",
   },
 
   // Админка

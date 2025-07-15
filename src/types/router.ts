@@ -5,6 +5,9 @@ export interface RouteParams {
   [ROUTES.APP.EDIT_CHILD]: {
     childId: string;
   };
+  [ROUTES.APP.CANCEL_SUBSCRIPTION]: {
+    childId: string;
+  };
 }
 
 // Вспомогательные типы для типизации роутов
@@ -18,5 +21,9 @@ export type GetRouteParams<T extends AppRouteValues> =
 
 // Константы для типизированных параметров
 export const EDIT_CHILD_PARAMS: RouteParams[typeof ROUTES.APP.EDIT_CHILD] = {
+  childId: ":childId",
+} as const;
+
+export const CANCEL_SUBSCRIPTION_PARAMS: RouteParams[typeof ROUTES.APP.CANCEL_SUBSCRIPTION] = {
   childId: ":childId",
 } as const;

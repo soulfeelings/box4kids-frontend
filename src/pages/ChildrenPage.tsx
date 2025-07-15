@@ -149,34 +149,19 @@ function ChildCard({
       <div className="space-y-3">
         {subscriptionPlan &&
         subscription.status === SubscriptionStatus.active ? (
-          <>
-            <button
-              onClick={() => {
-                navigate(ROUTES.AUTH.ONBOARDING, {
-                  state: {
-                    step: AUTH_STEPS.SUBSCRIPTION,
-                  },
-                });
-                setCurrentChildIdToUpdate(child.id);
-              }}
-              className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
-            >
-              Остановить подписку
-            </button>
-            <button
-              onClick={() => {
-                navigate(ROUTES.AUTH.ONBOARDING, {
-                  state: {
-                    step: AUTH_STEPS.SUBSCRIPTION,
-                  },
-                });
-                setCurrentChildIdToUpdate(child.id);
-              }}
-              className="w-full bg-gray-100 text-gray-700 py-2 rounded-2xl text-sm font-medium"
-            >
-              Остановить подписку
-            </button>
-          </>
+          <button
+            onClick={() => {
+              navigate(
+                ROUTES.APP.CANCEL_SUBSCRIPTION.replace(
+                  ":childId",
+                  child.id.toString()
+                )
+              );
+            }}
+            className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+          >
+            Остановить подписку
+          </button>
         ) : (
           <button
             onClick={() => {
@@ -194,7 +179,9 @@ function ChildCard({
         )}
         <button
           onClick={() => {
-            navigate(`/app/edit-child/${child.id}`);
+            navigate(
+              ROUTES.APP.EDIT_CHILD.replace(":childId", child.id.toString())
+            );
           }}
           className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium"
         >
