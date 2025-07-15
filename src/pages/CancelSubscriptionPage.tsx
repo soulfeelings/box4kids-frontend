@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCancelSubscriptionParams } from "../hooks/useTypedParams";
 import { useStore } from "../store/store";
 import { ModalHeader } from "../components/common/ModalHeader";
+import { LoadingComponent } from "../components/common/LoadingComponent";
 import {
   usePauseSubscriptionSubscriptionsSubscriptionIdPausePost,
   useResumeSubscriptionSubscriptionsSubscriptionIdResumePost,
@@ -10,9 +11,11 @@ import {
 } from "../api-client";
 import { SubscriptionStatus } from "../api-client/model";
 import { notifications } from "../utils/notifications";
+import { ErrorComponent } from "../components/common/ErrorComponent";
 
 export const CancelSubscriptionPage: React.FC = () => {
   const { subscriptionId } = useCancelSubscriptionParams();
+  const { updateChildSubscription } = useStore();
   const navigate = useNavigate();
 
   const pauseSubscriptionMutation =
@@ -21,21 +24,34 @@ export const CancelSubscriptionPage: React.FC = () => {
     useResumeSubscriptionSubscriptionsSubscriptionIdResumePost();
 
   // Получаем данные подписки
-  const { data: subscription, isLoading: isLoadingSubscription } =
-    useGetSubscriptionSubscriptionsSubscriptionIdGet(
-      subscriptionId ? parseInt(subscriptionId) : 0
-    );
+  const {
+    data: subscription,
+    isLoading: isLoadingSubscription,
+    refetch,
+  } = useGetSubscriptionSubscriptionsSubscriptionIdGet(
+    subscriptionId ? parseInt(subscriptionId) : 0
+  );
 
   if (!subscriptionId) {
-    return <div>ID подписки не найден</div>;
+    return (
+      <ErrorComponent
+        errorMessage="ID подписки не найден"
+        onBack={() => navigate(-1)}
+      />
+    );
   }
 
   if (isLoadingSubscription) {
-    return <div>Загрузка...</div>;
+    return <LoadingComponent />;
   }
 
   if (!subscription) {
-    return <div>Подписка не найдена</div>;
+    return (
+      <ErrorComponent
+        errorMessage="Подписка не найдена"
+        onBack={() => navigate(-1)}
+      />
+    );
   }
 
   const isPaused = subscription.status === SubscriptionStatus.paused;
@@ -50,8 +66,20 @@ export const CancelSubscriptionPage: React.FC = () => {
       await pauseSubscriptionMutation.mutateAsync({
         subscriptionId: parseInt(subscriptionId),
       });
+
+      const updatedSubscription = {
+        ...subscription,
+        status: SubscriptionStatus.paused,
+        is_paused: true,
+      };
+      updateChildSubscription(
+        subscription.child_id,
+        subscription.id,
+        updatedSubscription
+      );
+
       notifications.subscriptionPaused();
-      navigate(-1);
+      refetch();
     } catch (error) {
       console.error("Ошибка при приостановке подписки:", error);
       notifications.error("Не удалось приостановить подписку");
@@ -63,8 +91,21 @@ export const CancelSubscriptionPage: React.FC = () => {
       await resumeSubscriptionMutation.mutateAsync({
         subscriptionId: parseInt(subscriptionId),
       });
+
+      // Обновляем подписку в store
+      const updatedSubscription = {
+        ...subscription,
+        status: SubscriptionStatus.active,
+        is_paused: false,
+      };
+      updateChildSubscription(
+        subscription.child_id,
+        subscription.id,
+        updatedSubscription
+      );
+
       notifications.subscriptionResumed();
-      navigate(-1);
+      refetch();
     } catch (error) {
       console.error("Ошибка при возобновлении подписки:", error);
       notifications.error("Не удалось возобновить подписку");
@@ -83,7 +124,7 @@ export const CancelSubscriptionPage: React.FC = () => {
 
         {/* Description */}
         <div className="mb-8">
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-gray-600 text-center leading-relaxed">
             {isPaused
               ? "Мы возобновим доставку коробок и подбор игрушек для вашего ребенка."
               : "Мы приостановим доставку коробок и подбор игрушек. Вы сможете возобновить подписку в любой момент."}

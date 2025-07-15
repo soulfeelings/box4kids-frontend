@@ -2,12 +2,14 @@ import React from "react";
 
 export interface ErrorComponentProps {
   errorMessage?: string | null;
+  onBack?: () => void;
   onRetry?: () => void;
   onSupport?: () => void;
 }
 
 export const ErrorComponent: React.FC<ErrorComponentProps> = ({
   errorMessage,
+  onBack,
   onRetry,
   onSupport,
 }) => {
@@ -16,6 +18,14 @@ export const ErrorComponent: React.FC<ErrorComponentProps> = ({
       onRetry();
     } else {
       window.location.reload();
+    }
+  };
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      window.history.back();
     }
   };
 
@@ -70,6 +80,14 @@ export const ErrorComponent: React.FC<ErrorComponentProps> = ({
           </p>
 
           <div className="w-full space-y-3">
+            {onBack && (
+              <button
+                onClick={handleBack}
+                className="w-full bg-gray-800 text-white py-3 px-6 rounded-full font-medium hover:bg-gray-700 transition-colors"
+              >
+                Назад
+              </button>
+            )}
             <button
               onClick={handleRetry}
               className="w-full bg-gray-800 text-white py-3 px-6 rounded-full font-medium hover:bg-gray-700 transition-colors"

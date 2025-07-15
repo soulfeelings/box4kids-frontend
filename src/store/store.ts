@@ -137,6 +137,11 @@ interface State {
   removeChild: (childId: number) => void;
   updateChild: (childId: number, updateData: UpdateChildData) => void;
   getChildById: (childId: number) => UserChildData | null;
+  updateChildSubscription: (
+    childId: number,
+    subscriptionId: number,
+    updatedSubscription: SubscriptionResponse
+  ) => void;
 
   // Управление адресами доставки
   getUserDeliveryAddresses: () => DeliveryAddressData[];
@@ -359,6 +364,55 @@ export const useStore = create<State>()(
           return null;
         }
         return user.children.find((child) => child.id === childId) || null;
+      },
+
+      updateChildSubscription: (
+        childId: number,
+        subscriptionId: number,
+        updatedSubscription: SubscriptionResponse
+      ) => {
+        const user = get().user;
+        if (!user) {
+          console.error("updateChildSubscription: User not found");
+          return;
+        }
+
+        const childIndex = user.children.findIndex(
+          (child) => child.id === childId
+        );
+        if (childIndex === -1) {
+          console.error(
+            `updateChildSubscription: Child with id ${childId} not found`
+          );
+          return;
+        }
+
+        const child = user.children[childIndex];
+        const subscriptionIndex = child.subscriptions.findIndex(
+          (sub) => sub.id === subscriptionId
+        );
+        if (subscriptionIndex === -1) {
+          console.error(
+            `updateChildSubscription: Subscription with id ${subscriptionId} not found`
+          );
+          return;
+        }
+
+        const updatedChildren = [...user.children];
+        const updatedSubscriptions = [...child.subscriptions];
+        updatedSubscriptions[subscriptionIndex] = updatedSubscription;
+
+        updatedChildren[childIndex] = {
+          ...child,
+          subscriptions: updatedSubscriptions,
+        };
+
+        set({
+          user: {
+            ...user,
+            children: updatedChildren,
+          },
+        });
       },
 
       // Управление адресами доставки
