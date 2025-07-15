@@ -40,7 +40,16 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
               state: { step: AUTH_STEPS.CHILD },
             });
           }}
-          textButton="Добавить ребенка"
+          textButton={
+            userData.children && userData.children.length > 0
+              ? "Продолжить оформление"
+              : "Добавить ребенка"
+          }
+          text={
+            userData.children && userData.children.length > 0
+              ? "Завершите оформление подписки, чтобы мы могли собрать коробку с игрушками и доставить её вам"
+              : "Добавьте ребенка, чтобы мы могли собрать коробку с игрушками и доставить её вам"
+          }
         />
       </div>
 

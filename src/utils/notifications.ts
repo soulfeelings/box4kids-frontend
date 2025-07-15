@@ -9,6 +9,16 @@ export const notifications = {
     toast.error(message);
   },
 
+  warning: (message: string) => {
+    toast(message, {
+      icon: "⚠️",
+      style: {
+        background: "#fef3c7",
+        color: "#92400e",
+      },
+    });
+  },
+
   loading: (message: string) => {
     return toast.loading(message);
   },
@@ -31,7 +41,7 @@ export const notifications = {
   },
 
   subscriptionCreated: () => {
-    toast.success("Подписка создана!");
+    toast.success("Подписка добавлена!");
   },
 
   paymentSuccess: () => {

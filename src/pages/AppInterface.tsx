@@ -14,6 +14,7 @@ import {
   getCurrentBoxToyBoxesCurrentChildIdGet,
   getNextBoxToyBoxesNextChildIdGet,
 } from "../api-client";
+import { notifications } from "../utils/notifications";
 import {
   NextBoxResponse,
   SubscriptionStatus,
@@ -25,15 +26,21 @@ interface AppInterfaceProps {}
 
 export interface BoxesState {
   child: UserChildData;
+  currentBox: ToyBoxResponse | null;
+  nextBox: NextBoxResponse | null;
+}
+
+export interface SuccessfulBoxesState {
+  child: UserChildData;
   currentBox: ToyBoxResponse;
   nextBox: NextBoxResponse;
 }
 
 export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
-  const [currentBox, setCurrentBox] = useState<BoxesState["currentBox"] | null>(
-    null
-  );
+  const [currentBox, setCurrentBox] = useState<
+    SuccessfulBoxesState["currentBox"] | null
+  >(null);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
@@ -52,30 +59,70 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
     }
   }, [currentAppScreen]);
 
-  const [currentBoxes, setCurrentBoxes] = useState<BoxesState[]>([]);
+  const [currentSuccessfulBoxes, setCurrentSuccessfulBoxes] = useState<
+    SuccessfulBoxesState[]
+  >([]);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
       if (user?.children.length) {
-        const res = await Promise.all(
-          user?.children.map((child) =>
-            Promise.all([
-              getCurrentBoxToyBoxesCurrentChildIdGet(child.id),
-              getNextBoxToyBoxesNextChildIdGet(child.id),
-            ])
-          )
-        );
+        try {
+          // Фильтруем детей с активной подпиской
+          const subscribedChildren = user.children.filter((child) =>
+            child.subscriptions.some(
+              (subscription) =>
+                subscription.status === SubscriptionStatus.active
+            )
+          );
 
-        setCurrentBoxes(
-          res.map(([currentBox, nextBox], index) => ({
-            child: user?.children[index],
-            currentBox,
-            nextBox,
-          }))
-        );
-        console.log(res);
+          if (subscribedChildren.length === 0) {
+            setCurrentSuccessfulBoxes([]);
+            return;
+          }
+
+          const res = await Promise.all(
+            subscribedChildren.map(async (child) => {
+              try {
+                const [currentBox, nextBox] = await Promise.all([
+                  getCurrentBoxToyBoxesCurrentChildIdGet(child.id),
+                  getNextBoxToyBoxesNextChildIdGet(child.id),
+                ]);
+                return { currentBox, nextBox, success: true };
+              } catch (error) {
+                console.warn(
+                  `Failed to fetch boxes for child ${child.id}:`,
+                  error
+                );
+                return { currentBox: null, nextBox: null, success: false };
+              }
+            })
+          );
+
+          const successfulBoxes = res
+            .map((result, index) => ({
+              child: subscribedChildren[index],
+              currentBox: result.currentBox,
+              nextBox: result.nextBox,
+            }))
+            .filter((box) => box.currentBox !== null || box.nextBox !== null);
+
+          setCurrentSuccessfulBoxes(successfulBoxes as SuccessfulBoxesState[]);
+
+          // Показываем уведомление если не удалось загрузить данные для некоторых детей
+          const failedCount = res.filter((r) => !r.success).length;
+          if (failedCount > 0) {
+            notifications.warning(
+              `Не удалось загрузить данные для ${failedCount} ${
+                failedCount === 1 ? "ребенка" : "детей"
+              }. Попробуйте позже.`
+            );
+          }
+        } catch (error) {
+          console.error("Failed to fetch boxes data:", error);
+          notifications.error("Не удалось загрузить данные о наборах игрушек");
+        }
       }
     };
 
@@ -91,96 +138,12 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
     setShowFeedback(true);
   };
 
-  // Обновить функцию обработки отзывов
-  const handleFeedbackSubmit = async (rating: number, comment: string) => {
-    // Найти ID текущего набора (логика зависит от UI)
-    const currentChild = user?.children[0]; // Упрощение для примера
-    if (!currentChild) return;
-
-    // const currentBox = currentToyBoxes.get(currentChild.id);
-
-    // if (currentBox) {
-    //   await submitReview(currentBox.id, rating, comment);
-    //   // После успешной отправки отзыва закрываем модальное окно
-    //   setShowFeedback(false);
-    //   setRating(0);
-    //   setFeedbackComment("");
-    // }
-  };
-
-  const getNextToys = () => {
-    const currentChild = user?.children[0]; // Упрощение для примера
-    if (!currentChild) return [];
-
-    // const nextBox = nextToyBoxes.get(currentChild.id);
-
-    // if (nextBox) {
-    //   return transformToyBoxToToys(nextBox);
-    // }
-
-    // Fallback на существующую логику если нет API данных
-    const toys: Array<{
-      icon: string;
-      count: number;
-      name: string;
-      color: string;
-    }> = [];
-
-    user?.children.forEach((child) => {
-      // Add toys based on interests
-      // TODO: change to real interests
-      if (child.interests.includes(1)) {
-        toys.push({
-          icon: "🔧",
-          count: 2,
-          name: "Конструктор",
-          color: "bg-orange-200",
-        });
-      }
-      // TODO: change to real interests
-      if (child.interests.includes(2)) {
-        toys.push({
-          icon: "🎨",
-          count: 2,
-          name: "Творческий набор",
-          color: "bg-green-200",
-        });
-      }
-
-      // Add default toys
-      toys.push(
-        {
-          icon: "🧸",
-          count: 1,
-          name: "Мягкая игрушка",
-          color: "bg-yellow-200",
-        },
-        { icon: "🧠", count: 1, name: "Головоломка", color: "bg-pink-200" }
-      );
-    });
-
-    // Remove duplicates and combine counts
-    const toyMap = new Map();
-    toys.forEach((toy) => {
-      const key = toy.name;
-      if (toyMap.has(key)) {
-        toyMap.get(key).count += toy.count;
-      } else {
-        toyMap.set(key, { ...toy });
-      }
-    });
-
-    return Array.from(toyMap.values());
-  };
-
   // Determine current screen state
   const getCurrentScreenState = ():
     | "not_subscribed"
     // | "just_subscribed"
-    // | "next_set_not_determined"
+    // | "next_set_not_determsined"
     | undefined => {
-    // Check if user is not subscribed
-
     const noSubscribedChild =
       user?.children?.find((child) =>
         child.subscriptions.find(
@@ -352,7 +315,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       return (
         <NextSetDeterminedView
           userData={user}
-          boxes={currentBoxes}
+          boxes={currentSuccessfulBoxes}
           rating={rating}
           setCurrentBox={setCurrentBox}
           handleStarClick={handleStarClick}

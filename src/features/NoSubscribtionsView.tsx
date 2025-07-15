@@ -1,9 +1,11 @@
 export const NoSubscribtionsView = ({
   onClickButton,
   textButton,
+  text,
 }: {
   onClickButton: () => void;
   textButton: string;
+  text?: string;
 }) => {
   return (
     <div
@@ -32,8 +34,8 @@ export const NoSubscribtionsView = ({
           className="text-sm text-white/90 text-center mb-4"
           style={{ fontFamily: "Open Sans, sans-serif" }}
         >
-          Завершите оформление подпсики, чтобы мы могли собрать коробку с
-          игрушками и доставить её вам
+          {text ||
+            "Завершите оформление подписки, чтобы мы могли собрать коробку с игрушками и доставить её вам"}
         </p>
 
         <button

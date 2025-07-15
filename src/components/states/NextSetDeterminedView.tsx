@@ -4,13 +4,13 @@ import { RatingSection } from "../../features/RatingSection";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { UserData } from "../../types";
 import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
-import { BoxesState } from "../../pages/AppInterface";
+import { SuccessfulBoxesState } from "../../pages/AppInterface";
 
 interface NextSetDeterminedViewProps {
   userData: UserData;
-  boxes: BoxesState[];
+  boxes: SuccessfulBoxesState[];
   rating: number;
-  setCurrentBox: (box: BoxesState["currentBox"]) => void;
+  setCurrentBox: (box: SuccessfulBoxesState["currentBox"]) => void;
   handleStarClick: (starIndex: number) => void;
   getCurrentDate: () => string;
   formatDeliveryDate: (dateString: string) => string;

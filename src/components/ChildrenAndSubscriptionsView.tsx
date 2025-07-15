@@ -178,7 +178,7 @@ function ChildCard({
           </h4>
           <div className="space-y-3">
             {subscriptionPlan.toy_configurations?.map((toy) => (
-              <div className="flex items-center">
+              <div className="flex items-center" key={toy.id}>
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                   {toy.icon}
                 </div>
