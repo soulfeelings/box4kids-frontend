@@ -48,12 +48,14 @@ import type {
   PaymentReturnRequest,
   PaymentWebhookRequest,
   PhoneRequest,
+  RefreshTokenRequest,
   SkillsListResponse,
   SubscriptionCreateRequest,
   SubscriptionPlansListResponse,
   SubscriptionResponse,
   SubscriptionUpdateRequest,
   SubscriptionWithDetailsResponse,
+  TokenResponse,
   ToyBoxCreateRequest,
   ToyBoxListResponse,
   ToyBoxResponse,
@@ -260,6 +262,72 @@ export const useVerifyOtpAuthVerifyOtpPost = <TError = HTTPValidationError,
       > => {
 
       const mutationOptions = getVerifyOtpAuthVerifyOtpPostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Обновляет access токен используя refresh токен
+ * @summary Refresh Token
+ */
+export const refreshTokenAuthRefreshPost = (
+    refreshTokenRequest: RefreshTokenRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<TokenResponse>(
+      {url: `/auth/refresh`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: refreshTokenRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getRefreshTokenAuthRefreshPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshTokenAuthRefreshPost>>, TError,{data: RefreshTokenRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof refreshTokenAuthRefreshPost>>, TError,{data: RefreshTokenRequest}, TContext> => {
+
+const mutationKey = ['refreshTokenAuthRefreshPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshTokenAuthRefreshPost>>, {data: RefreshTokenRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  refreshTokenAuthRefreshPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RefreshTokenAuthRefreshPostMutationResult = NonNullable<Awaited<ReturnType<typeof refreshTokenAuthRefreshPost>>>
+    export type RefreshTokenAuthRefreshPostMutationBody = RefreshTokenRequest
+    export type RefreshTokenAuthRefreshPostMutationError = HTTPValidationError
+
+    /**
+ * @summary Refresh Token
+ */
+export const useRefreshTokenAuthRefreshPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshTokenAuthRefreshPost>>, TError,{data: RefreshTokenRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof refreshTokenAuthRefreshPost>>,
+        TError,
+        {data: RefreshTokenRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getRefreshTokenAuthRefreshPostMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }
