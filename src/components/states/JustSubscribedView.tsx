@@ -1,9 +1,9 @@
 import React from "react";
 import { UserData } from "../../types";
+import { BottomNavigation } from "../../features/BottomNavigation";
 
 interface JustSubscribedViewProps {
   userData: UserData;
-  BottomNavigation: React.ComponentType;
   formatDeliveryDate: (dateString: string) => string;
   formatDeliveryTime: (timeString: string) => string;
   allToys: Array<{ icon: string; count: number; name: string; color: string }>;
@@ -12,7 +12,6 @@ interface JustSubscribedViewProps {
 
 export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
   userData,
-  BottomNavigation,
   formatDeliveryDate,
   formatDeliveryTime,
   allToys,
@@ -66,13 +65,18 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
         <div className="p-4 rounded-2xl" style={{ backgroundColor: "#FFFFFF" }}>
           <p className="text-gray-600 text-sm mb-1">Доставка</p>
           <p className="text-gray-800 font-medium">
-            {formatDeliveryDate(userData.deliveryAddresses[0].date)} •{" "}
-            {formatDeliveryTime(userData.deliveryAddresses[0].time)}
+            {formatDeliveryDate(userData.deliveryAddresses[0]?.date)} •{" "}
+            {formatDeliveryTime(userData.deliveryAddresses[0]?.time)}
           </p>
         </div>
       </div>
     </div>
 
-    <BottomNavigation />
+    <BottomNavigation
+      currentScreen="home"
+      onHomeClick={() => {}}
+      onChildrenClick={() => {}}
+      onProfileClick={() => {}}
+    />
   </div>
 );

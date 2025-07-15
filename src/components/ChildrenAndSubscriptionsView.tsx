@@ -1,21 +1,21 @@
 import React from "react";
 import { ArrowLeft, User } from "lucide-react";
-import { UserChildData, UserData } from "../../types";
-import { AddNewChildBanner } from "../../features/AddNewChildBanner";
-import { ROUTES } from "../../constants/routes";
+import { UserChildData, UserData } from "../types";
+import { AddNewChildBanner } from "../features/AddNewChildBanner";
+import { ROUTES } from "../constants/routes";
 import { useNavigate } from "react-router-dom";
-import { AUTH_STEPS } from "../../constants/auth";
+import { AUTH_STEPS } from "../constants/auth";
+import { calculateAge } from "../utils/age/calculateAge";
+import { BottomNavigation } from "../features/BottomNavigation";
 
 interface ChildrenAndSubscriptionsViewProps {
   userData: UserData;
-  setShowChildrenScreen: (show: boolean) => void;
-  BottomNavigation: React.ComponentType;
-  getAge: (birthDate: string) => number;
+  onArrowLeftClick: () => void;
 }
 
 export const ChildrenAndSubscriptionsView: React.FC<
   ChildrenAndSubscriptionsViewProps
-> = ({ userData, setShowChildrenScreen, BottomNavigation, getAge }) => {
+> = ({ userData, onArrowLeftClick }) => {
   const child: UserChildData | null = userData.children[0] || null; // Assuming first child for now
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ export const ChildrenAndSubscriptionsView: React.FC<
         style={{ backgroundColor: "#FFE8C8" }}
       >
         <button
-          onClick={() => setShowChildrenScreen(false)}
+          onClick={() => onArrowLeftClick()}
           className="absolute left-4 p-1"
         >
           <ArrowLeft size={24} className="text-gray-600" />
@@ -50,7 +50,7 @@ export const ChildrenAndSubscriptionsView: React.FC<
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  {child?.name}, {getAge(child?.date_of_birth)} лет
+                  {child?.name}, {calculateAge(child?.date_of_birth)} лет
                 </h3>
               </div>
             </div>
@@ -152,7 +152,12 @@ export const ChildrenAndSubscriptionsView: React.FC<
           }}
         />
       </div>
-      <BottomNavigation />
+      <BottomNavigation
+        currentScreen="children"
+        onHomeClick={() => {}}
+        onChildrenClick={() => {}}
+        onProfileClick={() => {}}
+      />
     </div>
   );
 };

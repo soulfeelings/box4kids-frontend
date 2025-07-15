@@ -1,12 +1,12 @@
-import React from 'react';
-import { Star, X } from 'lucide-react';
+import React from "react";
+import { Star, X } from "lucide-react";
+import { BottomNavigation } from "../../features/BottomNavigation";
 
 interface FeedbackViewProps {
   rating: number;
   feedbackComment: string;
   setFeedbackComment: (comment: string) => void;
   setShowFeedback: (show: boolean) => void;
-  BottomNavigation: React.ComponentType;
 }
 
 export const FeedbackView: React.FC<FeedbackViewProps> = ({
@@ -14,7 +14,6 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   feedbackComment,
   setFeedbackComment,
   setShowFeedback,
-  BottomNavigation
 }) => {
   // Get feedback text based on rating
   const getFeedbackText = (rating: number) => {
@@ -26,9 +25,15 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
       case 3:
         return { title: "Так себе", subtitle: "Что можно улучшить?" };
       case 4:
-        return { title: "Хорошо", subtitle: "Спасибо за оценку!\nЧто вам особенно понравилось?" };
+        return {
+          title: "Хорошо",
+          subtitle: "Спасибо за оценку!\nЧто вам особенно понравилось?",
+        };
       case 5:
-        return { title: "Отлично", subtitle: "Спасибо за оценку!\nЧто вам особенно понравилось?" };
+        return {
+          title: "Отлично",
+          subtitle: "Спасибо за оценку!\nЧто вам особенно понравилось?",
+        };
       default:
         return { title: "", subtitle: "" };
     }
@@ -36,7 +41,7 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
 
   const handleSubmitFeedback = () => {
     // Here you would typically send the feedback to your backend
-    console.log('Feedback submitted:', { rating, comment: feedbackComment });
+    console.log("Feedback submitted:", { rating, comment: feedbackComment });
     setShowFeedback(false);
     setFeedbackComment("");
   };
@@ -48,16 +53,16 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   const feedbackText = getFeedbackText(rating);
 
   return (
-    <div className="w-full bg-white min-h-screen" style={{ fontFamily: 'Nunito, sans-serif' }}>
+    <div
+      className="w-full bg-white min-h-screen"
+      style={{ fontFamily: "Nunito, sans-serif" }}
+    >
       {/* Header */}
       <div className="p-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-gray-800">
           Как вам набор игрушек?
         </h1>
-        <button 
-          onClick={handleCloseFeedback}
-          className="p-1"
-        >
+        <button onClick={handleCloseFeedback} className="p-1">
           <X size={24} className="text-gray-600" />
         </button>
       </div>
@@ -72,8 +77,8 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
               size={40}
               className={`${
                 index < rating
-                  ? 'fill-yellow-400 text-yellow-400'
-                  : 'text-gray-300'
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-gray-300"
               }`}
             />
           ))}
@@ -81,7 +86,9 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
 
         {/* Rating text */}
         <div className="text-center mb-2">
-          <p className="text-lg font-medium text-gray-800">{feedbackText.title}</p>
+          <p className="text-lg font-medium text-gray-800">
+            {feedbackText.title}
+          </p>
         </div>
 
         {/* Subtitle */}
@@ -98,7 +105,7 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
             onChange={(e) => setFeedbackComment(e.target.value)}
             placeholder="Здесь можно оставить комментарий"
             className="w-full h-32 p-3 bg-gray-100 rounded-xl resize-none text-sm text-gray-700 placeholder-gray-500 border-none outline-none"
-            style={{ fontFamily: 'Nunito, sans-serif' }}
+            style={{ fontFamily: "Nunito, sans-serif" }}
           />
         </div>
 
@@ -110,7 +117,12 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
           Отправить
         </button>
       </div>
-      <BottomNavigation />
+      <BottomNavigation
+        currentScreen="home"
+        onHomeClick={() => {}}
+        onChildrenClick={() => {}}
+        onProfileClick={() => {}}
+      />
     </div>
   );
-}; 
+};

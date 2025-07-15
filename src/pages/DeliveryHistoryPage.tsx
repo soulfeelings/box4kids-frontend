@@ -1,5 +1,6 @@
-import React from 'react';
-import { ArrowLeft, X } from 'lucide-react';
+import React from "react";
+import { ArrowLeft, X } from "lucide-react";
+import { BottomNavigation } from "../features/BottomNavigation";
 
 interface DeliveryItem {
   id: string;
@@ -9,23 +10,27 @@ interface DeliveryItem {
 
 interface DeliveryHistoryPageProps {
   onClose?: () => void;
-  BottomNavigation: React.ComponentType;
 }
 
-export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClose, BottomNavigation }) => {
+export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
+  onClose,
+}) => {
   const deliveries: DeliveryItem[] = [
-    { id: '1', orderNumber: 'Набор №5', date: '10 апреля' },
-    { id: '2', orderNumber: 'Набор №4', date: '24 марта' },
-    { id: '3', orderNumber: 'Набор №3', date: '10 марта' },
-    { id: '4', orderNumber: 'Набор №2', date: '24 февраля' },
-    { id: '5', orderNumber: 'Набор №1', date: '10 февраля' },
+    { id: "1", orderNumber: "Набор №5", date: "10 апреля" },
+    { id: "2", orderNumber: "Набор №4", date: "24 марта" },
+    { id: "3", orderNumber: "Набор №3", date: "10 марта" },
+    { id: "4", orderNumber: "Набор №2", date: "24 февраля" },
+    { id: "5", orderNumber: "Набор №1", date: "10 февраля" },
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] pb-20" style={{ fontFamily: 'Nunito, sans-serif' }}>
+    <div
+      className="min-h-screen bg-[#FFFFFF] pb-20"
+      style={{ fontFamily: "Nunito, sans-serif" }}
+    >
       {/* Back Button */}
       <div className="px-4 pt-6 pb-4">
-        <button 
+        <button
           onClick={onClose}
           className="p-2 hover:bg-gray-100 rounded-full"
         >
@@ -35,8 +40,10 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClos
 
       {/* Title */}
       <div className="px-4 pb-6 relative">
-        <h1 className="text-[20px] font-semibold text-gray-900 text-center">История доставок</h1>
-        <button 
+        <h1 className="text-[20px] font-semibold text-gray-900 text-center">
+          История доставок
+        </h1>
+        <button
           onClick={onClose}
           className="absolute right-4 top-0 p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
@@ -47,9 +54,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClos
       {/* Table Header */}
       <div className="mx-4 px-4 py-3 mb-2">
         <div className="flex justify-between items-center">
-          <div className="text-base font-medium text-black flex-1">
-            №
-          </div>
+          <div className="text-base font-medium text-black flex-1">№</div>
           <div className="text-base font-medium text-black flex-1 text-right">
             Доставка
           </div>
@@ -59,7 +64,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClos
       {/* Delivery List */}
       <div className="mx-4 space-y-2">
         {deliveries.map((delivery, index) => (
-          <div 
+          <div
             key={delivery.id}
             className="bg-[#F2F2F2] rounded-[8px] px-4 py-4 hover:bg-gray-300 transition-colors cursor-pointer"
           >
@@ -75,7 +80,12 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({ onClos
         ))}
       </div>
 
-      <BottomNavigation />
+      <BottomNavigation
+        currentScreen="profile"
+        onHomeClick={() => {}}
+        onChildrenClick={() => {}}
+        onProfileClick={() => {}}
+      />
     </div>
   );
-}; 
+};

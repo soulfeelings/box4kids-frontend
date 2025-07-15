@@ -59,6 +59,8 @@ export interface PaymentData {
   status: string;
 }
 
+export type AppScreen = "home" | "children" | "profile";
+
 // Типы для управления детьми
 export interface CreateChildData {
   id: number;
@@ -104,6 +106,7 @@ interface State {
   initDataError: string | null;
   currentChildIdToUpdate: number | null;
   selectedDeliveryAddressId: number | null;
+  currentAppScreen: AppScreen;
 
   // Действия
   setPhoneData: (data: Partial<PhoneData>) => void;
@@ -138,6 +141,7 @@ interface State {
   removeDeliveryAddress: (id: number) => void;
   getSelectedDeliveryAddressId: () => number | null;
   setSelectedDeliveryAddressId: (id: number | null) => void;
+  setCurrentAppScreen: (screen: "home" | "children" | "profile") => void;
 
   // Новые методы для онбординга
   canAccessStep: (step: AuthStep) => boolean;
@@ -171,6 +175,7 @@ const initialState = {
   initDataError: null,
   currentChildIdToUpdate: null,
   selectedDeliveryAddressId: null,
+  currentAppScreen: "home" as const,
 };
 
 // Создание store с persist middleware для сохранения в localStorage
@@ -397,6 +402,10 @@ export const useStore = create<State>()(
         set({ selectedDeliveryAddressId: id });
       },
 
+      setCurrentAppScreen: (screen: AppScreen) => {
+        set({ currentAppScreen: screen });
+      },
+
       // Инициализация данных
       fetchInitData: async () => {
         set({ isInitDataLoading: true, initDataError: null });
@@ -493,6 +502,7 @@ export const useStore = create<State>()(
         currentChildIdToUpdate: state.currentChildIdToUpdate,
         selectedDeliveryAddressId: state.selectedDeliveryAddressId,
       }),
+      
     }
   )
 );

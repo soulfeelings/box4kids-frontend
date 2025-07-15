@@ -1,24 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FeedbackView,
   ToySetDetailView,
-  ChildrenAndSubscriptionsView,
   NotSubscribedView,
   JustSubscribedView,
   NextSetDeterminedView,
   NextSetNotDeterminedView,
 } from "../components/states";
 import { ProfilePage } from "./ProfilePage";
-import {
-  useGetUserProfileUsersProfileGet,
-  useGetUserSubscriptionsSubscriptionsUserGet,
-  useGetUserDeliveryAddressesDeliveryAddressesGet,
-  useGetCurrentBoxToyBoxesCurrentChildIdGet,
-  useGetNextBoxToyBoxesNextChildIdGet,
-} from "../api-client";
-import { Home, MoreHorizontal } from "lucide-react";
 import { useStore } from "../store/store";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 
 interface AppInterfaceProps {}
@@ -27,11 +18,27 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
   const [showAllToys, setShowAllToys] = useState<boolean>(false);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
-  const [showChildrenScreen, setShowChildrenScreen] = useState<boolean>(false);
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
-  const { user } = useStore();
+  const { user, currentAppScreen } = useStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentAppScreen === "home") {
+      setShowAllToys(false);
+      setShowFeedback(false);
+      setShowProfile(false);
+      navigate(ROUTES.APP.ROOT);
+    } else if (currentAppScreen === "children") {
+      navigate(ROUTES.APP.CHILDREN);
+    } else if (currentAppScreen === "profile") {
+      navigate(ROUTES.APP.ROOT);
+      setShowAllToys(false);
+      setShowFeedback(false);
+      setShowProfile(true);
+    }
+  }, [currentAppScreen]);
 
   if (!user) {
     return <Navigate to={ROUTES.HOME} replace />;
@@ -177,56 +184,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
     return Array.from(toyMap.values());
   };
 
-  // Bottom Navigation Component
-  const BottomNavigation = () => (
-    <div
-      className="fixed bottom-4 left-4 right-4 bg-gray-800 shadow-lg"
-      style={{ borderRadius: "48px" }}
-    >
-      <div className="flex justify-center items-center space-x-8 px-4 py-3">
-        <button
-          onClick={() => {
-            setShowAllToys(false);
-            setShowFeedback(false);
-            setShowChildrenScreen(false);
-            setShowProfile(false);
-          }}
-          className={`p-3 rounded-2xl ${
-            !showAllToys && !showFeedback && !showChildrenScreen && !showProfile
-              ? "bg-purple-500"
-              : ""
-          }`}
-        >
-          <Home size={24} className="text-white" />
-        </button>
-        <button
-          onClick={() => {
-            setShowChildrenScreen(true);
-            setShowAllToys(false);
-            setShowFeedback(false);
-            setShowProfile(false);
-          }}
-          className={`p-3 rounded-2xl ${
-            showChildrenScreen ? "bg-purple-500" : ""
-          }`}
-        >
-          <img src="/illustrations/Icon.png" alt="Icon" className="w-6 h-6" />
-        </button>
-        <button
-          onClick={() => {
-            setShowProfile(true);
-            setShowAllToys(false);
-            setShowFeedback(false);
-            setShowChildrenScreen(false);
-          }}
-          className={`p-3 rounded-2xl ${showProfile ? "bg-purple-500" : ""}`}
-        >
-          <MoreHorizontal size={24} className="text-white" />
-        </button>
-      </div>
-    </div>
-  );
-
   // Determine current screen state
   const getCurrentScreenState = ():
     | "not_subscribed"
@@ -335,32 +292,9 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
     return `${formatHour(startTime)}–${formatHour(endTime)}`;
   };
 
-  // Helper function to calculate age
-  const getAge = (birthDate: string): number => {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
-  };
-
   // Render based on current view
   if (showProfile) {
-    return (
-      <ProfilePage
-        userData={user}
-        setShowProfile={setShowProfile}
-        BottomNavigation={BottomNavigation}
-      />
-    );
+    return <ProfilePage userData={user} setShowProfile={setShowProfile} />;
   }
 
   if (showFeedback) {
@@ -370,18 +304,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
         feedbackComment={feedbackComment}
         setFeedbackComment={setFeedbackComment}
         setShowFeedback={setShowFeedback}
-        BottomNavigation={BottomNavigation}
-      />
-    );
-  }
-
-  if (showChildrenScreen) {
-    return (
-      <ChildrenAndSubscriptionsView
-        userData={user}
-        setShowChildrenScreen={setShowChildrenScreen}
-        BottomNavigation={BottomNavigation}
-        getAge={getAge}
       />
     );
   }
@@ -391,7 +313,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       <ToySetDetailView
         allToys={getAllCurrentToys()}
         setShowAllToys={setShowAllToys}
-        BottomNavigation={BottomNavigation}
       />
     );
   }
@@ -402,17 +323,11 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
 
   switch (currentScreenState) {
     case "not_subscribed":
-      return (
-        <NotSubscribedView
-          userData={user}
-          BottomNavigation={BottomNavigation}
-        />
-      );
+      return <NotSubscribedView userData={user} />;
     case "just_subscribed":
       return (
         <JustSubscribedView
           userData={user}
-          BottomNavigation={BottomNavigation}
           formatDeliveryDate={formatDeliveryDate}
           formatDeliveryTime={formatDeliveryTime}
           allToys={getAllCurrentToys()}
@@ -423,7 +338,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       return (
         <NextSetNotDeterminedView
           userData={user}
-          BottomNavigation={BottomNavigation}
           currentToys={currentToys}
           rating={rating}
           setShowAllToys={setShowAllToys}
@@ -437,7 +351,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       return (
         <NextSetDeterminedView
           userData={user}
-          BottomNavigation={BottomNavigation}
           currentToys={currentToys}
           nextToys={nextToys}
           rating={rating}
@@ -452,7 +365,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       return (
         <NextSetDeterminedView
           userData={user}
-          BottomNavigation={BottomNavigation}
           currentToys={currentToys}
           nextToys={nextToys}
           rating={rating}

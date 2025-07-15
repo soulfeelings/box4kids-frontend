@@ -1,10 +1,10 @@
 import React from "react";
 import { Star } from "lucide-react";
 import { UserData } from "../../types";
+import { BottomNavigation } from "../../features/BottomNavigation";
 
 interface NextSetDeterminedViewProps {
   userData: UserData;
-  BottomNavigation: React.ComponentType;
   currentToys: Array<{
     icon: string;
     count: number;
@@ -22,7 +22,6 @@ interface NextSetDeterminedViewProps {
 
 export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
   userData,
-  BottomNavigation,
   currentToys,
   nextToys,
   rating,
@@ -147,8 +146,8 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
         <div>
           <p className="text-gray-600 text-sm mb-1">Доставка</p>
           <p className="text-gray-800 font-medium">
-            {formatDeliveryDate(userData.deliveryAddresses[0].date)} •{" "}
-            {formatDeliveryTime(userData.deliveryAddresses[0].time)}
+            {formatDeliveryDate(userData.deliveryAddresses[0]?.date)} •{" "}
+            {formatDeliveryTime(userData.deliveryAddresses[0]?.time)}
           </p>
         </div>
       </div>
@@ -162,6 +161,11 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
       </button>
     </div>
 
-    <BottomNavigation />
+    <BottomNavigation
+      currentScreen="home"
+      onHomeClick={() => {}}
+      onChildrenClick={() => {}}
+      onProfileClick={() => {}}
+    />
   </div>
 );

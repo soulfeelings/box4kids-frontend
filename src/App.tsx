@@ -25,6 +25,7 @@ import { OtpStep } from "./components/auth/otp/OtpStep";
 import { SuccessStep } from "./components/auth/SuccessStep";
 import { OnboardingFlow } from "./components/auth/OnboardingFlow";
 import { DataGuard } from "./components/common/DataGuard";
+import { ChildrenPage } from "./pages/ChildrenPage";
 
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
@@ -77,6 +78,7 @@ const AppWithRoutes: React.FC = () => {
           }
         >
           <Route index element={<AppInterface />} />
+          <Route path={ROUTES.APP.CHILDREN} element={<ChildrenPage />} />
           {/* TODO: Адаптировать для router */}
           {/* <Route path="profile" element={<ProfilePage />} /> */}
           {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
@@ -100,7 +102,7 @@ const AppWithRoutes: React.FC = () => {
 
 function InitialPage() {
   const ref = useRef(false);
-  const { isInitDataLoading, initDataError, user, fetchInitData } = useStore();
+  const { isInitDataLoading, initDataError, fetchInitData, user } = useStore();
 
   useEffect(() => {
     if (!ref.current) {
@@ -118,9 +120,9 @@ function InitialPage() {
   }
 
   // Если есть имя значит юзер уже открывал онбординг и каким то образом ушел с него, мы больше ему его не показываем
-  // if (user?.name) {
-  //   return <Navigate to={ROUTES.APP.ROOT} replace />;
-  // }
+  if (user?.name) {
+    return <Navigate to={ROUTES.APP.ROOT} replace />;
+  }
 
   return <Navigate to={ROUTES.AUTH.ONBOARDING} replace />;
 }

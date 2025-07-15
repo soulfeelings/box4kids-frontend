@@ -1,12 +1,12 @@
 import React from 'react';
 import { ArrowLeft, X } from 'lucide-react';
+import { BottomNavigation } from '../features/BottomNavigation';
 
 interface SupportPageProps {
   onClose?: () => void;
-  BottomNavigation: React.ComponentType;
 }
 
-export const SupportPage: React.FC<SupportPageProps> = ({ onClose, BottomNavigation }) => {
+export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
   const handleWhatsAppClick = () => {
     // Здесь можно добавить логику для открытия WhatsApp
     window.open('https://wa.me/your_whatsapp_number', '_blank');
@@ -84,7 +84,12 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose, BottomNavigat
         </div>
       </div>
 
-      <BottomNavigation />
+      <BottomNavigation
+        currentScreen="profile"
+        onHomeClick={() => {}}
+        onChildrenClick={() => {}}
+        onProfileClick={() => {}}
+      />
     </div>
   );
 }; 

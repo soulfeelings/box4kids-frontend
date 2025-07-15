@@ -3,15 +3,14 @@ import { UserData } from "../../types";
 import { AUTH_STEPS } from "../../constants/auth";
 import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
+import { BottomNavigation } from "../../features/BottomNavigation";
 
 interface NotSubscribedViewProps {
   userData: UserData;
-  BottomNavigation: React.ComponentType;
 }
 
 export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
   userData,
-  BottomNavigation,
 }) => {
   const navigate = useNavigate();
 
@@ -81,7 +80,12 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
         </div>
       </div>
 
-      <BottomNavigation />
+      <BottomNavigation
+        currentScreen="home"
+        onHomeClick={() => {}}
+        onChildrenClick={() => {}}
+        onProfileClick={() => {}}
+      />
     </div>
   );
 };

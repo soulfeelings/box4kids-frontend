@@ -3,11 +3,11 @@ import { ChevronRight, ArrowLeft } from "lucide-react";
 import { UserData } from "../types";
 import { DeliveryHistoryPage } from "./DeliveryHistoryPage";
 import { SupportPage } from "./SupportPage";
+import { BottomNavigation } from "../features/BottomNavigation";
 
 interface ProfilePageProps {
   userData: UserData;
   setShowProfile: (show: boolean) => void;
-  BottomNavigation: React.ComponentType;
 }
 
 interface ProfileItemProps {
@@ -104,7 +104,6 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   userData,
   setShowProfile,
-  BottomNavigation,
 }) => {
   const [showDeliveryHistory, setShowDeliveryHistory] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
@@ -174,21 +173,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   // Show delivery history page if requested
   if (showDeliveryHistory) {
     return (
-      <DeliveryHistoryPage
-        onClose={() => setShowDeliveryHistory(false)}
-        BottomNavigation={BottomNavigation}
-      />
+      <DeliveryHistoryPage onClose={() => setShowDeliveryHistory(false)} />
     );
   }
 
   // Show support page if requested
   if (showSupport) {
-    return (
-      <SupportPage
-        onClose={() => setShowSupport(false)}
-        BottomNavigation={BottomNavigation}
-      />
-    );
+    return <SupportPage onClose={() => setShowSupport(false)} />;
   }
 
   return (
@@ -269,7 +260,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
       </div>
 
-      <BottomNavigation />
+      <BottomNavigation
+        currentScreen="profile"
+        onHomeClick={() => {}}
+        onChildrenClick={() => {}}
+        onProfileClick={() => {}}
+      />
     </div>
   );
 };
