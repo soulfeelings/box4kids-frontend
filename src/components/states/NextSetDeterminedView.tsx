@@ -1,10 +1,10 @@
 import React from "react";
-import { Star } from "lucide-react";
-import { UserData } from "../../types";
 import { BottomNavigation } from "../../features/BottomNavigation";
+import { RatingSection } from "../../features/RatingSection";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
-import { BoxesState } from "../../pages/AppInterface";
+import { UserData } from "../../types";
 import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
+import { BoxesState } from "../../pages/AppInterface";
 
 interface NextSetDeterminedViewProps {
   userData: UserData;
@@ -64,21 +64,23 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
               </div>
 
               <div className="space-y-2 mb-4">
-                {box.currentBox.items?.slice(0, 2).map((item, index) => {
-                  const category = categories?.categories.find(
-                    (category) => category.id === item.toy_category_id
-                  );
-                  return (
-                    <div key={index} className="flex items-center text-white">
-                      <div className="w-6 h-6 rounded-full bg-white/50 mr-3 flex items-center justify-center text-xs">
-                        {category?.icon}
+                {box.currentBox.items
+                  ?.slice(0, 2)
+                  .map((item: any, index: number) => {
+                    const category = categories?.categories.find(
+                      (category) => category.id === item.toy_category_id
+                    );
+                    return (
+                      <div key={index} className="flex items-center text-white">
+                        <div className="w-6 h-6 rounded-full bg-white/50 mr-3 flex items-center justify-center text-xs">
+                          {category?.icon}
+                        </div>
+                        <span className="text-sm">
+                          x{item.quantity} {category?.name}
+                        </span>
                       </div>
-                      <span className="text-sm">
-                        x{item.quantity} {category?.name}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
 
               <button
@@ -98,6 +100,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
                 rating={rating}
                 setCurrentBox={setCurrentBox}
                 handleStarClick={handleStarClick}
+                userId={userData.id}
               />
             )}
           </React.Fragment>
@@ -122,7 +125,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
             </h3>
 
             <div className="space-y-3 mb-6">
-              {box.nextBox.items?.map((item, index) => {
+              {box.nextBox.items?.map((item, index: number) => {
                 const category = categories?.categories.find(
                   (category) => category.id === item.category_id
                 );
@@ -174,47 +177,3 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
     </div>
   );
 };
-
-function RatingSection({
-  box,
-  rating,
-  setCurrentBox,
-  handleStarClick,
-}: {
-  box: BoxesState;
-  rating: number;
-  setCurrentBox: (box: BoxesState["currentBox"]) => void;
-  handleStarClick: (starIndex: number) => void;
-}) {
-  return (
-    <div
-      className="p-4 mb-6"
-      style={{ backgroundColor: "#747EEC", borderRadius: "24px" }}
-    >
-      <h3 className="text-white font-medium mb-3">
-        Как вам текущий набор для {box.child.name}?
-      </h3>
-      <div className="flex justify-center space-x-2">
-        {[0, 1, 2, 3, 4].map((index) => (
-          <button
-            key={index}
-            onClick={() => {
-              setCurrentBox(box.currentBox);
-              handleStarClick(index);
-            }}
-            className="transition-transform hover:scale-110"
-          >
-            <Star
-              size={32}
-              className={`${
-                index < rating
-                  ? "fill-[#FFDB28] text-[#FFDB28]"
-                  : "fill-[#BABFF6] text-[#BABFF6]"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
