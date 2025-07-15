@@ -7,6 +7,7 @@ interface FeedbackViewProps {
   feedbackComment: string;
   setFeedbackComment: (comment: string) => void;
   setShowFeedback: (show: boolean) => void;
+  setRating: (rating: number) => void;
 }
 
 export const FeedbackView: React.FC<FeedbackViewProps> = ({
@@ -14,6 +15,7 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   feedbackComment,
   setFeedbackComment,
   setShowFeedback,
+  setRating,
 }) => {
   // Get feedback text based on rating
   const getFeedbackText = (rating: number) => {
@@ -71,16 +73,21 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
       <div className="p-4 pb-24">
         {/* Stars */}
         <div className="flex justify-center space-x-1 mb-4">
-          {[0, 1, 2, 3, 4].map((index) => (
-            <Star
-              key={index}
-              size={40}
-              className={`${
-                index < rating
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-300"
-              }`}
-            />
+          {[1, 2, 3, 4, 5].map((starRating) => (
+            <button
+              key={starRating}
+              onClick={() => setRating(starRating)}
+              className="focus:outline-none"
+            >
+              <Star
+                size={40}
+                className={`${
+                  starRating <= rating
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-gray-300"
+                }`}
+              />
+            </button>
           ))}
         </div>
 

@@ -294,6 +294,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
         feedbackComment={feedbackComment}
         setFeedbackComment={setFeedbackComment}
         setShowFeedback={setShowFeedback}
+        setRating={setRating}
       />
     );
   }
