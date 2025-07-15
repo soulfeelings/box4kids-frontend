@@ -78,8 +78,15 @@ export const customFetch = async <T>({
   const fullUrl = `${baseUrl}${url}${queryString}`;
 
   const makeRequest = async (token: string | null = null): Promise<T> => {
-    // Используем переданный токен или берем из localStorage
-    const authToken = token || localStorage.getItem("access_token");
+    // Для админских запросов используем админский токен, иначе обычный
+    let authToken = token;
+    if (!authToken) {
+      if (url.includes("/admin/")) {
+        authToken = localStorage.getItem("admin_token");
+      } else {
+        authToken = localStorage.getItem("access_token");
+      }
+    }
 
     const requestInit: RequestInit = {
       method,
@@ -113,6 +120,12 @@ export const customFetch = async <T>({
 
     if (!response.ok) {
       if (response.status === 401) {
+        // Для админских запросов просто возвращаем ошибку без попытки обновления
+        if (url.includes("/admin/")) {
+          console.warn("[customFetch] Админский токен недействителен");
+          throw new Error("Недействительный админский токен");
+        }
+
         // 🔄 Пытаемся обновить токен только если это не запрос на рефреш
         if (!url.includes("/auth/refresh")) {
           console.warn(

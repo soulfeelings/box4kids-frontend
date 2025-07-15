@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetAllUsersAdminUsersGetParams = {
-/**
- * Пароль администратора
- */
-password: string;
+export type UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams = {
+new_status: string;
 };

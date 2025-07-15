@@ -19,6 +19,9 @@ export const ROUTES = {
     DELIVERY_HISTORY: "/app/delivery-history",
     SUPPORT: "/app/support",
   },
+
+  // Админка
+  ADMIN: "/admin",
 } as const;
 
 // Вспомогательные типы для типизации

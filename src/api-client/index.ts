@@ -25,6 +25,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminLoginRequest,
+  AdminLoginResponse,
   AuthResponse,
   BatchPaymentCreateRequest,
   BatchPaymentResponse,
@@ -37,9 +39,7 @@ import type {
   DeliveryInfoResponse,
   DeliveryInfoUpdate,
   DevGetCodeResponse,
-  GetAllUsersAdminUsersGetParams,
   GetBoxHistoryToyBoxesHistoryGetParams,
-  GetStatsAdminStatsGetParams,
   GetUserDeliveryAddressesDeliveryAddressesGetParams,
   HTTPValidationError,
   InterestsListResponse,
@@ -62,6 +62,7 @@ import type {
   ToyBoxReviewRequest,
   ToyBoxReviewsResponse,
   ToyCategoriesListResponse,
+  UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams,
   UserProfileResponse,
   UserProfileUpdateRequest,
   UserProfileUpdateResponse
@@ -1148,38 +1149,103 @@ export const usePaymentWebhookPaymentsWebhookPost = <TError = HTTPValidationErro
     }
     
 /**
- * Получает всех пользователей (только для админов)
- * @summary Get All Users
+ * Авторизация администратора
+ * @summary Admin Login
  */
-export const getAllUsersAdminUsersGet = (
-    params: GetAllUsersAdminUsersGetParams,
+export const adminLoginAdminLoginPost = (
+    adminLoginRequest: AdminLoginRequest,
  signal?: AbortSignal
 ) => {
       
       
-      return customFetch<unknown>(
-      {url: `/admin/users`, method: 'GET',
-        params, signal
+      return customFetch<AdminLoginResponse>(
+      {url: `/admin/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: adminLoginRequest, signal
     },
       );
     }
   
 
-export const getGetAllUsersAdminUsersGetQueryKey = (params: GetAllUsersAdminUsersGetParams,) => {
-    return [`/admin/users`, ...(params ? [params]: [])] as const;
+
+export const getAdminLoginAdminLoginPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminLoginAdminLoginPost>>, TError,{data: AdminLoginRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof adminLoginAdminLoginPost>>, TError,{data: AdminLoginRequest}, TContext> => {
+
+const mutationKey = ['adminLoginAdminLoginPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminLoginAdminLoginPost>>, {data: AdminLoginRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminLoginAdminLoginPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminLoginAdminLoginPostMutationResult = NonNullable<Awaited<ReturnType<typeof adminLoginAdminLoginPost>>>
+    export type AdminLoginAdminLoginPostMutationBody = AdminLoginRequest
+    export type AdminLoginAdminLoginPostMutationError = HTTPValidationError
+
+    /**
+ * @summary Admin Login
+ */
+export const useAdminLoginAdminLoginPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminLoginAdminLoginPost>>, TError,{data: AdminLoginRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminLoginAdminLoginPost>>,
+        TError,
+        {data: AdminLoginRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getAdminLoginAdminLoginPostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Получает всех пользователей с полной информацией для админки
+ * @summary Get All Users
+ */
+export const getAllUsersAdminUsersGet = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<unknown>(
+      {url: `/admin/users`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+export const getGetAllUsersAdminUsersGetQueryKey = () => {
+    return [`/admin/users`] as const;
     }
 
     
-export const getGetAllUsersAdminUsersGetQueryOptions = <TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = HTTPValidationError>(params: GetAllUsersAdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>>, }
+export const getGetAllUsersAdminUsersGetQueryOptions = <TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetAllUsersAdminUsersGetQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetAllUsersAdminUsersGetQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>> = ({ signal }) => getAllUsersAdminUsersGet(params, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>> = ({ signal }) => getAllUsersAdminUsersGet(signal);
 
       
 
@@ -1189,11 +1255,11 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetAllUsersAdminUsersGetQueryResult = NonNullable<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>>
-export type GetAllUsersAdminUsersGetQueryError = HTTPValidationError
+export type GetAllUsersAdminUsersGetQueryError = unknown
 
 
-export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = HTTPValidationError>(
- params: GetAllUsersAdminUsersGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>> & Pick<
+export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>,
           TError,
@@ -1202,8 +1268,8 @@ export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof ge
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = HTTPValidationError>(
- params: GetAllUsersAdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>> & Pick<
+export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>,
           TError,
@@ -1212,110 +1278,20 @@ export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof ge
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = HTTPValidationError>(
- params: GetAllUsersAdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>>, }
+export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get All Users
  */
 
-export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = HTTPValidationError>(
- params: GetAllUsersAdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>>, }
+export function useGetAllUsersAdminUsersGet<TData = Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsersAdminUsersGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetAllUsersAdminUsersGetQueryOptions(params,options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Получает статистику платформы
- * @summary Get Stats
- */
-export const getStatsAdminStatsGet = (
-    params: GetStatsAdminStatsGetParams,
- signal?: AbortSignal
-) => {
-      
-      
-      return customFetch<unknown>(
-      {url: `/admin/stats`, method: 'GET',
-        params, signal
-    },
-      );
-    }
-  
-
-export const getGetStatsAdminStatsGetQueryKey = (params: GetStatsAdminStatsGetParams,) => {
-    return [`/admin/stats`, ...(params ? [params]: [])] as const;
-    }
-
-    
-export const getGetStatsAdminStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError = HTTPValidationError>(params: GetStatsAdminStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetStatsAdminStatsGetQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStatsAdminStatsGet>>> = ({ signal }) => getStatsAdminStatsGet(params, signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetStatsAdminStatsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getStatsAdminStatsGet>>>
-export type GetStatsAdminStatsGetQueryError = HTTPValidationError
-
-
-export function useGetStatsAdminStatsGet<TData = Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError = HTTPValidationError>(
- params: GetStatsAdminStatsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getStatsAdminStatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof getStatsAdminStatsGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetStatsAdminStatsGet<TData = Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError = HTTPValidationError>(
- params: GetStatsAdminStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getStatsAdminStatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof getStatsAdminStatsGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetStatsAdminStatsGet<TData = Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError = HTTPValidationError>(
- params: GetStatsAdminStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get Stats
- */
-
-export function useGetStatsAdminStatsGet<TData = Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError = HTTPValidationError>(
- params: GetStatsAdminStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatsAdminStatsGet>>, TError, TData>>, }
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetStatsAdminStatsGetQueryOptions(params,options)
+  const queryOptions = getGetAllUsersAdminUsersGetQueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -1388,6 +1364,71 @@ export const useChangeUserRoleAdminUsersUserIdRolePut = <TError = HTTPValidation
       > => {
 
       const mutationOptions = getChangeUserRoleAdminUsersUserIdRolePutMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Изменяет статус набора игрушек
+ * @summary Update Toy Box Status
+ */
+export const updateToyBoxStatusAdminToyBoxesBoxIdStatusPut = (
+    boxId: number,
+    params: UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams,
+ ) => {
+      
+      
+      return customFetch<unknown>(
+      {url: `/admin/toy-boxes/${boxId}/status`, method: 'PUT',
+        params
+    },
+      );
+    }
+  
+
+
+export const getUpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateToyBoxStatusAdminToyBoxesBoxIdStatusPut>>, TError,{boxId: number;params: UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateToyBoxStatusAdminToyBoxesBoxIdStatusPut>>, TError,{boxId: number;params: UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams}, TContext> => {
+
+const mutationKey = ['updateToyBoxStatusAdminToyBoxesBoxIdStatusPut'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateToyBoxStatusAdminToyBoxesBoxIdStatusPut>>, {boxId: number;params: UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams}> = (props) => {
+          const {boxId,params} = props ?? {};
+
+          return  updateToyBoxStatusAdminToyBoxesBoxIdStatusPut(boxId,params,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutMutationResult = NonNullable<Awaited<ReturnType<typeof updateToyBoxStatusAdminToyBoxesBoxIdStatusPut>>>
+    
+    export type UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutMutationError = HTTPValidationError
+
+    /**
+ * @summary Update Toy Box Status
+ */
+export const useUpdateToyBoxStatusAdminToyBoxesBoxIdStatusPut = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateToyBoxStatusAdminToyBoxesBoxIdStatusPut>>, TError,{boxId: number;params: UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateToyBoxStatusAdminToyBoxesBoxIdStatusPut>>,
+        TError,
+        {boxId: number;params: UpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutParams},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateToyBoxStatusAdminToyBoxesBoxIdStatusPutMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }

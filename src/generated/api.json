@@ -630,31 +630,32 @@
         }
       }
     },
-    "/admin/users": {
-      "get": {
+    "/admin/login": {
+      "post": {
         "tags": [
           "Admin"
         ],
-        "summary": "Get All Users",
-        "description": "Получает всех пользователей (только для админов)",
-        "operationId": "get_all_users_admin_users_get",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
+        "summary": "Admin Login",
+        "description": "Авторизация администратора",
+        "operationId": "admin_login_admin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginRequest"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AdminLoginResponse"
+                }
               }
             }
           },
@@ -671,25 +672,14 @@
         }
       }
     },
-    "/admin/stats": {
+    "/admin/users": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "summary": "Get Stats",
-        "description": "Получает статистику платформы",
-        "operationId": "get_stats_admin_stats_get",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "User Id"
-            }
-          }
-        ],
+        "summary": "Get All Users",
+        "description": "Получает всех пользователей с полной информацией для админки",
+        "operationId": "get_all_users_admin_users_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -698,18 +688,13 @@
                 "schema": {}
               }
             }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/admin/users/{user_id}/role": {
@@ -720,6 +705,11 @@
         "summary": "Change User Role",
         "description": "Изменяет роль пользователя",
         "operationId": "change_user_role_admin_users__user_id__role_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "user_id",
@@ -737,6 +727,61 @@
             "schema": {
               "type": "string",
               "title": "New Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/toy-boxes/{box_id}/status": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update Toy Box Status",
+        "description": "Изменяет статус набора игрушек",
+        "operationId": "update_toy_box_status_admin_toy_boxes__box_id__status_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "box_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Box Id"
+            }
+          },
+          {
+            "name": "new_status",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "New Status"
             }
           }
         ],
@@ -1587,6 +1632,42 @@
   },
   "components": {
     "schemas": {
+      "AdminLoginRequest": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "title": "AdminLoginRequest"
+      },
+      "AdminLoginResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "expires_in"
+        ],
+        "title": "AdminLoginResponse"
+      },
       "AuthResponse": {
         "properties": {
           "user": {
@@ -1906,6 +1987,7 @@
           },
           "date": {
             "type": "string",
+            "format": "date",
             "title": "Date",
             "description": "Дата доставки"
           },
@@ -1968,6 +2050,7 @@
           },
           "date": {
             "type": "string",
+            "format": "date",
             "title": "Date",
             "description": "Дата доставки"
           },
@@ -2044,7 +2127,8 @@
           "date": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "format": "date"
               },
               {
                 "type": "null"

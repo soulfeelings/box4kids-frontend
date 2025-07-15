@@ -6,9 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetAllUsersAdminUsersGetParams = {
-/**
- * Пароль администратора
- */
-password: string;
-};
+export interface AdminLoginResponse {
+  access_token: string;
+  token_type?: string;
+  expires_in: number;
+}

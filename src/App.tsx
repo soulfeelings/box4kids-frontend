@@ -28,6 +28,7 @@ import { OnboardingPage } from "./pages/OnboardingPage";
 import { DataGuard } from "./components/common/DataGuard";
 import { ChildrenPage } from "./pages/ChildrenPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { AdminPage } from "./pages/AdminPage";
 
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
@@ -86,6 +87,9 @@ const AppWithRoutes: React.FC = () => {
           {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
           {/* <Route path="support" element={<SupportPage />} /> */}
         </Route>
+
+        {/* Админка */}
+        <Route path={ROUTES.ADMIN} element={<AdminPage />} />
 
         {/* Fallback - перенаправление на регистрацию */}
         <Route
