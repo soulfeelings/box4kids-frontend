@@ -25,3 +25,35 @@ export const convertDateFromISO = (isoDateString: string): string => {
 
   return `${day}.${month}.${year}`;
 };
+
+// Функция конвертации даты доставки из DD.MM в YYYY-MM-DD
+export const convertDeliveryDateToISO = (dateString: string): string => {
+  if (!dateString) return "";
+
+  const parts = dateString.split(".");
+  if (parts.length !== 2) return "";
+
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+
+  if (isNaN(day) || isNaN(month)) return "";
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+
+  // Создаем дату с текущим годом
+  const deliveryDate = new Date(currentYear, month - 1, day);
+
+  // Если дата уже прошла в текущем году, используем следующий год
+  if (deliveryDate < today) {
+    deliveryDate.setFullYear(currentYear + 1);
+  }
+
+  const year = deliveryDate.getFullYear();
+  const formattedDay = deliveryDate.getDate().toString().padStart(2, "0");
+  const formattedMonth = (deliveryDate.getMonth() + 1)
+    .toString()
+    .padStart(2, "0");
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
+};

@@ -6,6 +6,7 @@ import {
 } from "../../../api-client/";
 import { DeliveryAddressCards } from "../../../features/DeliveryAddressCards";
 import { generateDateOptions } from "../../../utils/date/generateDateOptions";
+import { convertDeliveryDateToISO } from "../../../utils/date/convert";
 
 const timeOptions = [
   { value: "", label: "Выберите время" },
@@ -117,7 +118,7 @@ export const DeliveryStep: React.FC<{
         data: {
           name: deliveryData.name,
           address: deliveryData.address,
-          date: deliveryData.date,
+          date: convertDeliveryDateToISO(deliveryData.date),
           time: deliveryData.time,
           courier_comment: deliveryData.comment,
         },
