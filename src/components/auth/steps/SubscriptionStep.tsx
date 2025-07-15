@@ -4,6 +4,7 @@ import { useCreateSubscriptionOrderSubscriptionsPost } from "../../../api-client
 import { UserChildData } from "../../../types";
 import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 import { SingleChildSubscriptionView } from "./subscription-step-components/SingleChildSubscriptionView";
+import { notifications } from "../../../utils/notifications";
 
 export const SubscriptionStep: React.FC<{
   onBack: () => void;
@@ -70,6 +71,8 @@ export const SubscriptionStep: React.FC<{
         subscriptions: [subscription],
       });
 
+      notifications.subscriptionCreated();
+
       // Если мы были в режиме редактирования, выходим из него
       // Переходим к следующему шагу
       onNext();
@@ -79,6 +82,7 @@ export const SubscriptionStep: React.FC<{
       } else {
         setError("Неизвестная ошибка");
       }
+      notifications.error("Не удалось создать подписку");
       console.error("Failed to create subscription:", error);
     }
   };

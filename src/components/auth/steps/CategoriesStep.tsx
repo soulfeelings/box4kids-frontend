@@ -6,6 +6,7 @@ import {
   useUpdateChildChildrenChildIdPut,
 } from "../../../api-client/";
 import { UserChildData } from "../../../types";
+import { notifications } from "../../../utils/notifications";
 
 export const CategoriesStep: React.FC<{
   onBack: () => void;
@@ -81,10 +82,13 @@ export const CategoriesStep: React.FC<{
         skills: skillIds,
       });
 
+      notifications.dataSaved();
+
       // Переходим на следующий шаг
       onNext();
     } catch (error) {
-      setError("Не удалось обновить категори и");
+      setError("Не удалось обновить категории");
+      notifications.error("Не удалось сохранить категории");
     }
   };
 

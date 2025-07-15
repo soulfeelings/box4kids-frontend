@@ -1,6 +1,9 @@
 import React from "react";
 import { Star, X } from "lucide-react";
 import { BottomNavigation } from "../../features/BottomNavigation";
+import { useAddBoxReviewToyBoxesBoxIdReviewPost } from "../../api-client";
+import type { ToyBoxReviewRequest } from "../../api-client/model";
+import { notifications } from "../../utils/notifications";
 
 interface FeedbackViewProps {
   rating: number;
@@ -8,6 +11,8 @@ interface FeedbackViewProps {
   setFeedbackComment: (comment: string) => void;
   setShowFeedback: (show: boolean) => void;
   setRating: (rating: number) => void;
+  boxId: number;
+  userId: number;
 }
 
 export const FeedbackView: React.FC<FeedbackViewProps> = ({
@@ -16,7 +21,11 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   setFeedbackComment,
   setShowFeedback,
   setRating,
+  boxId,
+  userId,
 }) => {
+  const addReviewMutation = useAddBoxReviewToyBoxesBoxIdReviewPost();
+
   // Get feedback text based on rating
   const getFeedbackText = (rating: number) => {
     switch (rating) {
@@ -41,11 +50,27 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
     }
   };
 
-  const handleSubmitFeedback = () => {
-    // Here you would typically send the feedback to your backend
-    console.log("Feedback submitted:", { rating, comment: feedbackComment });
-    setShowFeedback(false);
-    setFeedbackComment("");
+  const handleSubmitFeedback = async () => {
+    try {
+      const reviewData: ToyBoxReviewRequest = {
+        user_id: userId,
+        rating: rating,
+        comment: feedbackComment.trim() || null,
+      };
+
+      await addReviewMutation.mutateAsync({
+        boxId: boxId,
+        data: reviewData,
+      });
+
+      console.log("Feedback submitted successfully");
+      notifications.reviewSubmitted();
+      setShowFeedback(false);
+      setFeedbackComment("");
+    } catch (error) {
+      console.error("Failed to submit feedback:", error);
+      notifications.error("Не удалось отправить отзыв");
+    }
   };
 
   const handleCloseFeedback = () => {
@@ -64,7 +89,13 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
         <h1 className="text-lg font-semibold text-gray-800">
           Как вам набор игрушек?
         </h1>
-        <button onClick={handleCloseFeedback} className="p-1">
+        <button
+          onClick={handleCloseFeedback}
+          disabled={addReviewMutation.isPending}
+          className={`p-1 ${
+            addReviewMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
           <X size={24} className="text-gray-600" />
         </button>
       </div>
@@ -77,7 +108,12 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
             <button
               key={starRating}
               onClick={() => setRating(starRating)}
-              className="focus:outline-none"
+              disabled={addReviewMutation.isPending}
+              className={`focus:outline-none ${
+                addReviewMutation.isPending
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
             >
               <Star
                 size={40}
@@ -111,7 +147,10 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
             value={feedbackComment}
             onChange={(e) => setFeedbackComment(e.target.value)}
             placeholder="Здесь можно оставить комментарий"
-            className="w-full h-32 p-3 bg-gray-100 rounded-xl resize-none text-sm text-gray-700 placeholder-gray-500 border-none outline-none"
+            disabled={addReviewMutation.isPending}
+            className={`w-full h-32 p-3 bg-gray-100 rounded-xl resize-none text-sm text-gray-700 placeholder-gray-500 border-none outline-none ${
+              addReviewMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             style={{ fontFamily: "Nunito, sans-serif" }}
           />
         </div>
@@ -119,9 +158,14 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
         {/* Submit button */}
         <button
           onClick={handleSubmitFeedback}
-          className="w-full bg-gray-800 text-white py-4 rounded-xl text-sm font-medium"
+          disabled={addReviewMutation.isPending}
+          className={`w-full py-4 rounded-xl text-sm font-medium ${
+            addReviewMutation.isPending
+              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+              : "bg-gray-800 text-white hover:bg-gray-700"
+          }`}
         >
-          Отправить
+          {addReviewMutation.isPending ? "Отправка..." : "Отправить"}
         </button>
       </div>
       <BottomNavigation

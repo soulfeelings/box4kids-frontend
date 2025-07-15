@@ -13,6 +13,7 @@ import { validateBirthDate } from "../../../utils/date/validate";
 import { useStore } from "../../../store";
 import { UserChildData } from "../../../types";
 import { ChoseChildCards } from "../../../features/ChoseChildCards";
+import { notifications } from "../../../utils/notifications";
 
 interface ChildData {
   name: string;
@@ -124,6 +125,8 @@ export const ChildStep: React.FC<{
           limitations: updatedChild.has_limitations,
           comment: updatedChild.comment,
         });
+
+        notifications.childUpdated();
       } else {
         const newChild = await createChildMutation.mutateAsync({
           data: {
@@ -148,12 +151,14 @@ export const ChildStep: React.FC<{
           subscriptions: newChild.subscriptions,
         });
         setCurrentChildIdToUpdate(newChild.id);
-        // Переходим на следующий шаг
-        onNext();
+        notifications.childAdded();
       }
+      // Переходим на следующий шаг
+      onNext();
     } catch (error) {
       console.error("Failed to update child:", error);
       setError("Не удалось обновить ребёнка");
+      notifications.error("Не удалось сохранить данные ребенка");
     }
   };
 

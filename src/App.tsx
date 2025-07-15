@@ -7,6 +7,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 import { DemoPage } from "./pages/DemoPage";
 import { AppInterface } from "./pages/AppInterface";
 // import { ProfilePage } from "./pages/ProfilePage";
@@ -97,6 +98,31 @@ const AppWithRoutes: React.FC = () => {
         />
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+            fontFamily: "Nunito, sans-serif",
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: "#4ade80",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
     </BrowserRouter>
   );
 };

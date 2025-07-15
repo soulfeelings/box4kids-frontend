@@ -10,7 +10,7 @@ interface NextSetDeterminedViewProps {
   userData: UserData;
   boxes: BoxesState[];
   rating: number;
-  setShowAllToys: (box: BoxesState["currentBox"]) => void;
+  setCurrentBox: (box: BoxesState["currentBox"]) => void;
   handleStarClick: (starIndex: number) => void;
   getCurrentDate: () => string;
   formatDeliveryDate: (dateString: string) => string;
@@ -21,7 +21,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
   userData,
   boxes,
   rating,
-  setShowAllToys,
+  setCurrentBox,
   handleStarClick,
 }) => {
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
@@ -51,7 +51,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
               className="p-4 mb-4"
               style={{ backgroundColor: "#F0955E", borderRadius: "24px" }}
             >
-              <div className="flex justify-between items-center mb-3">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-3">
                 <h2 className="text-white font-medium">
                   Текущий набор для {box.child.name}
                 </h2>
@@ -63,28 +63,26 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
                 </span>
               </div>
 
-              {boxes.map((box, index) => (
-                <div className="space-y-2 mb-4" key={index}>
-                  {box.currentBox.items?.slice(0, 2).map((item, index) => {
-                    const category = categories?.categories.find(
-                      (category) => category.id === item.toy_category_id
-                    );
-                    return (
-                      <div key={index} className="flex items-center text-white">
-                        <div className="w-6 h-6 rounded-full bg-white/50 mr-3 flex items-center justify-center text-xs">
-                          {category?.icon}
-                        </div>
-                        <span className="text-sm">
-                          x{item.quantity} {category?.name}
-                        </span>
+              <div className="space-y-2 mb-4">
+                {box.currentBox.items?.slice(0, 2).map((item, index) => {
+                  const category = categories?.categories.find(
+                    (category) => category.id === item.toy_category_id
+                  );
+                  return (
+                    <div key={index} className="flex items-center text-white">
+                      <div className="w-6 h-6 rounded-full bg-white/50 mr-3 flex items-center justify-center text-xs">
+                        {category?.icon}
                       </div>
-                    );
-                  })}
-                </div>
-              ))}
+                      <span className="text-sm">
+                        x{item.quantity} {category?.name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
 
               <button
-                onClick={() => setShowAllToys(box.currentBox)}
+                onClick={() => setCurrentBox(box.currentBox)}
                 className="w-full text-white py-2 rounded-lg text-sm font-medium"
                 style={{ backgroundColor: "#F4B58E" }}
               >
@@ -93,32 +91,15 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
             </div>
 
             {/* Rating Section */}
-            <div
-              className="p-4 mb-6"
-              style={{ backgroundColor: "#747EEC", borderRadius: "24px" }}
-            >
-              <h3 className="text-white font-medium mb-3">
-                Как вам текущий набор для {box.child.name}?
-              </h3>
-              <div className="flex justify-center space-x-2">
-                {[0, 1, 2, 3, 4].map((index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleStarClick(index)}
-                    className="transition-transform hover:scale-110"
-                  >
-                    <Star
-                      size={32}
-                      className={`${
-                        index < rating
-                          ? "fill-[#FFDB28] text-[#FFDB28]"
-                          : "fill-[#BABFF6] text-[#BABFF6]"
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+
+            {box.currentBox.status === "delivered" && (
+              <RatingSection
+                box={box}
+                rating={rating}
+                setCurrentBox={setCurrentBox}
+                handleStarClick={handleStarClick}
+              />
+            )}
           </React.Fragment>
         ))}
       </div>
@@ -193,3 +174,47 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
     </div>
   );
 };
+
+function RatingSection({
+  box,
+  rating,
+  setCurrentBox,
+  handleStarClick,
+}: {
+  box: BoxesState;
+  rating: number;
+  setCurrentBox: (box: BoxesState["currentBox"]) => void;
+  handleStarClick: (starIndex: number) => void;
+}) {
+  return (
+    <div
+      className="p-4 mb-6"
+      style={{ backgroundColor: "#747EEC", borderRadius: "24px" }}
+    >
+      <h3 className="text-white font-medium mb-3">
+        Как вам текущий набор для {box.child.name}?
+      </h3>
+      <div className="flex justify-center space-x-2">
+        {[0, 1, 2, 3, 4].map((index) => (
+          <button
+            key={index}
+            onClick={() => {
+              setCurrentBox(box.currentBox);
+              handleStarClick(index);
+            }}
+            className="transition-transform hover:scale-110"
+          >
+            <Star
+              size={32}
+              className={`${
+                index < rating
+                  ? "fill-[#FFDB28] text-[#FFDB28]"
+                  : "fill-[#BABFF6] text-[#BABFF6]"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

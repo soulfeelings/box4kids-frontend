@@ -109,57 +109,6 @@ export const ProfilePage: React.FC = () => {
   const [showEditName, setShowEditName] = useState(false);
   const [showEditPhone, setShowEditPhone] = useState(false);
 
-  // Helper function to format delivery date
-  const formatDeliveryDate = (dateString: string) => {
-    if (!dateString || !dateString.includes(".")) return dateString;
-
-    const [day, month] = dateString.split(".");
-    const currentYear = new Date().getFullYear();
-    const date = new Date(currentYear, parseInt(month) - 1, parseInt(day));
-
-    const months = [
-      "января",
-      "февраля",
-      "марта",
-      "апреля",
-      "мая",
-      "июня",
-      "июля",
-      "августа",
-      "сентября",
-      "октября",
-      "ноября",
-      "декабря",
-    ];
-
-    const daysOfWeek = [
-      "воскресенье",
-      "понедельник",
-      "вторник",
-      "среда",
-      "четверг",
-      "пятница",
-      "суббота",
-    ];
-
-    const monthName = months[date.getMonth()];
-    const dayOfWeek = daysOfWeek[date.getDay()];
-
-    return `${day} ${monthName}, ${dayOfWeek}`;
-  };
-
-  // Helper function to format delivery time
-  const formatDeliveryTime = (timeString: string) => {
-    if (!timeString || !timeString.includes("-")) return timeString;
-
-    const [startTime, endTime] = timeString.split("-");
-    const formatHour = (hour: string) => {
-      const h = parseInt(hour);
-      return h.toString().padStart(2, "0") + ":00";
-    };
-
-    return `${formatHour(startTime)}–${formatHour(endTime)}`;
-  };
 
   // Handle delivery history click
   const handleDeliveryHistoryClick = () => {

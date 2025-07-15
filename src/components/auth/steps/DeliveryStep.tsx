@@ -10,10 +10,10 @@ import { convertDeliveryDateToISO } from "../../../utils/date/convert";
 
 const timeOptions = [
   { value: "", label: "Выберите время" },
-  { value: "9-12", label: "9:00 - 12:00" },
-  { value: "12-15", label: "12:00 - 15:00" },
-  { value: "15-18", label: "15:00 - 18:00" },
-  { value: "18-21", label: "18:00 - 21:00" },
+  { value: "9:00 – 12:00", label: "9:00 - 12:00" },
+  { value: "12:00 – 15:00", label: "12:00 - 15:00" },
+  { value: "15:00 – 18:00", label: "15:00 - 18:00" },
+  { value: "18:00 – 21:00", label: "18:00 - 21:00" },
 ];
 
 export const DeliveryStep: React.FC<{

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ArrowLeft } from "lucide-react";
 import { BottomNavigation } from "../../features/BottomNavigation";
 import { ToyBoxResponse } from "../../api-client/model/toyBoxResponse";
@@ -15,6 +15,23 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
   close,
 }) => {
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
+
+  const deliveryLabel = useMemo(() => {
+    switch (currentBox.status) {
+      case "planned":
+        return "Запланирован";
+      case "assembled":
+        return "Собран";
+      case "shipped":
+        return "В пути";
+      case "delivered":
+        return "Доставлено";
+      case "returned":
+        return "Возвращен";
+      default:
+        return "Неизвестный статус";
+    }
+  }, [currentBox.status]);
 
   return (
     <div
@@ -36,7 +53,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
         {/* Delivery and Return Info */}
         <div className="bg-gray-200 rounded-xl p-4 mb-4">
           <div className="mb-2">
-            <p className="text-gray-600 text-sm">Доставлено</p>
+            <p className="text-gray-600 text-sm">{deliveryLabel}</p>
             <p className="text-gray-800 font-medium">
               {formatFullDeliveryDateTime(
                 currentBox.delivery_date,
@@ -81,10 +98,20 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
 
         {/* Info Text */}
         <div className="px-2">
-          <p className="text-blue-600 text-sm leading-relaxed">
-            Если вы хотите оставить какую-то игрушку — сообщите об этом курьеру
-            при возврате и менеджер свяжется с вами для выкупа
-          </p>
+          <div
+            className="bg-blue-100 rounded-xl p-3"
+            style={{ borderRadius: "12px" }}
+          >
+            <p
+              className="text-center text-sm leading-5 font-medium text-[#5052CB]"
+              style={{
+                fontFamily: "Nunito, sans-serif",
+              }}
+            >
+              Если вы хотите оставить какую-то игрушку — сообщите об этом
+              курьеру при возврате и менеджер свяжется с вами для выкупа
+            </p>
+          </div>
         </div>
       </div>
       <BottomNavigation

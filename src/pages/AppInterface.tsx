@@ -276,18 +276,28 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
 
   // Format delivery time to 24-hour format
   const formatDeliveryTime = (timeString: string) => {
-    if (!timeString || !timeString.includes("-")) return timeString;
+    if (!timeString) return timeString;
 
-    const [startTime, endTime] = timeString.split("-");
-    const formatHour = (hour: string) => {
-      const h = parseInt(hour);
-      return h.toString().padStart(2, "0") + ":00";
-    };
+    // Если время уже в формате "14:00 – 18:00", возвращаем как есть
+    if (timeString.includes(":") && timeString.includes("–")) {
+      return timeString;
+    }
 
-    return `${formatHour(startTime)}–${formatHour(endTime)}`;
+    // Если время в формате "14-18", преобразуем в "14:00 – 18:00"
+    if (timeString.includes("-")) {
+      const [startTime, endTime] = timeString.split("-");
+      const formatHour = (hour: string) => {
+        const h = parseInt(hour);
+        return h.toString().padStart(2, "0") + ":00";
+      };
+
+      return `${formatHour(startTime)}–${formatHour(endTime)}`;
+    }
+
+    return timeString;
   };
 
-  if (showFeedback) {
+  if (showFeedback && currentBox) {
     return (
       <FeedbackView
         rating={rating}
@@ -295,6 +305,8 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
         setFeedbackComment={setFeedbackComment}
         setShowFeedback={setShowFeedback}
         setRating={setRating}
+        boxId={currentBox.id}
+        userId={user?.id}
       />
     );
   }
@@ -342,7 +354,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
           userData={user}
           boxes={currentBoxes}
           rating={rating}
-          setShowAllToys={setCurrentBox}
+          setCurrentBox={setCurrentBox}
           handleStarClick={handleStarClick}
           getCurrentDate={getCurrentDate}
           formatDeliveryDate={formatDeliveryDate}

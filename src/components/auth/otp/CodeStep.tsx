@@ -6,6 +6,7 @@ import {
   useDevGetCodeAuthDevGetCodePost,
 } from "../../../api-client";
 import { SECONDS_TO_RESEND_CODE } from "../../../constants/phone";
+import { notifications } from "../../../utils/notifications";
 
 interface CodeStepProps {
   onBack: () => void;
@@ -93,10 +94,12 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
       }
 
       console.log("✅ Аутентификация успешна:", response.user);
+      notifications.success("Вход выполнен успешно!");
 
       onSuccess();
     } catch (error) {
       setError("Неверный код подтверждения");
+      notifications.error("Неверный код подтверждения");
     }
   };
 
@@ -110,6 +113,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
 
       setResendTimer(SECONDS_TO_RESEND_CODE);
       setError(null);
+      notifications.success("Код отправлен повторно");
 
       // DEV MODE: Автоматически получаем код после повторной отправки
       setIsAutoFilling(true);
@@ -127,6 +131,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
       }, 2000);
     } catch (error) {
       setError("Не удалось отправить код повторно");
+      notifications.error("Не удалось отправить код повторно");
     }
   };
 

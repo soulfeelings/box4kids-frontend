@@ -1,5 +1,6 @@
 import { clearPersistedStore } from "../store/store";
 import { refreshTokenClient } from "./refreshClient";
+import { notifications } from "../utils/notifications";
 
 export interface CustomFetchParams {
   url: string;
@@ -106,6 +107,7 @@ export const customFetch = async <T>({
       }
 
       console.error("[customFetch] Network error:", err);
+      notifications.networkError();
       throw new Error("Network error");
     }
 
