@@ -145,6 +145,18 @@ function ChildCard({
         </div>
       )}
 
+      {/* Subscription warning block */}
+      {subscriptionPlan &&
+        subscription &&
+        subscription.status === SubscriptionStatus.paused && (
+          <div className="mb-4 p-3 rounded-xl border border-[#DC7E45] bg-[#F0955E] bg-opacity-15">
+            <p className="text-sm text-gray-800 leading-5">
+              Подписка остановлена! Возобновите её в любое время — и мы снова
+              начнём собирать коробки для вашего ребёнка
+            </p>
+          </div>
+        )}
+
       {/* Action buttons */}
       <div className="space-y-3">
         {subscriptionPlan && subscription ? (
@@ -172,7 +184,7 @@ function ChildCard({
                   )
                 );
               }}
-              className="w-full bg-[#4CAF50] text-white py-2 rounded-2xl text-sm font-medium"
+              className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
             >
               Возобновить подписку
             </button>
