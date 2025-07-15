@@ -1,3 +1,5 @@
+import { clearPersistedStore } from "../store/store";
+
 export interface CustomFetchParams {
   url: string;
   method: string;
@@ -65,6 +67,7 @@ export const customFetch = async <T>({
       console.warn("[customFetch] Unauthorized (401)");
 
       localStorage.clear();
+      clearPersistedStore();
       window.location.href = "/";
       return undefined as T;
     }

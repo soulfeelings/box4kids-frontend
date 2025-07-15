@@ -69,7 +69,6 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
         </div>
       </div>
       <BottomNavigation
-        currentScreen="home"
         onHomeClick={() => {}}
         onChildrenClick={() => {}}
         onProfileClick={() => {}}

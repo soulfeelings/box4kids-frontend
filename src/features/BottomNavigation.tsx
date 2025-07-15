@@ -1,37 +1,45 @@
 import { Home, MoreHorizontal } from "lucide-react";
 import { useStore } from "../store";
 import { ROUTES } from "../constants/routes";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const BottomNavigation = ({
-  currentScreen,
   onHomeClick,
   onChildrenClick,
   onProfileClick,
 }: {
-  currentScreen: "home" | "children" | "profile";
-  onHomeClick: () => void;
-  onChildrenClick: () => void;
-  onProfileClick: () => void;
+  onHomeClick?: () => void;
+  onChildrenClick?: () => void;
+  onProfileClick?: () => void;
 }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === ROUTES.APP.ROOT) {
+      setCurrentAppScreen("home");
+    } else if (location.pathname === ROUTES.APP.CHILDREN) {
+      setCurrentAppScreen("children");
+    } else if (location.pathname === ROUTES.APP.PROFILE) {
+      setCurrentAppScreen("profile");
+    }
+  }, [location.pathname]);
+
   const { currentAppScreen, setCurrentAppScreen } = useStore();
   const navigate = useNavigate();
   const handleHomeClick = () => {
     navigate(ROUTES.APP.ROOT);
-    setCurrentAppScreen("home");
-    onHomeClick();
+    onHomeClick?.();
   };
 
   const handleChildrenClick = () => {
-    setCurrentAppScreen("children");
     navigate(ROUTES.APP.CHILDREN);
-    onChildrenClick();
+    onChildrenClick?.();
   };
 
   const handleProfileClick = () => {
-    setCurrentAppScreen("profile");
-    navigate(ROUTES.APP.ROOT);
-    onProfileClick();
+    navigate(ROUTES.APP.PROFILE);
+    onProfileClick?.();
   };
 
   return (

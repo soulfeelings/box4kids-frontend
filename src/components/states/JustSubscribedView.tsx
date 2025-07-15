@@ -73,7 +73,6 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
     </div>
 
     <BottomNavigation
-      currentScreen="home"
       onHomeClick={() => {}}
       onChildrenClick={() => {}}
       onProfileClick={() => {}}

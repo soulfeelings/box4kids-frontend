@@ -7,7 +7,6 @@ import {
   NextSetDeterminedView,
   NextSetNotDeterminedView,
 } from "../components/states";
-import { ProfilePage } from "./ProfilePage";
 import { useStore } from "../store/store";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
@@ -18,7 +17,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
   const [showAllToys, setShowAllToys] = useState<boolean>(false);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
-  const [showProfile, setShowProfile] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
   const { user, currentAppScreen } = useStore();
@@ -28,15 +26,13 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
     if (currentAppScreen === "home") {
       setShowAllToys(false);
       setShowFeedback(false);
-      setShowProfile(false);
       navigate(ROUTES.APP.ROOT);
     } else if (currentAppScreen === "children") {
       navigate(ROUTES.APP.CHILDREN);
     } else if (currentAppScreen === "profile") {
-      navigate(ROUTES.APP.ROOT);
+      navigate(ROUTES.APP.PROFILE);
       setShowAllToys(false);
       setShowFeedback(false);
-      setShowProfile(true);
     }
   }, [currentAppScreen]);
 
@@ -291,11 +287,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
 
     return `${formatHour(startTime)}–${formatHour(endTime)}`;
   };
-
-  // Render based on current view
-  if (showProfile) {
-    return <ProfilePage userData={user} setShowProfile={setShowProfile} />;
-  }
 
   if (showFeedback) {
     return (

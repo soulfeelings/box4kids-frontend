@@ -1,7 +1,7 @@
 import { InterestResponse, SkillResponse } from "../../../../api-client/model";
 import { UserChildData } from "../../../../types";
 import { calculateAge } from "../../../../utils/age/calculateAge";
-import { Tag } from "./Tag";
+import { Tag } from "../../../Tag";
 
 // Child overview card component
 export const ChildOverviewCard: React.FC<{

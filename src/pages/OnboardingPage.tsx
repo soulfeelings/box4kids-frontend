@@ -1,24 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AUTH_STEPS, AuthStep, isCorrectStep } from "../../constants/auth";
+import { AUTH_STEPS, AuthStep, isCorrectStep } from "../constants/auth";
 
 // Импортируем все step-компоненты
-import { UpdateNameStep } from "./steps/UpdateNameStep";
-import { ChildStep } from "./steps/ChildStep";
-import { CategoriesStep } from "./steps/CategoriesStep";
-import { SubscriptionStep } from "./steps/SubscriptionStep";
-import { DeliveryStep } from "./steps/DeliveryStep";
-import { PaymentStep } from "./steps/PaymentStep";
-import { useStore } from "../../store/store";
-import { WelcomeStep } from "./steps/WelcomeStep";
-import { ROUTES } from "../../constants/routes";
+import { UpdateNameStep } from "../components/auth/steps/UpdateNameStep";
+import { ChildStep } from "../components/auth/steps/ChildStep";
+import { CategoriesStep } from "../components/auth/steps/CategoriesStep";
+import { SubscriptionStep } from "../components/auth/steps/SubscriptionStep";
+import { DeliveryStep } from "../components/auth/steps/DeliveryStep";
+import { PaymentStep } from "../components/auth/steps/PaymentStep";
+import { useStore } from "../store/store";
+import { WelcomeStep } from "../components/auth/steps/WelcomeStep";
+import { ROUTES } from "../constants/routes";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ValidateSubscriptionsStep } from "./steps/ValidateSubscriptions";
+import { ValidateSubscriptionsStep } from "../components/auth/steps/ValidateSubscriptions";
 
-interface OnboardingFlowProps {
+interface OnboardingPageProps {
   className?: string;
 }
 
-export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
+export const OnboardingPage: React.FC<OnboardingPageProps> = ({
   className,
 }) => {
   const { state } = useLocation();
@@ -149,7 +149,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
           <PaymentStep
             onBack={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
             onNext={() => {
-              window.location.assign("/");
+              navigate(ROUTES.AUTH.SUCCESS);
             }}
             onClose={handleClose}
           />

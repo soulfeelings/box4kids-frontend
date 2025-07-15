@@ -502,7 +502,17 @@ export const useStore = create<State>()(
         currentChildIdToUpdate: state.currentChildIdToUpdate,
         selectedDeliveryAddressId: state.selectedDeliveryAddressId,
       }),
-      
     }
   )
 );
+
+export const clearPersistedStore = async () => {
+  // 1. Очистка localStorage (или другого хранилища)
+  useStore.persist.clearStorage();
+
+  // 2. Сброс всех данных в начальное состояние
+  useStore.setState(initialState);
+
+  // Если хочешь быть аккуратным — можно ещё обнулить вручную поля, не входящие в initialState,
+  // например, categoriesData, если она добавляется после fetchInitData
+};

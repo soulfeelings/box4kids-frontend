@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { ChevronRight, ArrowLeft } from "lucide-react";
-import { UserData } from "../types";
+import { ChevronRight } from "lucide-react";
 import { DeliveryHistoryPage } from "./DeliveryHistoryPage";
 import { SupportPage } from "./SupportPage";
 import { BottomNavigation } from "../features/BottomNavigation";
-
-interface ProfilePageProps {
-  userData: UserData;
-  setShowProfile: (show: boolean) => void;
-}
+import { clearPersistedStore, useStore } from "../store/store";
+import { EditNamePage } from "./EditNamePage";
+import { EditPhonePage } from "./EditPhonePage";
 
 interface ProfileItemProps {
   label: string;
@@ -23,6 +20,7 @@ interface ProfileItemProps {
   deliveryTime?: string;
   customRadius?: string;
   isMenuItem?: boolean;
+  onEditClick?: () => void;
 }
 
 const ProfileItem: React.FC<ProfileItemProps> = ({
@@ -30,7 +28,6 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
   value,
   hasArrow = false,
   isEditable = false,
-  icon,
   isDelivery = false,
   isLogout = false,
   deliveryAddress,
@@ -38,6 +35,7 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
   deliveryTime,
   customRadius = "rounded-lg",
   isMenuItem = false,
+  onEditClick,
 }) => {
   const backgroundColor =
     isMenuItem || isLogout ? "bg-[#FFFFFF]" : "bg-[#F2F2F2]";
@@ -86,7 +84,10 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
         </div>
         <div className="flex items-center ml-4">
           {isEditable && (
-            <button className="bg-[#E3E3E3] rounded-full p-2 mr-2 hover:bg-gray-300 transition-colors">
+            <button
+              onClick={onEditClick}
+              className="bg-[#E3E3E3] rounded-full p-2 mr-2 hover:bg-gray-300 transition-colors"
+            >
               <img
                 src="/illustrations/pen.png"
                 alt="Edit"
@@ -101,12 +102,12 @@ const ProfileItem: React.FC<ProfileItemProps> = ({
   );
 };
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({
-  userData,
-  setShowProfile,
-}) => {
+export const ProfilePage: React.FC = () => {
+  const { user } = useStore();
   const [showDeliveryHistory, setShowDeliveryHistory] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  const [showEditName, setShowEditName] = useState(false);
+  const [showEditPhone, setShowEditPhone] = useState(false);
 
   // Helper function to format delivery date
   const formatDeliveryDate = (dateString: string) => {
@@ -182,6 +183,26 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     return <SupportPage onClose={() => setShowSupport(false)} />;
   }
 
+  if (showEditName) {
+    return (
+      <EditNamePage
+        onClose={() => setShowEditName(false)}
+        onSave={() => {}}
+        currentName={user?.name || ""}
+      />
+    );
+  }
+
+  if (showEditPhone) {
+    return (
+      <EditPhonePage
+        onClose={() => setShowEditPhone(false)}
+        onSave={() => {}}
+        currentPhone={user?.phone || ""}
+      />
+    );
+  }
+
   return (
     <div
       className="min-h-screen bg-[#FFFFFF] pb-20"
@@ -189,59 +210,49 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     >
       {/* Profile Content */}
       <div className="px-4 py-6">
-        {/* Back Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => setShowProfile(false)}
-            className="p-2 hover:bg-gray-100 rounded-full"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
-        </div>
-
         {/* Name */}
         <ProfileItem
           label="Имя"
-          value={userData.name}
+          value={user?.name}
           isEditable={true}
           customRadius="rounded-[24px]"
+          onEditClick={() => setShowEditName(true)}
         />
 
         {/* Phone */}
         <ProfileItem
           label="Номер"
-          value={userData.phone}
+          value={user?.phone}
           isEditable={true}
           customRadius="rounded-[24px]"
+          onEditClick={() => setShowEditPhone(true)}
         />
 
         {/* Delivery */}
-        <ProfileItem
+        {/* <ProfileItem
           label="Доставка"
           isDelivery={true}
-          deliveryAddress={userData.deliveryAddresses[0]?.address}
-          deliveryDate={formatDeliveryDate(userData.deliveryAddresses[0]?.date)}
-          deliveryTime={formatDeliveryTime(userData.deliveryAddresses[0]?.time)}
+          deliveryAddress={user?.deliveryAddresses[0]?.address}
+          deliveryDate={formatDeliveryDate(user?.deliveryAddresses[0]?.date)}
+          deliveryTime={formatDeliveryTime(user?.deliveryAddresses[0]?.time)}
           customRadius="rounded-[24px]"
-        />
+        /> */}
 
         {/* Menu Items */}
         <div className="mt-6">
-          <div onClick={handleDeliveryHistoryClick} className="cursor-pointer">
+          {/* <div onClick={handleDeliveryHistoryClick} className="cursor-pointer">
             <ProfileItem
               label="История доставок"
               hasArrow={true}
               isMenuItem={true}
             />
-          </div>
+          </div> */}
 
-          <ProfileItem
+          {/* <ProfileItem
             label="Платёжные данные"
             hasArrow={true}
             isMenuItem={true}
-          />
-
-          <ProfileItem label="Уведомления" hasArrow={true} isMenuItem={true} />
+          /> */}
 
           <div onClick={handleSupportClick} className="cursor-pointer">
             <ProfileItem label="Поддержка" hasArrow={true} isMenuItem={true} />
@@ -252,6 +263,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div
           className="mt-6"
           onClick={() => {
+            clearPersistedStore();
             localStorage.clear();
             window.location.href = "/";
           }}
@@ -261,7 +273,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       </div>
 
       <BottomNavigation
-        currentScreen="profile"
         onHomeClick={() => {}}
         onChildrenClick={() => {}}
         onProfileClick={() => {}}

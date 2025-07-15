@@ -23,9 +23,10 @@ import { ROUTES } from "./constants/routes";
 // Импорт компонентов шагов авторизации
 import { OtpStep } from "./components/auth/otp/OtpStep";
 import { SuccessStep } from "./components/auth/SuccessStep";
-import { OnboardingFlow } from "./components/auth/OnboardingFlow";
+import { OnboardingPage } from "./pages/OnboardingPage";
 import { DataGuard } from "./components/common/DataGuard";
 import { ChildrenPage } from "./pages/ChildrenPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
@@ -51,7 +52,7 @@ const AppWithRoutes: React.FC = () => {
           element={
             <RouteGuard>
               <DataGuard>
-                <OnboardingFlow />
+                <OnboardingPage />
               </DataGuard>
             </RouteGuard>
           }
@@ -79,8 +80,8 @@ const AppWithRoutes: React.FC = () => {
         >
           <Route index element={<AppInterface />} />
           <Route path={ROUTES.APP.CHILDREN} element={<ChildrenPage />} />
+          <Route path={ROUTES.APP.PROFILE} element={<ProfilePage />} />
           {/* TODO: Адаптировать для router */}
-          {/* <Route path="profile" element={<ProfilePage />} /> */}
           {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
           {/* <Route path="support" element={<SupportPage />} /> */}
         </Route>

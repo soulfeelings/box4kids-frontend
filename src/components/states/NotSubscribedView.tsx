@@ -81,7 +81,6 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
       </div>
 
       <BottomNavigation
-        currentScreen="home"
         onHomeClick={() => {}}
         onChildrenClick={() => {}}
         onProfileClick={() => {}}

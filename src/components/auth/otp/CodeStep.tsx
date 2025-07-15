@@ -5,13 +5,12 @@ import {
   useSendOtpAuthSendOtpPost,
   useDevGetCodeAuthDevGetCodePost,
 } from "../../../api-client";
+import { SECONDS_TO_RESEND_CODE } from "../../../constants/phone";
 
 interface CodeStepProps {
   onBack: () => void;
   onSuccess: () => void;
 }
-
-const SECONDS_TO_RESEND_CODE = 60;
 
 export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
   const { phoneData, setPhoneData, setError, error } = useStore();

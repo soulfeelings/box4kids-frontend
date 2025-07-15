@@ -1,12 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../constants/routes";
 
 export const SuccessStep: React.FC = () => {
-  const navigate = useNavigate();
-
   const handleSuccessComplete = () => {
-    navigate(ROUTES.APP.ROOT);
+    window.location.assign("/");
   };
 
   return (

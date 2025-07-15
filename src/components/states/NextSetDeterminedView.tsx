@@ -162,7 +162,6 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
     </div>
 
     <BottomNavigation
-      currentScreen="home"
       onHomeClick={() => {}}
       onChildrenClick={() => {}}
       onProfileClick={() => {}}

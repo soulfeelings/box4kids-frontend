@@ -118,7 +118,6 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
         </button>
       </div>
       <BottomNavigation
-        currentScreen="home"
         onHomeClick={() => {}}
         onChildrenClick={() => {}}
         onProfileClick={() => {}}

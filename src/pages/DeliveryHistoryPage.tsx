@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, X } from "lucide-react";
+import { X } from "lucide-react";
 import { BottomNavigation } from "../features/BottomNavigation";
 
 interface DeliveryItem {
@@ -29,23 +29,24 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
       style={{ fontFamily: "Nunito, sans-serif" }}
     >
       {/* Back Button */}
-      <div className="px-4 pt-6 pb-4">
+      {/* <div className="px-4 pt-6 pb-4">
         <button
           onClick={onClose}
           className="p-2 hover:bg-gray-100 rounded-full"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
-      </div>
+      </div> */}
 
       {/* Title */}
-      <div className="px-4 pb-6 relative">
-        <h1 className="text-[20px] font-semibold text-gray-900 text-center">
+      <div className="px-4 py-6 relative flex items-center">
+        <div className="flex justify-between items-center" />
+        <h1 className="flex-1 text-[20px] font-semibold text-gray-900 text-center">
           История доставок
         </h1>
         <button
           onClick={onClose}
-          className="absolute right-4 top-0 p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <X className="w-5 h-5 text-gray-600" />
         </button>
@@ -80,12 +81,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
         ))}
       </div>
 
-      <BottomNavigation
-        currentScreen="profile"
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
-      />
+      <BottomNavigation />
     </div>
   );
 };

@@ -172,7 +172,6 @@ export const NextSetNotDeterminedView: React.FC<
     </div>
 
     <BottomNavigation
-      currentScreen="home"
       onHomeClick={() => {}}
       onChildrenClick={() => {}}
       onProfileClick={() => {}}

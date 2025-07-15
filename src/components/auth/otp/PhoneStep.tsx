@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import { useStore } from "../../../store/store";
 import { useSendOtpAuthSendOtpPost } from "../../../api-client";
+import { PHONE_MIN_LENGTH } from "../../../constants/phone";
 
 interface PhoneStepProps {
   onSuccess: () => void;
 }
-
-const PHONE_MIN_LENGTH = 1; // TODO: change to normal value
 
 export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
   const { phoneData, setPhoneData, setError } = useStore();
