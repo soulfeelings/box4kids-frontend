@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { BottomNavigation } from "../features/BottomNavigation";
+import { useStore } from "../store/store";
+import { useUpdateUserProfileUsersProfilePut } from "../api-client";
+import { notifications } from "../utils/notifications";
 
 interface EditNamePageProps {
   currentName: string;
@@ -14,11 +17,35 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
   onSave,
 }) => {
   const [name, setName] = useState(currentName);
+  const { setUserName } = useStore();
+  const updateUserMutation = useUpdateUserProfileUsersProfilePut();
 
-  const handleSave = () => {
-    if (name.trim()) {
-      onSave(name.trim());
+  const handleSave = async () => {
+    if (!name.trim()) return;
+
+    try {
+      // Если имя не изменилось, просто закрываем
+      if (currentName === name.trim()) {
+        onClose();
+        return;
+      }
+
+      // Обновляем имя через API
+      const userUpdated = await updateUserMutation.mutateAsync({
+        data: { name: name.trim() },
+      });
+
+      // Обновляем в store
+      setUserName(userUpdated.name);
+
+      // Вызываем callback и закрываем
+      onSave(userUpdated.name);
       onClose();
+
+      notifications.success("Имя успешно обновлено");
+    } catch (error) {
+      console.error("Update name error:", error);
+      notifications.error("Ошибка при обновлении имени");
     }
   };
 
@@ -77,14 +104,14 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
       <div className="fixed bottom-24 left-4 right-4">
         <button
           onClick={handleSave}
-          disabled={!name.trim()}
+          disabled={!name.trim() || updateUserMutation.isPending}
           className={`w-full py-3 px-4 rounded-[32px] font-medium text-base transition-colors ${
-            name.trim()
+            name.trim() && !updateUserMutation.isPending
               ? "bg-gray-800 text-white hover:bg-gray-700"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          Сохранить
+          {updateUserMutation.isPending ? "Сохраняем..." : "Сохранить"}
         </button>
       </div>
 
