@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Схема для возврата с платежной страницы
+ */
 export interface PaymentReturnRequest {
   external_payment_id: string;
   status?: string;

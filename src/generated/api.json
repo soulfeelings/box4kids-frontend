@@ -644,6 +644,53 @@
         }
       }
     },
+    "/payments/process-subscriptions": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Process Subscriptions",
+        "description": "Создает платеж и сразу его обрабатывает для указанных подписок",
+        "operationId": "process_subscriptions_payments_process_subscriptions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessSubscriptionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessSubscriptionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/payments/return": {
       "post": {
         "tags": [
@@ -1871,7 +1918,8 @@
         "required": [
           "subscription_ids"
         ],
-        "title": "BatchPaymentCreateRequest"
+        "title": "BatchPaymentCreateRequest",
+        "description": "Схема для создания пакетного платежа"
       },
       "BatchPaymentResponse": {
         "properties": {
@@ -1914,7 +1962,8 @@
           "subscription_count",
           "message"
         ],
-        "title": "BatchPaymentResponse"
+        "title": "BatchPaymentResponse",
+        "description": "Схема ответа при создании пакетного платежа"
       },
       "ChildCreate": {
         "properties": {
@@ -2639,7 +2688,17 @@
         "required": [
           "external_payment_id"
         ],
-        "title": "PaymentReturnRequest"
+        "title": "PaymentReturnRequest",
+        "description": "Схема для возврата с платежной страницы"
+      },
+      "PaymentStatusEnum": {
+        "type": "string",
+        "enum": [
+          "success",
+          "failed"
+        ],
+        "title": "PaymentStatusEnum",
+        "description": "Статусы платежа"
       },
       "PaymentWebhookRequest": {
         "properties": {
@@ -2657,7 +2716,8 @@
           "external_payment_id",
           "status"
         ],
-        "title": "PaymentWebhookRequest"
+        "title": "PaymentWebhookRequest",
+        "description": "Схема для webhook от платежной системы"
       },
       "PhoneRequest": {
         "properties": {
@@ -2689,7 +2749,53 @@
           "status",
           "message"
         ],
-        "title": "ProcessPaymentResponse"
+        "title": "ProcessPaymentResponse",
+        "description": "Схема ответа при обработке платежа"
+      },
+      "ProcessSubscriptionsRequest": {
+        "properties": {
+          "subscription_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Subscription Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subscription_ids"
+        ],
+        "title": "ProcessSubscriptionsRequest",
+        "description": "Схема для обработки подписок"
+      },
+      "ProcessSubscriptionsResponse": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatusEnum"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "payment_id": {
+            "type": "integer",
+            "title": "Payment Id"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message",
+          "payment_id",
+          "amount"
+        ],
+        "title": "ProcessSubscriptionsResponse",
+        "description": "Схема ответа при обработке подписок"
       },
       "RefreshTokenRequest": {
         "properties": {

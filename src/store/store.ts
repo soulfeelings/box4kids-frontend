@@ -120,6 +120,11 @@ interface State {
   setError: (error: string | null) => void;
   resetRegistration: () => void;
 
+  // Управление платежами
+  hasActivePayment: () => boolean;
+  getActivePaymentId: () => number | null;
+  clearPaymentData: () => void;
+
   // Аутентификация
   setUser: (user: UserData) => void;
   setUserName: (name: string) => void;
@@ -269,6 +274,22 @@ export const useStore = create<State>()(
         set({ user: null });
         // Перенаправляем на главную страницу
         window.location.href = "/";
+      },
+
+      // Управление платежами
+      hasActivePayment: () => {
+        const paymentData = get().paymentData;
+        return (
+          paymentData.paymentId !== null && paymentData.status === "pending"
+        );
+      },
+
+      getActivePaymentId: () => {
+        return get().paymentData.paymentId;
+      },
+
+      clearPaymentData: () => {
+        set({ paymentData: { paymentId: null, status: "" } });
       },
 
       // Управление детьми

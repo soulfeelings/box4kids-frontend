@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Схема для webhook от платежной системы
+ */
 export interface PaymentWebhookRequest {
   external_payment_id: string;
   status: string;

@@ -1,12 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
-import {
-  useCreateBatchPaymentPaymentsCreateBatchPost,
-  useProcessPaymentPaymentsPaymentIdProcessPost,
-} from "../../../api-client/";
+import { useProcessSubscriptionsPaymentsProcessSubscriptionsPost } from "../../../api-client/";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { SubscriptionPlanResponse } from "../../../api-client/model/subscriptionPlanResponse";
 import { ToyCategoryConfigResponse } from "../../../api-client/model/toyCategoryConfigResponse";
+import { PaymentStatusEnum } from "../../../api-client/model/paymentStatusEnum";
 import { notifications } from "../../../utils/notifications";
 
 export const PaymentStep: React.FC<{
@@ -14,23 +12,40 @@ export const PaymentStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
-  const { isLoading, setPaymentData, user, setError, subscriptionPlans } =
-    useStore();
+  const {
+    isLoading,
+    setPaymentData,
+    user,
+    setError,
+    subscriptionPlans,
+    hasActivePayment,
+    getActivePaymentId,
+    clearPaymentData,
+  } = useStore();
 
-  const createBatchPaymentMutation =
-    useCreateBatchPaymentPaymentsCreateBatchPost();
-  const processPaymentMutation =
-    useProcessPaymentPaymentsPaymentIdProcessPost();
+  const processSubscriptionsMutation =
+    useProcessSubscriptionsPaymentsProcessSubscriptionsPost();
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   const allChildrenSubscriptionsIds = user?.children.flatMap((child) =>
-    child.subscriptions.map((subscription) => subscription.id)
+    child.subscriptions
+      .filter(
+        (subscription) =>
+          subscription.status === SubscriptionStatus.pending_payment
+      )
+      .map((subscription) => subscription.id)
   );
-  console.log(allChildrenSubscriptionsIds);
+  console.log("Подписки для оплаты:", allChildrenSubscriptionsIds);
 
   const handleBack = () => {
+    clearPaymentData(); // Очищаем данные платежа при переходе назад
     onBack();
+  };
+
+  const handleClose = () => {
+    clearPaymentData(); // Очищаем данные платежа при закрытии
+    onClose();
   };
 
   const handlePaymentSubmit = async () => {
@@ -41,27 +56,23 @@ export const PaymentStep: React.FC<{
 
     setPaymentProcessing(true);
     try {
-      // Создаем платеж
-      const paymentResponse = await createBatchPaymentMutation.mutateAsync({
+      // Используем новый объединенный endpoint
+      const result = await processSubscriptionsMutation.mutateAsync({
         data: {
           subscription_ids: allChildrenSubscriptionsIds,
         },
       });
 
-      // Сохраняем данные платежа в store
+      // Сохраняем данные платежа в store для возможного повторного использования
       setPaymentData({
-        paymentId: paymentResponse.payment_id,
-        status: "created",
-      });
-
-      // Переходим к успешному завершению или обработке платежа
-      const processResult = await processPaymentMutation.mutateAsync({
-        paymentId: paymentResponse.payment_id,
+        paymentId: result.payment_id,
+        status: result.status,
       });
 
       // Проверяем результат обработки платежа
-      if (processResult.status === "success") {
+      if (result.status === PaymentStatusEnum.success) {
         notifications.paymentSuccess();
+        clearPaymentData(); // Очищаем данные платежа после успешной оплаты
         onNext(); // Переходим к успешному завершению
       } else {
         notifications.paymentError();
@@ -153,7 +164,7 @@ export const PaymentStep: React.FC<{
         </span>
 
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
         >
           <svg
@@ -321,7 +332,7 @@ export const PaymentStep: React.FC<{
           }}
         >
           {isLoading
-            ? "Создаем платеж..."
+            ? "Подготавливаем платеж..."
             : paymentProcessing
             ? "Обрабатываем платеж..."
             : !totalPrice

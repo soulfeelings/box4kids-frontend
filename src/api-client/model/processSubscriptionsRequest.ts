@@ -7,9 +7,8 @@
  */
 
 /**
- * Схема ответа при обработке платежа
+ * Схема для обработки подписок
  */
-export interface ProcessPaymentResponse {
-  status: string;
-  message: string;
+export interface ProcessSubscriptionsRequest {
+  subscription_ids: number[];
 }

@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Схема для создания пакетного платежа
+ */
 export interface BatchPaymentCreateRequest {
   subscription_ids: number[];
 }

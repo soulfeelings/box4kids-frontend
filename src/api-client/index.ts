@@ -52,6 +52,8 @@ import type {
   PaymentWebhookRequest,
   PhoneRequest,
   ProcessPaymentResponse,
+  ProcessSubscriptionsRequest,
+  ProcessSubscriptionsResponse,
   RefreshTokenRequest,
   SkillsListResponse,
   SubscriptionCreateRequest,
@@ -1148,6 +1150,72 @@ export const useProcessPaymentPaymentsPaymentIdProcessPost = <TError = HTTPValid
       > => {
 
       const mutationOptions = getProcessPaymentPaymentsPaymentIdProcessPostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Создает платеж и сразу его обрабатывает для указанных подписок
+ * @summary Process Subscriptions
+ */
+export const processSubscriptionsPaymentsProcessSubscriptionsPost = (
+    processSubscriptionsRequest: ProcessSubscriptionsRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<ProcessSubscriptionsResponse>(
+      {url: `/payments/process-subscriptions`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: processSubscriptionsRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getProcessSubscriptionsPaymentsProcessSubscriptionsPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processSubscriptionsPaymentsProcessSubscriptionsPost>>, TError,{data: ProcessSubscriptionsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof processSubscriptionsPaymentsProcessSubscriptionsPost>>, TError,{data: ProcessSubscriptionsRequest}, TContext> => {
+
+const mutationKey = ['processSubscriptionsPaymentsProcessSubscriptionsPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof processSubscriptionsPaymentsProcessSubscriptionsPost>>, {data: ProcessSubscriptionsRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  processSubscriptionsPaymentsProcessSubscriptionsPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProcessSubscriptionsPaymentsProcessSubscriptionsPostMutationResult = NonNullable<Awaited<ReturnType<typeof processSubscriptionsPaymentsProcessSubscriptionsPost>>>
+    export type ProcessSubscriptionsPaymentsProcessSubscriptionsPostMutationBody = ProcessSubscriptionsRequest
+    export type ProcessSubscriptionsPaymentsProcessSubscriptionsPostMutationError = HTTPValidationError
+
+    /**
+ * @summary Process Subscriptions
+ */
+export const useProcessSubscriptionsPaymentsProcessSubscriptionsPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processSubscriptionsPaymentsProcessSubscriptionsPost>>, TError,{data: ProcessSubscriptionsRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof processSubscriptionsPaymentsProcessSubscriptionsPost>>,
+        TError,
+        {data: ProcessSubscriptionsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getProcessSubscriptionsPaymentsProcessSubscriptionsPostMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }

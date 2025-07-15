@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Схема ответа при создании пакетного платежа
+ */
 export interface BatchPaymentResponse {
   payment_id: number;
   external_payment_id: string;
