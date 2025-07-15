@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Search, Eye, X } from "lucide-react";
 import {
   useGetAllUsersAdminUsersGet,
@@ -7,7 +7,6 @@ import {
 } from "../api-client";
 import type {
   AdminUserResponse,
-  ChildWithBoxesResponse,
   ToyBoxResponse,
   NextBoxResponse,
   DeliveryInfoResponse,
@@ -65,7 +64,7 @@ export const AdminPage: React.FC = () => {
   const updateStatusMutation =
     useUpdateToyBoxStatusAdminToyBoxesBoxIdStatusPut();
 
-  const handleLogin = async () => {
+  const handleLogin = useCallback(async () => {
     try {
       const response = await loginMutation.mutateAsync({
         data: { password },
@@ -78,127 +77,136 @@ export const AdminPage: React.FC = () => {
       console.error("Ошибка авторизации:", error);
       alert("Неверный пароль");
     }
-  };
+  }, [loginMutation, password]);
 
-  const handleStatusChange = async (boxId: number, newStatus: string) => {
-    try {
-      await updateStatusMutation.mutateAsync({
-        boxId,
-        params: {
-          new_status: newStatus,
-        },
-      });
+  const handleStatusChange = useCallback(
+    async (boxId: number, newStatus: string) => {
+      try {
+        await updateStatusMutation.mutateAsync({
+          boxId,
+          params: {
+            new_status: newStatus,
+          },
+        });
 
-      // Обновляем данные после успешного изменения
-      refetchUsers();
-    } catch (error) {
-      console.error("Ошибка обновления статуса:", error);
-      alert("Ошибка при обновлении статуса");
-    }
-  };
+        // Обновляем данные после успешного изменения
+        refetchUsers();
+      } catch (error) {
+        console.error("Ошибка обновления статуса:", error);
+        alert("Ошибка при обновлении статуса");
+      }
+    },
+    [updateStatusMutation, refetchUsers]
+  );
 
-  const transformUserToClientData = (user: AdminUserResponse): ClientData[] => {
-    const result: ClientData[] = [];
+  const formatToyBox = useCallback((box: ToyBoxResponse): string => {
+    if (!box.items || box.items.length === 0) return "---";
 
-    // Получаем все адреса пользователя
-    const userAddresses = user.delivery_addresses?.addresses || [];
+    const totalToys = box.items.reduce(
+      (sum: number, item: any) => sum + item.quantity,
+      0
+    );
+    const itemsList = box.items
+      .map((item: any) => `- ${item.quantity} ${item.category_name}`)
+      .join(" ");
 
-    // Если у пользователя нет детей, создаем одну запись
-    if (!user.children || user.children.length === 0) {
-      result.push({
-        id: user.id,
-        phone: user.phone_number || "",
-        name: user.name || "",
-        registeredWithoutSubscription: true,
-        subscriptionStatus: "Нет подписки",
-        deliveryAddresses: userAddresses.map((addr: DeliveryInfoResponse) => ({
-          id: addr.id || 0,
-          name: addr.name || "Адрес",
-          address: addr.address || "Не указан",
-        })),
-        nextDeliveryDate: "",
-        childName: "",
-        currentSet: "---",
-        currentSetStatus: "",
-        nextSet: "---",
-        nextSetStatus: "",
-        fullData: user,
-      });
+    return `Набор на ${totalToys} игрушек: ${itemsList}`;
+  }, []);
+
+  const formatNextBox = useCallback((box: NextBoxResponse): string => {
+    if (!box.items || box.items.length === 0) return "---";
+
+    const totalToys = box.items.reduce(
+      (sum: number, item: any) => sum + item.quantity,
+      0
+    );
+    const itemsList = box.items
+      .map((item: any) => `- ${item.quantity} ${item.category_name}`)
+      .join(" ");
+
+    return `Набор на ${totalToys} игрушек: ${itemsList}`;
+  }, []);
+
+  const transformUserToClientData = useCallback(
+    (user: AdminUserResponse): ClientData[] => {
+      const result: ClientData[] = [];
+
+      // Получаем все адреса пользователя
+      const userAddresses = user.delivery_addresses?.addresses || [];
+
+      // Если у пользователя нет детей, создаем одну запись
+      if (!user.children || user.children.length === 0) {
+        result.push({
+          id: user.id,
+          phone: user.phone_number || "",
+          name: user.name || "",
+          registeredWithoutSubscription: true,
+          subscriptionStatus: "Нет подписки",
+          deliveryAddresses: userAddresses.map(
+            (addr: DeliveryInfoResponse) => ({
+              id: addr.id || 0,
+              name: addr.name || "Адрес",
+              address: addr.address || "Не указан",
+            })
+          ),
+          nextDeliveryDate: "",
+          childName: "",
+          currentSet: "---",
+          currentSetStatus: "",
+          nextSet: "---",
+          nextSetStatus: "",
+          fullData: user,
+        });
+        return result;
+      }
+
+      // Для каждого ребенка создаем отдельную запись
+      for (const child of user.children) {
+        const currentBox = child.current_box;
+        const nextBox = child.next_box;
+
+        // Получаем подписку для этого ребенка
+        const childSubscription = user.subscriptions?.find(
+          (sub: SubscriptionWithDetailsResponse) => sub.child_id === child.id
+        );
+
+        // Помечаем адреса, которые используются в подписке и боксе
+        const addressesWithUsage = userAddresses.map(
+          (addr: DeliveryInfoResponse) => ({
+            id: addr.id || 0,
+            name: addr.name || "Адрес",
+            address: addr.address || "Не указан",
+            isUsedInSubscription:
+              childSubscription?.delivery_info_id === addr.id,
+            isUsedInBox: currentBox?.delivery_info_id === addr.id,
+          })
+        );
+
+        result.push({
+          id: user.id,
+          phone: user.phone_number || "",
+          name: user.name || "",
+          registeredWithoutSubscription: !childSubscription,
+          subscriptionStatus: childSubscription?.status || "Нет подписки",
+          deliveryAddresses: addressesWithUsage,
+          nextDeliveryDate:
+            currentBox?.delivery_date || nextBox?.delivery_date || "",
+          childName: child.name || "",
+          currentSet: currentBox ? formatToyBox(currentBox) : "---",
+          currentSetStatus: currentBox?.status || "",
+          currentBoxId: currentBox?.id,
+          nextSet: nextBox ? formatNextBox(nextBox) : "---",
+          nextSetStatus: nextBox ? "Запланирован" : "",
+          fullData: user,
+        });
+      }
+
       return result;
-    }
+    },
+    [formatNextBox, formatToyBox]
+  );
 
-    // Для каждого ребенка создаем отдельную запись
-    for (const child of user.children) {
-      const currentBox = child.current_box;
-      const nextBox = child.next_box;
-
-      // Получаем подписку для этого ребенка
-      const childSubscription = user.subscriptions?.find(
-        (sub: SubscriptionWithDetailsResponse) => sub.child_id === child.id
-      );
-
-      // Помечаем адреса, которые используются в подписке и боксе
-      const addressesWithUsage = userAddresses.map(
-        (addr: DeliveryInfoResponse) => ({
-          id: addr.id || 0,
-          name: addr.name || "Адрес",
-          address: addr.address || "Не указан",
-          isUsedInSubscription: childSubscription?.delivery_info_id === addr.id,
-          isUsedInBox: currentBox?.delivery_info_id === addr.id,
-        })
-      );
-
-      result.push({
-        id: user.id,
-        phone: user.phone_number || "",
-        name: user.name || "",
-        registeredWithoutSubscription: !childSubscription,
-        subscriptionStatus: childSubscription?.status || "Нет подписки",
-        deliveryAddresses: addressesWithUsage,
-        nextDeliveryDate:
-          currentBox?.delivery_date || nextBox?.delivery_date || "",
-        childName: child.name || "",
-        currentSet: currentBox ? formatToyBox(currentBox) : "---",
-        currentSetStatus: currentBox?.status || "",
-        currentBoxId: currentBox?.id,
-        nextSet: nextBox ? formatNextBox(nextBox) : "---",
-        nextSetStatus: nextBox ? "Запланирован" : "",
-        fullData: user,
-      });
-    }
-
-    return result;
-  };
-
-  const formatToyBox = (box: ToyBoxResponse): string => {
-    if (!box.items || box.items.length === 0) return "---";
-
-    const totalToys = box.items.reduce(
-      (sum: number, item: any) => sum + item.quantity,
-      0
-    );
-    const itemsList = box.items
-      .map((item: any) => `- ${item.quantity} ${item.category_name}`)
-      .join(" ");
-
-    return `Набор на ${totalToys} игрушек: ${itemsList}`;
-  };
-
-  const formatNextBox = (box: NextBoxResponse): string => {
-    if (!box.items || box.items.length === 0) return "---";
-
-    const totalToys = box.items.reduce(
-      (sum: number, item: any) => sum + item.quantity,
-      0
-    );
-    const itemsList = box.items
-      .map((item: any) => `- ${item.quantity} ${item.category_name}`)
-      .join(" ");
-
-    return `Набор на ${totalToys} игрушек: ${itemsList}`;
-  };
-
-  const filteredAndSortedData = React.useMemo(() => {
+  const filteredAndSortedData = useMemo(() => {
     if (!users) return [];
 
     // Преобразуем пользователей в записи для таблицы (каждый ребенок = отдельная запись)
@@ -247,7 +255,14 @@ export const AdminPage: React.FC = () => {
     });
 
     return data;
-  }, [users, searchTerm, filterColumn, sortBy, sortOrder]);
+  }, [
+    users,
+    searchTerm,
+    filterColumn,
+    sortBy,
+    sortOrder,
+    transformUserToClientData,
+  ]);
 
   if (!isAuthenticated) {
     return (

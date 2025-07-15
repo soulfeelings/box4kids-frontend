@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { BottomNavigation } from "../features/BottomNavigation";
 import { DevModeBanner } from "../features/DevModeBanner";
 import {
   useSendOtpAuthSendOtpPost,
-  useVerifyOtpAuthVerifyOtpPost,
   useDevGetCodeAuthDevGetCodePost,
   useInitiatePhoneChangeAuthChangePhoneInitiatePost,
   useConfirmPhoneChangeAuthChangePhoneConfirmPost,
@@ -41,7 +40,6 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
 
   // API мутации
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
-  const verifyOtpMutation = useVerifyOtpAuthVerifyOtpPost();
   const devGetCodeMutation = useDevGetCodeAuthDevGetCodePost();
   const initiatePhoneChangeMutation =
     useInitiatePhoneChangeAuthChangePhoneInitiatePost();
@@ -53,17 +51,20 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
   const [isAutoFillingNew, setIsAutoFillingNew] = useState(false);
 
   // Функция для получения dev кода
-  const getDevCode = async (phoneNumber: string): Promise<string | null> => {
-    try {
-      const response = await devGetCodeMutation.mutateAsync({
-        data: { phone_number: phoneNumber },
-      });
-      return response.code || null;
-    } catch (error) {
-      console.error("Dev code error:", error);
-      return null;
-    }
-  };
+  const getDevCode = useCallback(
+    async (phoneNumber: string): Promise<string | null> => {
+      try {
+        const response = await devGetCodeMutation.mutateAsync({
+          data: { phone_number: phoneNumber },
+        });
+        return response.code || null;
+      } catch (error) {
+        console.error("Dev code error:", error);
+        return null;
+      }
+    },
+    [devGetCodeMutation]
+  );
 
   // Timer logic
   useEffect(() => {
@@ -77,7 +78,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
   }, [resendTimer]);
 
   // Handle sending code to current phone
-  const handleSendCodeToCurrent = async () => {
+  const handleSendCodeToCurrent = useCallback(async () => {
     setError(null);
 
     try {
@@ -107,10 +108,10 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       setError("Не удалось отправить код на текущий номер");
       notifications.error("Не удалось отправить код");
     }
-  };
+  }, [sendOtpMutation, currentPhone, setStep, setResendTimer, getDevCode]);
 
   // Handle verifying current phone code
-  const handleVerifyCurrentCode = async () => {
+  const handleVerifyCurrentCode = useCallback(async () => {
     if (currentCode.length !== 4) {
       setError("Введите 4-значный код");
       return;
@@ -150,21 +151,17 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       setError("Неверный код подтверждения");
       notifications.error("Неверный код подтверждения");
     }
-  };
-
-  // Handle sending code to new phone (теперь код отправляется автоматически при инициации)
-  const handleSendCodeToNew = async () => {
-    if (newPhone.length < PHONE_MIN_LENGTH) {
-      setError("Введите корректный номер телефона");
-      return;
-    }
-
-    setError(null);
-    setStep(Step.CurrentPhoneCode);
-  };
+  }, [
+    initiatePhoneChangeMutation,
+    currentCode,
+    newPhone,
+    setStep,
+    setResendTimer,
+    getDevCode,
+  ]);
 
   // Handle verifying new phone code
-  const handleVerifyNewCode = async () => {
+  const handleVerifyNewCode = useCallback(async () => {
     if (newCode.length !== 4) {
       setError("Введите 4-значный код");
       return;
@@ -198,10 +195,17 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       setError("Неверный код подтверждения");
       notifications.error("Неверный код подтверждения");
     }
-  };
+  }, [
+    confirmPhoneChangeMutation,
+    newPhone,
+    newCode,
+    setUserPhone,
+    onSave,
+    onClose,
+  ]);
 
   // Handle resending code
-  const handleResendCode = async () => {
+  const handleResendCode = useCallback(async () => {
     if (resendTimer > 0) return;
 
     if (step === Step.CurrentPhoneCode) {
@@ -266,10 +270,20 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
         notifications.error("Не удалось отправить код повторно");
       }
     }
-  };
+  }, [
+    resendTimer,
+    step,
+    currentPhone,
+    newPhone,
+    initiatePhoneChangeMutation,
+    getDevCode,
+    sendOtpMutation,
+    currentCode,
+    setError,
+  ]);
 
   // Handle back navigation
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     switch (step) {
       case Step.CurrentPhoneCode:
         setStep(Step.CurrentPhoneConfirm);
@@ -280,7 +294,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       default:
         onClose();
     }
-  };
+  }, [step, onClose]);
 
   const renderStep = () => {
     const isNewPhoneValid = newPhone.length >= PHONE_MIN_LENGTH;

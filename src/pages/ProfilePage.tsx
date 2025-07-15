@@ -7,6 +7,7 @@ import { EditNamePage } from "./EditNamePage";
 import { EditPhonePage } from "./EditPhonePage";
 import { ProfileItem } from "../components/profile/ProfileItem";
 import { DeliveryProfileSections } from "../features/DeliveryProfileSections";
+import { PaymentDataPage } from "./PaymentDataPage";
 
 export const ProfilePage: React.FC = () => {
   const { user } = useStore();
@@ -14,7 +15,7 @@ export const ProfilePage: React.FC = () => {
   const [showSupport, setShowSupport] = useState(false);
   const [showEditName, setShowEditName] = useState(false);
   const [showEditPhone, setShowEditPhone] = useState(false);
-
+  const [showPaymentData, setShowPaymentData] = useState(false);
   // Handle delivery history click
   const handleDeliveryHistoryClick = () => {
     setShowDeliveryHistory(true);
@@ -23,6 +24,10 @@ export const ProfilePage: React.FC = () => {
   // Handle support click
   const handleSupportClick = () => {
     setShowSupport(true);
+  };
+
+  const handlePaymentDataClick = () => {
+    setShowPaymentData(true);
   };
 
   // Show delivery history page if requested
@@ -55,6 +60,10 @@ export const ProfilePage: React.FC = () => {
         currentPhone={user?.phone || ""}
       />
     );
+  }
+
+  if (showPaymentData) {
+    return <PaymentDataPage onClose={() => setShowPaymentData(false)} />;
   }
 
   return (
@@ -93,19 +102,21 @@ export const ProfilePage: React.FC = () => {
 
         {/* Menu Items */}
         <div className="mt-6">
-          {/* <div onClick={handleDeliveryHistoryClick} className="cursor-pointer">
+          <div onClick={handleDeliveryHistoryClick} className="cursor-pointer">
             <ProfileItem
               label="История доставок"
               hasArrow={true}
               isMenuItem={true}
             />
-          </div> */}
+          </div>
 
-          {/* <ProfileItem
-            label="Платёжные данные"
-            hasArrow={true}
-            isMenuItem={true}
-          /> */}
+          <div onClick={handlePaymentDataClick} className="cursor-pointer">
+            <ProfileItem
+              label="Платёжные данные"
+              hasArrow={true}
+              isMenuItem={true}
+            />
+          </div>
 
           <div onClick={handleSupportClick} className="cursor-pointer">
             <ProfileItem label="Поддержка" hasArrow={true} isMenuItem={true} />

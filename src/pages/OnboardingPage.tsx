@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AUTH_STEPS, AuthStep, isCorrectStep } from "../constants/auth";
 
 // Импортируем все step-компоненты
@@ -9,10 +9,12 @@ import { SubscriptionStep } from "../components/auth/steps/SubscriptionStep";
 import { DeliveryStep } from "../components/auth/steps/DeliveryStep";
 import { PaymentStep } from "../components/auth/steps/PaymentStep";
 import { useStore } from "../store/store";
-import { selectChildById } from "../store/selectors";
+import { useChildById } from "../store/hooks";
 import { WelcomeStep } from "../components/auth/steps/WelcomeStep";
 import { ROUTES } from "../constants/routes";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useNavigateToApp } from "../hooks/useNavigateHooks";
+import { useNavigate } from "react-router-dom";
 import { ValidateSubscriptionsStep } from "../components/auth/steps/ValidateSubscriptions";
 
 interface OnboardingPageProps {
@@ -43,15 +45,14 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     resetTemporaryState,
   } = useStore();
 
-  const currentChildToUpdate = useStore(
-    selectChildById(currentChildIdToUpdate)
-  );
+  const currentChildToUpdate = useChildById(currentChildIdToUpdate);
 
+  const navigateToApp = useNavigateToApp();
   const navigate = useNavigate();
 
   const handleClose = () => {
     resetTemporaryState(); // Сбрасываем временные значения
-    navigate(ROUTES.APP.ROOT);
+    navigateToApp();
   };
 
   useEffect(() => {

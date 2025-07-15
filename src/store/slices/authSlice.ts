@@ -1,5 +1,5 @@
 import { State } from "../store";
-import { PhoneData, CategoriesData } from "../types/index";
+import { PhoneData } from "../types/index";
 import * as authMutations from "../mutations/auth";
 
 // Типы мутаций для аутентификации

@@ -7,11 +7,12 @@ import { SkillResponse } from "../../../api-client/model/skillResponse";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { useHandleDeleteChilld } from "../../../features/useHandleDeleteChilld";
 import { useStore } from "../../../store";
-import {
-  selectChildrenWithoutSubscriptionByStatus,
-  selectSubscriptionPlan,
-} from "../../../store/selectors";
+import { useChildrenWithoutSubscriptionByStatus } from "../../../store/hooks";
 import { ChildrenOverviewView } from "./subscription-step-components/ChildrenOverviewView";
+import {
+  useNavigateToEditChild,
+  useNavigateToOnboarding,
+} from "../../../hooks/useNavigateHooks";
 
 export const ValidateSubscriptionsStep: React.FC<{
   onBack: () => void;
@@ -24,30 +25,37 @@ export const ValidateSubscriptionsStep: React.FC<{
   onBack,
   onNext,
   onClose,
-  onAddNewChild,
-  onEditChildSubscription,
-  onEditChildData,
+  // onAddNewChild,
+  // onEditChildSubscription,
+  // onEditChildData,
+  ...props
 }) => {
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
   const { handleDeleteChild } = useHandleDeleteChilld();
 
+  const navigateToEditChild = useNavigateToEditChild();
+  const navigateToOnboarding = useNavigateToOnboarding();
+
   const handleEditChildSubscription = (childId: number) => {
-    onEditChildSubscription(childId);
+    navigateToOnboarding({ step: "subscription" });
   };
 
   const handleAddNewChild = () => {
-    onAddNewChild();
+    navigateToOnboarding({ step: "child" });
+  };
+
+  const handleEditChildData = (childId: number) => {
+    navigateToEditChild({ childId });
   };
 
   // Получаем детей без активной подписки из store
-  const childrenWithoutActiveSubscription = useStore(
-    selectChildrenWithoutSubscriptionByStatus([
+  const childrenWithoutActiveSubscription =
+    useChildrenWithoutSubscriptionByStatus([
       SubscriptionStatus.active,
       SubscriptionStatus.paused,
-    ])
-  );
+    ]);
 
   const interests: InterestResponse[] = interestsData?.interests || [];
   const skills: SkillResponse[] = skillsData?.skills || [];
@@ -134,7 +142,7 @@ export const ValidateSubscriptionsStep: React.FC<{
             children={childrenWithoutActiveSubscription}
             interests={interests}
             skills={skills}
-            onEditData={onEditChildData}
+            onEditData={handleEditChildData}
             onEditSubscription={handleEditChildSubscription}
             onDelete={handleDeleteChild}
             onAddNewChild={handleAddNewChild}

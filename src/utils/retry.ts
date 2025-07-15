@@ -29,5 +29,5 @@ export const retryAsync = async <T>(
     }
   }
 
-  throw lastError!;
+  throw lastError!; // eslint-disable-line
 };

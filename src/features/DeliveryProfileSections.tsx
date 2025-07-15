@@ -2,7 +2,6 @@ import React from "react";
 import { DeliveryProfileSection } from "./DeliveryProfileSection";
 import { UserData } from "../types";
 import { useStore } from "../store/store";
-import { selectSubscriptionPlan } from "../store/selectors";
 
 interface DeliveryAddress {
   id: number;
@@ -49,8 +48,10 @@ export const DeliveryProfileSections: React.FC<
         c.subscriptions.some((sub) => sub.id === relatedSubscription.id)
       );
 
-      // Получаем реальное имя плана
-      const plan = selectSubscriptionPlan(relatedSubscription.plan_id)(state);
+      // Получаем реальное имя плана из state
+      const plan = state.subscriptionPlans.find(
+        (plan) => plan.id === relatedSubscription.plan_id
+      );
 
       enrichedAddress.subscriptionInfo = {
         id: relatedSubscription.id,

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useStore } from "../../../store/store";
 import { useSendOtpAuthSendOtpPost } from "../../../api-client";
 import { PHONE_MIN_LENGTH } from "../../../constants/phone";
@@ -12,7 +12,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
 
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
 
-  const handleSendCode = async () => {
+  const handleSendCode = useCallback(async () => {
     setError(null);
 
     if (phoneData.phone.length < PHONE_MIN_LENGTH) {
@@ -31,13 +31,13 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
         error instanceof Error ? error.message : "Не удалось отправить код"
       );
     }
-  };
+  }, [phoneData.phone, sendOtpMutation, setError, onSuccess]);
 
   useEffect(() => {
     return () => {
       setPhoneData({ code: "" });
     };
-  }, []);
+  }, [setPhoneData]);
 
   const isPhoneValid = phoneData.phone.length >= PHONE_MIN_LENGTH;
   const isLoading = sendOtpMutation.isPending;

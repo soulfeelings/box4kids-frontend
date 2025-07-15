@@ -1,5 +1,4 @@
-import React from "react";
-import { convertDateFromISO } from "../utils/date/convert";
+import React, { useCallback } from "react";
 
 interface DeliveryAddress {
   id: number;
@@ -30,7 +29,7 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
   deliveryAddresses = [],
   onEditDelivery,
 }) => {
-  const formatDeliveryDate = (date: string) => {
+  const formatDeliveryDate = useCallback((date: string) => {
     if (!date) return "";
     if (date.includes(".")) {
       const [day, month] = date.split(".");
@@ -53,16 +52,16 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
       return `${day} ${monthName}`;
     }
     return date;
-  };
+  }, []);
 
-  const formatDeliveryTime = (time: string) => {
+  const formatDeliveryTime = useCallback((time: string) => {
     if (!time) return "";
     if (time.includes("-")) {
       const [start, end] = time.split("-");
       return `${start}:00 – ${end}:00`;
     }
     return time;
-  };
+  }, []);
 
   const primaryAddress = deliveryAddresses[0];
   if (!primaryAddress) {

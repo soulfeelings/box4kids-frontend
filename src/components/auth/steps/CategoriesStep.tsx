@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useStore } from "../../../store/store";
 import {
   useGetAllInterestsInterestsGet,
@@ -54,49 +54,56 @@ export const CategoriesStep: React.FC<{
     return interestsChanged || skillsChanged;
   }, [selectedInterestsIds, selectedSkillsIds, currentChildToUpdate]);
 
-  const handleUpdateChildCategories = async (
-    interestIds: number[],
-    skillIds: number[]
-  ) => {
-    if (!currentChildToUpdate) {
-      setError("ID ребенка не найден");
-      return;
-    }
+  const handleUpdateChildCategories = useCallback(
+    async (interestIds: number[], skillIds: number[]) => {
+      if (!currentChildToUpdate) {
+        setError("ID ребенка не найден");
+        return;
+      }
 
-    if (!dataHasChanged) {
-      onNext();
-      return;
-    }
+      if (!dataHasChanged) {
+        onNext();
+        return;
+      }
 
-    try {
-      await updateChildMutation.mutateAsync({
-        childId: currentChildToUpdate.id,
-        data: {
-          interest_ids: interestIds,
-          skill_ids: skillIds,
-        },
-      });
+      try {
+        await updateChildMutation.mutateAsync({
+          childId: currentChildToUpdate.id,
+          data: {
+            interest_ids: interestIds,
+            skill_ids: skillIds,
+          },
+        });
 
-      updateChild(currentChildToUpdate.id, {
-        interests: interestIds,
-        skills: skillIds,
-      });
+        updateChild(currentChildToUpdate.id, {
+          interests: interestIds,
+          skills: skillIds,
+        });
 
-      notifications.dataSaved();
+        notifications.dataSaved();
 
-      // Переходим на следующий шаг
-      onNext();
-    } catch (error) {
-      setError("Не удалось обновить категории");
-      notifications.error("Не удалось сохранить категории");
-    }
-  };
+        // Переходим на следующий шаг
+        onNext();
+      } catch (error) {
+        setError("Не удалось обновить категории");
+        notifications.error("Не удалось сохранить категории");
+      }
+    },
+    [
+      currentChildToUpdate,
+      dataHasChanged,
+      updateChildMutation,
+      onNext,
+      setError,
+      updateChild,
+    ]
+  );
 
   useEffect(() => {
     if (!currentChildToUpdate) {
       setError("ID ребенка не найден");
     }
-  }, [currentChildToUpdate]);
+  }, [currentChildToUpdate, setError]);
 
   const handleBack = () => {
     onBack();

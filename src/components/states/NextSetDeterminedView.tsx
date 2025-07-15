@@ -5,6 +5,7 @@ import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { UserData } from "../../types";
 import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
+import { useNavigateToEditChild } from "../../hooks/useNavigateHooks";
 
 interface NextSetDeterminedViewProps {
   userData: UserData;
@@ -25,6 +26,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
   handleStarClick,
 }) => {
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
+  const navigateToEditChild = useNavigateToEditChild();
 
   return (
     <div
@@ -160,6 +162,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
 
             {/* Change Interests Button */}
             <button
+              onClick={() => navigateToEditChild({ childId: box.child.id })}
               className="w-full text-gray-600 py-3 text-sm font-medium mb-8"
               style={{ backgroundColor: "#E3E3E3", borderRadius: "32px" }}
             >

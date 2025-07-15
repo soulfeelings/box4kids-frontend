@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useStore } from "../../../store/store";
+import { useStore } from "../../../store";
 import { selectSelectedDeliveryAddressId } from "../../../store/selectors";
 import {
   useCreateDeliveryAddressDeliveryAddressesPost,
@@ -8,7 +8,7 @@ import {
 import { DeliveryAddressCards } from "../../../features/DeliveryAddressCards";
 import { generateDateOptions } from "../../../utils/date/generateDateOptions";
 import { convertDeliveryDateToISO } from "../../../utils/date/convert";
-import { selectAllChildrenSubscriptionsIds } from "../../../store/selectors";
+import { useChildrenSubscriptionsIds } from "../../../store/hooks";
 
 const timeOptions = [
   { value: "", label: "Выберите время" },
@@ -24,7 +24,7 @@ export const DeliveryStep: React.FC<{
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
   const { user, setSelectedDeliveryAddressId, addDeliveryAddress } = useStore();
-  const subscriptionsIds = useStore(selectAllChildrenSubscriptionsIds());
+  const subscriptionsIds = useChildrenSubscriptionsIds();
   const createDeliveryAddressMutation =
     useCreateDeliveryAddressDeliveryAddressesPost();
   const updateSubscriptionMutation =
@@ -87,7 +87,7 @@ export const DeliveryStep: React.FC<{
   const dateOptions = useMemo(() => generateDateOptions(), []);
 
   const updateSubscriptionsDeliveryInfoId = async (deliveryInfoId: number) => {
-    const updatePromises = subscriptionsIds.map((subscriptionId) =>
+    const updatePromises = subscriptionsIds.map((subscriptionId: number) =>
       updateSubscriptionMutation.mutateAsync({
         subscriptionId,
         data: { delivery_info_id: deliveryInfoId },

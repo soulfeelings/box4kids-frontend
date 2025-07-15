@@ -15,6 +15,9 @@ export const BottomNavigation = ({
 }) => {
   const location = useLocation();
 
+  const currentAppScreen = useStore((state) => state.currentAppScreen);
+  const setCurrentAppScreen = useStore((state) => state.setCurrentAppScreen);
+
   useEffect(() => {
     if (location.pathname === ROUTES.APP.ROOT) {
       setCurrentAppScreen("home");
@@ -23,9 +26,8 @@ export const BottomNavigation = ({
     } else if (location.pathname === ROUTES.APP.PROFILE) {
       setCurrentAppScreen("profile");
     }
-  }, [location.pathname]);
+  }, [location.pathname, setCurrentAppScreen]);
 
-  const { currentAppScreen, setCurrentAppScreen } = useStore();
   const navigate = useNavigate();
   const handleHomeClick = () => {
     navigate(ROUTES.APP.ROOT);

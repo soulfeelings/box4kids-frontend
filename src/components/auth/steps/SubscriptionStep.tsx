@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../../store/store";
-import { selectSubscriptionPlan } from "../../../store/selectors";
+import { useSubscriptionPlan } from "../../../store/hooks";
 import { useCreateSubscriptionOrderSubscriptionsPost } from "../../../api-client/";
 import { UserChildData } from "../../../types";
 import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
@@ -33,7 +33,7 @@ export const SubscriptionStep: React.FC<{
     onClose();
   };
 
-  const subscriptionPlan = useStore(selectSubscriptionPlan(subscriptionId));
+  const subscriptionPlan = useSubscriptionPlan(subscriptionId);
 
   const handleSubscriptionSubmit = async () => {
     const targetChild = currentChildToUpdate;

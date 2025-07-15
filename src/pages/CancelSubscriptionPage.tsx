@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCancelSubscriptionParams } from "../hooks/useTypedParams";
 import { useStore } from "../store/store";
@@ -32,36 +32,15 @@ export const CancelSubscriptionPage: React.FC = () => {
     subscriptionId ? parseInt(subscriptionId) : 0
   );
 
-  if (!subscriptionId) {
-    return (
-      <ErrorComponent
-        errorMessage="ID подписки не найден"
-        onBack={() => navigate(-1)}
-      />
-    );
-  }
-
-  if (isLoadingSubscription) {
-    return <LoadingComponent />;
-  }
-
-  if (!subscription) {
-    return (
-      <ErrorComponent
-        errorMessage="Подписка не найдена"
-        onBack={() => navigate(-1)}
-      />
-    );
-  }
-
-  const isPaused = subscription.status === SubscriptionStatus.paused;
-  const isActive = subscription.status === SubscriptionStatus.active;
-
-  const onCancel = () => {
+  const onCancel = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
 
-  const onPause = async () => {
+  const onPause = useCallback(async () => {
+    if (!subscriptionId || !subscription) {
+      return;
+    }
+
     try {
       await pauseSubscriptionMutation.mutateAsync({
         subscriptionId: parseInt(subscriptionId),
@@ -84,9 +63,19 @@ export const CancelSubscriptionPage: React.FC = () => {
       console.error("Ошибка при приостановке подписки:", error);
       notifications.error("Не удалось приостановить подписку");
     }
-  };
+  }, [
+    pauseSubscriptionMutation,
+    subscription,
+    subscriptionId,
+    updateChildSubscription,
+    refetch,
+  ]);
 
-  const onResume = async () => {
+  const onResume = useCallback(async () => {
+    if (!subscriptionId || !subscription) {
+      return;
+    }
+
     try {
       await resumeSubscriptionMutation.mutateAsync({
         subscriptionId: parseInt(subscriptionId),
@@ -110,7 +99,37 @@ export const CancelSubscriptionPage: React.FC = () => {
       console.error("Ошибка при возобновлении подписки:", error);
       notifications.error("Не удалось возобновить подписку");
     }
-  };
+  }, [
+    resumeSubscriptionMutation,
+    subscription,
+    subscriptionId,
+    updateChildSubscription,
+    refetch,
+  ]);
+
+  if (!subscriptionId) {
+    return (
+      <ErrorComponent
+        errorMessage="ID подписки не найден"
+        onBack={() => navigate(-1)}
+      />
+    );
+  }
+
+  if (isLoadingSubscription) {
+    return <LoadingComponent />;
+  }
+
+  if (!subscription) {
+    return (
+      <ErrorComponent
+        errorMessage="Подписка не найдена"
+        onBack={() => navigate(-1)}
+      />
+    );
+  }
+
+  const isPaused = subscription.status === SubscriptionStatus.paused;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

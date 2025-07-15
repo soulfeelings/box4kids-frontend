@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { AuthStep } from "../constants/auth";
 import { UserData } from "../types";
 import { createUserSlice, UserSlice } from "./slices/userSlice";
 import { createChildrenSlice, ChildrenSlice } from "./slices/childrenSlice";
@@ -8,7 +7,6 @@ import { createDeliverySlice, DeliverySlice } from "./slices/deliverySlice";
 import { createUISlice, UISlice } from "./slices/uiSlice";
 import { createAuthSlice, AuthSlice } from "./slices/authSlice";
 import { createCommonSlice, CommonSlice } from "./slices/commonSlice";
-import { PhoneData, CategoriesData, AppScreen } from "./types/index";
 import {
   getUserProfileUsersProfileGet,
   getUserChildrenUsersChildrenGet,
@@ -20,7 +18,6 @@ import {
 } from "../api-client";
 import { retryAsync } from "../utils/retry";
 import { convertDateFromISO } from "../utils/date/convert";
-import { SubscriptionPlanResponse } from "../api-client/model";
 
 // Основное состояние store (без мутаций)
 export interface BaseState {
@@ -65,7 +62,7 @@ const initialState: BaseState = {
 };
 
 export const useStore = create<State>()(
-  devtools((set, get) => ({
+  devtools((set) => ({
     ...initialState,
 
     setLoading: (loading) => set({ isLoading: loading }),

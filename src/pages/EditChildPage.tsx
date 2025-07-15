@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEditChildParams } from "../hooks/useTypedParams";
@@ -7,7 +7,7 @@ import { ChildEditForm } from "../features/ChildEditForm";
 import { CategoriesSelector } from "../features/CategoriesSelector";
 import { ActionButton } from "../features/ActionButton";
 import { useStore } from "../store/store";
-import { selectChildById } from "../store/selectors";
+import { useChildById } from "../store/hooks";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
@@ -16,9 +16,7 @@ import {
 import { Gender } from "../api-client/model/gender";
 import { convertDateFromISO, convertDateToISO } from "../utils/date/convert";
 import { validateBirthDate } from "../utils/date/validate";
-import { UserChildData } from "../types";
 import { notifications } from "../utils/notifications";
-import { ROUTES } from "../constants/routes";
 
 interface ChildData {
   name: string;
@@ -31,16 +29,15 @@ interface ChildData {
 export const EditChildPage: React.FC = () => {
   const { childId } = useEditChildParams();
   const navigate = useNavigate();
-  const { updateChild, setError } = useStore();
+  const updateChild = useStore((state) => state.updateChild);
+  const setError = useStore((state) => state.setError);
 
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
   // Находим ребенка по ID
-  const currentChild = useStore(
-    selectChildById(childId ? parseInt(childId) : 0)
-  );
+  const currentChild = useChildById(childId ? parseInt(childId) : 0);
 
   // Состояние для данных ребенка
   const [childData, setChildData] = useState<ChildData>({
@@ -51,9 +48,9 @@ export const EditChildPage: React.FC = () => {
     comment: "",
   });
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
 
   // Состояние для интересов и навыков
   const [selectedInterestsIds, setSelectedInterestsIds] = useState<number[]>(
@@ -120,7 +117,7 @@ export const EditChildPage: React.FC = () => {
   const isFormValid = isChildFormValid && isCategoriesFormValid;
   const hasChanges = isChildDataChanged || isCategoriesChanged;
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!isFormValid || !currentChild) return;
 
     try {
@@ -163,7 +160,18 @@ export const EditChildPage: React.FC = () => {
       setError("Не удалось обновить ребёнка");
       notifications.error("Не удалось сохранить данные ребенка");
     }
-  };
+  }, [
+    currentChild,
+    updateChildMutation,
+    childData,
+    selectedInterestsIds,
+    selectedSkillsIds,
+    isChildDataChanged,
+    isCategoriesChanged,
+    updateChild,
+    setError,
+    isFormValid,
+  ]);
 
   // Если ребенок не найден
   if (!currentChild) {

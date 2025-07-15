@@ -3,9 +3,7 @@ import {
   FeedbackView,
   ToySetDetailView,
   NotSubscribedView,
-  JustSubscribedView,
   NextSetDeterminedView,
-  NextSetNotDeterminedView,
 } from "../components/states";
 import { useStore } from "../store/store";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -22,8 +20,6 @@ import {
 } from "../api-client/model";
 import { UserChildData } from "../types";
 
-interface AppInterfaceProps {}
-
 export interface BoxesState {
   child: UserChildData;
   currentBox: ToyBoxResponse | null;
@@ -36,7 +32,7 @@ export interface SuccessfulBoxesState {
   nextBox: NextBoxResponse;
 }
 
-export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
+export const AppInterface: React.FC = () => {
   const [rating, setRating] = useState<number>(0);
   const [currentBox, setCurrentBox] = useState<
     SuccessfulBoxesState["currentBox"] | null
@@ -57,7 +53,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       navigate(ROUTES.APP.PROFILE);
       setShowFeedback(false);
     }
-  }, [currentAppScreen]);
+  }, [currentAppScreen, navigate]);
 
   const [currentSuccessfulBoxes, setCurrentSuccessfulBoxes] = useState<
     SuccessfulBoxesState[]
@@ -277,7 +273,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   if (currentBox) {
     return (
       <ToySetDetailView
-        userData={user}
         currentBox={currentBox}
         close={() => setCurrentBox(null)}
       />
@@ -289,29 +284,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   switch (currentScreenState) {
     case "not_subscribed":
       return <NotSubscribedView userData={user} />;
-    // case "just_subscribed":
-    //   return (
-    //     <JustSubscribedView
-    //       userData={user}
-    //       formatDeliveryDate={formatDeliveryDate}
-    //       formatDeliveryTime={formatDeliveryTime}
-    //       allToys={getAllCurrentToys()}
-    //       getCurrentDate={getCurrentDate}
-    //     />
-    //   );
-    // case "next_set_not_determined":
-    //   return (
-    //     <NextSetNotDeterminedView
-    //       userData={user}
-    //       currentToys={currentToys}
-    //       rating={rating}
-    //       setShowAllToys={setShowAllToys}
-    //       handleStarClick={handleStarClick}
-    //       getCurrentDate={getCurrentDate}
-    //       formatDeliveryDate={formatDeliveryDate}
-    //       formatDeliveryTime={formatDeliveryTime}
-    //     />
-    //   );
+
     default:
       return (
         <NextSetDeterminedView

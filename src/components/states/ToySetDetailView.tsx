@@ -4,18 +4,14 @@ import { BottomNavigation } from "../../features/BottomNavigation";
 import { ToyBoxResponse } from "../../api-client/model/toyBoxResponse";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
-import { UserData } from "../../types";
-import { useStore } from "../../store";
-import { selectChildById } from "../../store/selectors";
+import { useChildById } from "../../store/hooks";
 
 interface ToySetDetailViewProps {
-  userData: UserData;
   currentBox: ToyBoxResponse;
   close: () => void;
 }
 
 export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
-  userData,
   currentBox,
   close,
 }) => {
@@ -38,7 +34,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
     }
   }, [currentBox.status]);
 
-  const child = useStore(selectChildById(currentBox.child_id));
+  const child = useChildById(currentBox.child_id);
 
   return (
     <div

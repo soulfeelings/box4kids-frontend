@@ -20,7 +20,7 @@ export const DataGuard: React.FC<DataGuardProps> = ({ children }) => {
       ref.current = true;
       fetchInitData();
     }
-  }, []);
+  }, [user, fetchInitData]);
 
   if (user) {
     return <>{children}</>;

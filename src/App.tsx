@@ -1,18 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
-import { DemoPage } from "./pages/DemoPage";
 import { AppInterface } from "./pages/AppInterface";
-// import { ProfilePage } from "./pages/ProfilePage";
-// import { SupportPage } from "./pages/SupportPage";
-// import { DeliveryHistoryPage } from "./pages/DeliveryHistoryPage";
 import { LoadingComponent } from "./components/common/LoadingComponent";
 import { ErrorComponent } from "./components/common/ErrorComponent";
 import { RouteGuard } from "./components/common/RouteGuard";
@@ -37,9 +27,6 @@ const AppWithRoutes: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Демонстрация состояний */}
-        <Route path={ROUTES.DEMO} element={<DemoPage />} />
-
         {/* Авторизация - компоненты напрямую с AuthContainer */}
         <Route
           path={ROUTES.AUTH.OTP}
@@ -90,9 +77,6 @@ const AppWithRoutes: React.FC = () => {
             path={ROUTES.APP.CANCEL_SUBSCRIPTION}
             element={<CancelSubscriptionPage />}
           />
-          {/* TODO: Адаптировать для router */}
-          {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
-          {/* <Route path="support" element={<SupportPage />} /> */}
         </Route>
 
         {/* Админка */}
@@ -147,7 +131,7 @@ function InitialPage() {
       ref.current = true;
       fetchInitData();
     }
-  }, []);
+  }, [fetchInitData]);
 
   if (isInitDataLoading || !ref.current) {
     return <LoadingComponent />;

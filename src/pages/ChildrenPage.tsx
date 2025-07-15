@@ -1,28 +1,29 @@
 import React, { useMemo } from "react";
 import { UserChildData } from "../types";
 import { AddNewChildBanner } from "../features/AddNewChildBanner";
-import { ROUTES } from "../constants/routes";
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigateToOnboarding,
+  useNavigateToEditChild,
+  useNavigateToCancelSubscription,
+} from "../hooks/useNavigateHooks";
 import { AUTH_STEPS } from "../constants/auth";
-import { calculateAge } from "../utils/age/calculateAge";
 import { BottomNavigation } from "../features/BottomNavigation";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
 } from "../api-client";
 import { useStore } from "../store/store";
-import { selectSubscriptionPlan } from "../store/selectors";
+import { useSubscriptionPlan } from "../store/hooks";
 import { InterestResponse } from "../api-client/model/interestResponse";
 import { SkillResponse } from "../api-client/model/skillResponse";
 import { useHandleDeleteChilld } from "../features/useHandleDeleteChilld";
 import { NoSubscribtionsView } from "../features/NoSubscribtionsView";
 import { SubscriptionStatus } from "../api-client/model";
-import { Tag } from "../components/Tag";
 import { ChildInfoWidget } from "../widgets/child-info";
 
 export const ChildrenPage: React.FC = () => {
   const { user } = useStore();
-  const navigate = useNavigate();
+  const navigateToOnboarding = useNavigateToOnboarding();
 
   const { data: interests } = useGetAllInterestsInterestsGet();
   const { data: skills } = useGetAllSkillsSkillsGet();
@@ -54,11 +55,7 @@ export const ChildrenPage: React.FC = () => {
         {user?.children.length === 0 && (
           <NoSubscribtionsView
             onClickButton={() => {
-              navigate(ROUTES.AUTH.ONBOARDING, {
-                state: {
-                  step: AUTH_STEPS.CHILD,
-                },
-              });
+              navigateToOnboarding({ step: AUTH_STEPS.CHILD });
             }}
             textButton="Добавить ребенка"
           />
@@ -68,11 +65,7 @@ export const ChildrenPage: React.FC = () => {
           <AddNewChildBanner
             className="mb-4"
             onClick={() => {
-              navigate(ROUTES.AUTH.ONBOARDING, {
-                state: {
-                  step: AUTH_STEPS.CHILD,
-                },
-              });
+              navigateToOnboarding({ step: AUTH_STEPS.CHILD });
             }}
           />
         )}
@@ -92,7 +85,9 @@ function ChildCard({
   skills: SkillResponse[];
 }) {
   const { setCurrentChildIdToUpdate } = useStore();
-  const navigate = useNavigate();
+  const navigateToEditChild = useNavigateToEditChild();
+  const navigateToCancelSubscription = useNavigateToCancelSubscription();
+  const navigateToOnboarding = useNavigateToOnboarding();
 
   const childInterest = useMemo(() => {
     return child.interests
@@ -110,9 +105,7 @@ function ChildCard({
     return child.subscriptions[0] ?? null;
   }, [child.subscriptions]);
 
-  const subscriptionPlan = useStore(
-    selectSubscriptionPlan(subscription?.plan_id || 0)
-  );
+  const subscriptionPlan = useSubscriptionPlan(subscription?.plan_id);
 
   const { handleDeleteChild } = useHandleDeleteChilld();
 
@@ -164,12 +157,9 @@ function ChildCard({
           subscription.status === SubscriptionStatus.active ? (
             <button
               onClick={() => {
-                navigate(
-                  ROUTES.APP.CANCEL_SUBSCRIPTION.replace(
-                    ":subscriptionId",
-                    subscription.id.toString()
-                  )
-                );
+                navigateToCancelSubscription({
+                  subscriptionId: subscription.id,
+                });
               }}
               className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
             >
@@ -178,12 +168,9 @@ function ChildCard({
           ) : subscription.status === SubscriptionStatus.paused ? (
             <button
               onClick={() => {
-                navigate(
-                  ROUTES.APP.CANCEL_SUBSCRIPTION.replace(
-                    ":subscriptionId",
-                    subscription.id.toString()
-                  )
-                );
+                navigateToCancelSubscription({
+                  subscriptionId: subscription.id,
+                });
               }}
               className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
             >
@@ -193,11 +180,7 @@ function ChildCard({
         ) : (
           <button
             onClick={() => {
-              navigate(ROUTES.AUTH.ONBOARDING, {
-                state: {
-                  step: AUTH_STEPS.SUBSCRIPTION,
-                },
-              });
+              navigateToOnboarding({ step: AUTH_STEPS.SUBSCRIPTION });
               setCurrentChildIdToUpdate(child.id);
             }}
             className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
@@ -207,9 +190,7 @@ function ChildCard({
         )}
         <button
           onClick={() => {
-            navigate(
-              ROUTES.APP.EDIT_CHILD.replace(":childId", child.id.toString())
-            );
+            navigateToEditChild({ childId: child.id });
           }}
           className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium"
         >

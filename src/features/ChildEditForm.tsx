@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Gender } from "../api-client/model/gender";
 import { formatDateInput } from "../utils/date/format";
 import { validateBirthDate } from "../utils/date/validate";

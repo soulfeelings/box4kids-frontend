@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useStore } from "../../../store/store";
 import { DevModeBanner } from "../../../features/DevModeBanner";
 import {
@@ -24,17 +24,20 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
   const devGetCodeMutation = useDevGetCodeAuthDevGetCodePost();
 
   // Функция для получения dev кода
-  const getDevCode = async (phoneNumber: string): Promise<string | null> => {
-    try {
-      const response = await devGetCodeMutation.mutateAsync({
-        data: { phone_number: phoneNumber },
-      });
-      return response.code || null;
-    } catch (error) {
-      console.error("Dev code error:", error);
-      return null;
-    }
-  };
+  const getDevCode = useCallback(
+    async (phoneNumber: string): Promise<string | null> => {
+      try {
+        const response = await devGetCodeMutation.mutateAsync({
+          data: { phone_number: phoneNumber },
+        });
+        return response.code || null;
+      } catch (error) {
+        console.error("Dev code error:", error);
+        return null;
+      }
+    },
+    [devGetCodeMutation]
+  );
 
   // Таймер для повторной отправки
   useEffect(() => {
@@ -70,7 +73,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         clearTimeout(id);
       }
     };
-  }, [phoneData.phone, phoneData.code, setPhoneData]);
+  }, [phoneData.phone, phoneData.code, setPhoneData, getDevCode]);
 
   const handleCheckCode = async () => {
     if (!phoneData.code || phoneData.code.length !== 4) {

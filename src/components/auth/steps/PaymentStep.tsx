@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
-import { selectChildrenWithoutSubscriptionByStatus } from "../../../store/selectors";
+import { useChildrenWithSubscriptionByStatus } from "../../../store/hooks";
 import { useProcessSubscriptionsPaymentsProcessSubscriptionsPost } from "../../../api-client/";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { SubscriptionPlanResponse } from "../../../api-client/model/subscriptionPlanResponse";
@@ -13,26 +13,27 @@ export const PaymentStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
-  const { isLoading, user, setError, subscriptionPlans } = useStore();
+  const isLoading = useStore((state) => state.isLoading);
+  const setError = useStore((state) => state.setError);
+  const subscriptionPlans = useStore((state) => state.subscriptionPlans);
 
   const processSubscriptionsMutation =
     useProcessSubscriptionsPaymentsProcessSubscriptionsPost();
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  const allChildrenSubscriptionsIds = useMemo(
+  // Получение детей из store
+  const children = useChildrenWithSubscriptionByStatus([
+    SubscriptionStatus.pending_payment,
+  ]);
+
+  const subscriptionsIds = useMemo(
     () =>
-      user?.children.flatMap((child) =>
-        child.subscriptions
-          .filter(
-            (subscription) =>
-              subscription.status === SubscriptionStatus.pending_payment
-          )
-          .map((subscription) => subscription.id)
+      children.flatMap((child) =>
+        child.subscriptions.map((subscription) => subscription.id)
       ),
-    [user]
+    [children]
   );
-  console.log("Подписки для оплаты:", allChildrenSubscriptionsIds);
 
   const handleBack = () => {
     onBack();
@@ -42,8 +43,8 @@ export const PaymentStep: React.FC<{
     onClose();
   };
 
-  const handlePaymentSubmit = async () => {
-    if (!allChildrenSubscriptionsIds?.length) {
+  const handlePaymentSubmit = useCallback(async () => {
+    if (!subscriptionsIds?.length) {
       setError("Нет доступных подписок");
       return;
     }
@@ -53,7 +54,7 @@ export const PaymentStep: React.FC<{
       // Используем новый объединенный endpoint
       const result = await processSubscriptionsMutation.mutateAsync({
         data: {
-          subscription_ids: allChildrenSubscriptionsIds,
+          subscription_ids: subscriptionsIds,
         },
       });
 
@@ -72,15 +73,18 @@ export const PaymentStep: React.FC<{
     } finally {
       setPaymentProcessing(false);
     }
-  };
+  }, [subscriptionsIds, processSubscriptionsMutation, onNext, setError]);
 
   // Получение плана по ID
-  const getPlanById = (planId: number): SubscriptionPlanResponse | null => {
-    return subscriptionPlans.find((plan) => plan.id === planId) || null;
-  };
+  const getPlanById = useCallback(
+    (planId: number): SubscriptionPlanResponse | null => {
+      return subscriptionPlans.find((plan) => plan.id === planId) || null;
+    },
+    [subscriptionPlans]
+  );
 
   // Получение элементов плана
-  const getPlanItems = (plan: SubscriptionPlanResponse | null) => {
+  const getPlanItems = useCallback((plan: SubscriptionPlanResponse | null) => {
     if (!plan) return [];
 
     return (
@@ -91,15 +95,7 @@ export const PaymentStep: React.FC<{
         color: "#A4B9ED",
       })) || []
     );
-  };
-
-  // Получение детей из store
-  const children = useStore(
-    selectChildrenWithoutSubscriptionByStatus([
-      SubscriptionStatus.pending_payment,
-      SubscriptionStatus.paused,
-    ])
-  );
+  }, []);
 
   // Подсчет общей цены с учетом скидок
   const totalPrice = useMemo(
@@ -125,7 +121,7 @@ export const PaymentStep: React.FC<{
 
         return sum;
       }, 0),
-    [children]
+    [children, getPlanById]
   );
 
   return (

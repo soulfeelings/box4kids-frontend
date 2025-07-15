@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   useCreateChildChildrenPost,
   useUpdateChildChildrenChildIdPut,
@@ -11,7 +11,10 @@ import {
 import { formatDateInput } from "../../../utils/date/format";
 import { validateBirthDate } from "../../../utils/date/validate";
 import { useStore } from "../../../store";
-import { selectChildrenWithoutSubscriptionByStatus } from "../../../store/selectors";
+import {
+  useChildrenWithoutSubscriptionByStatus,
+  useUserWithFilteredChildren,
+} from "../../../store/hooks";
 import { UserChildData } from "../../../types";
 import { ChoseChildCards } from "../../../features/ChoseChildCards";
 import { notifications } from "../../../utils/notifications";
@@ -31,26 +34,22 @@ export const ChildStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
-  const { setCurrentChildIdToUpdate, user, addChild, updateChild, setError } =
+  const { setCurrentChildIdToUpdate, addChild, updateChild, setError } =
     useStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
-  // Получаем детей без активной подписки
-  const childrenWithoutActiveSubscription = useStore(
-    selectChildrenWithoutSubscriptionByStatus([
+  // Используем хуки для получения отфильтрованных данных
+  const childrenWithoutActiveSubscription =
+    useChildrenWithoutSubscriptionByStatus([
       SubscriptionStatus.active,
       SubscriptionStatus.paused,
-    ])
-  );
+    ]);
 
-  // Создаем объект пользователя с отфильтрованными детьми для передачи в ChoseChildCards
-  const userWithFilteredChildren = user
-    ? {
-        ...user,
-        children: childrenWithoutActiveSubscription,
-      }
-    : null;
+  // Мемоизируем объект пользователя с отфильтрованными детьми
+  const userWithFilteredChildren = useUserWithFilteredChildren(
+    childrenWithoutActiveSubscription
+  );
 
   const [childData, setChildData] = useState<ChildData>({
     name: currentChildToUpdate?.name || "",
@@ -80,13 +79,17 @@ export const ChildStep: React.FC<{
     }
   }, [currentChildToUpdate]);
 
-  const handleChildSelect = (childId: number) => {
-    setCurrentChildIdToUpdate(childId);
-  };
+  // Мемоизируем функции-обработчики
+  const handleChildSelect = useCallback(
+    (childId: number) => {
+      setCurrentChildIdToUpdate(childId);
+    },
+    [setCurrentChildIdToUpdate]
+  );
 
-  const handleAddNewChild = () => {
+  const handleAddNewChild = useCallback(() => {
     setCurrentChildIdToUpdate(null);
-  };
+  }, [setCurrentChildIdToUpdate]);
 
   const birthDateValidation = validateBirthDate(childData.date_of_birth);
   const isFormValid =
@@ -96,25 +99,35 @@ export const ChildStep: React.FC<{
     (childData.limitations === false ||
       (childData.limitations === true && childData.comment?.trim()));
 
+  // Оптимизируем зависимости useMemo
   const isFormChanged = useMemo(() => {
+    if (!currentChildToUpdate) return true; // Если создаем нового ребенка, форма всегда изменена
+
     return (
-      childData.name !== currentChildToUpdate?.name ||
-      childData.date_of_birth !== currentChildToUpdate?.date_of_birth ||
-      childData.gender !== currentChildToUpdate?.gender ||
-      childData.limitations !== currentChildToUpdate?.limitations ||
-      childData.comment !== currentChildToUpdate?.comment
+      childData.name !== currentChildToUpdate.name ||
+      childData.date_of_birth !== currentChildToUpdate.date_of_birth ||
+      childData.gender !== currentChildToUpdate.gender ||
+      childData.limitations !== currentChildToUpdate.limitations ||
+      childData.comment !== currentChildToUpdate.comment
     );
-  }, [childData, currentChildToUpdate]);
+  }, [
+    childData.name,
+    childData.date_of_birth,
+    childData.gender,
+    childData.limitations,
+    childData.comment,
+    currentChildToUpdate,
+  ]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     onBack();
-  };
+  }, [onBack]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onClose();
-  };
+  }, [onClose]);
 
-  const handleChildSubmit = async () => {
+  const handleChildSubmit = useCallback(async () => {
     if (!isFormValid) return;
 
     if (!isFormChanged) {
@@ -178,7 +191,19 @@ export const ChildStep: React.FC<{
       setError("Не удалось обновить ребёнка");
       notifications.error("Не удалось сохранить данные ребенка");
     }
-  };
+  }, [
+    isFormValid,
+    isFormChanged,
+    currentChildToUpdate,
+    childData,
+    updateChildMutation,
+    createChildMutation,
+    updateChild,
+    addChild,
+    setCurrentChildIdToUpdate,
+    setError,
+    onNext,
+  ]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -274,9 +299,12 @@ export const ChildStep: React.FC<{
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
                 placeholder=""
                 value={childData.name}
-                onChange={(e) => {
-                  setChildData({ ...childData, name: e.target.value });
-                }}
+                onChange={useCallback(
+                  (e: React.ChangeEvent<HTMLInputElement>) => {
+                    setChildData((prev) => ({ ...prev, name: e.target.value }));
+                  },
+                  []
+                )}
                 maxLength={32}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
@@ -303,10 +331,16 @@ export const ChildStep: React.FC<{
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
                 placeholder=""
                 value={childData.date_of_birth}
-                onChange={(e) => {
-                  const formatted = formatDateInput(e.target.value);
-                  setChildData({ ...childData, date_of_birth: formatted });
-                }}
+                onChange={useCallback(
+                  (e: React.ChangeEvent<HTMLInputElement>) => {
+                    const formatted = formatDateInput(e.target.value);
+                    setChildData((prev) => ({
+                      ...prev,
+                      date_of_birth: formatted,
+                    }));
+                  },
+                  []
+                )}
                 maxLength={10}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               />
@@ -331,7 +365,10 @@ export const ChildStep: React.FC<{
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() => setChildData({ ...childData, gender: "male" })}
+                onClick={useCallback(
+                  () => setChildData((prev) => ({ ...prev, gender: "male" })),
+                  []
+                )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.gender === "male"
                     ? "bg-indigo-400 text-white"
@@ -342,7 +379,10 @@ export const ChildStep: React.FC<{
                 Мужской
               </button>
               <button
-                onClick={() => setChildData({ ...childData, gender: "female" })}
+                onClick={useCallback(
+                  () => setChildData((prev) => ({ ...prev, gender: "female" })),
+                  []
+                )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.gender === "female"
                     ? "bg-indigo-400 text-white"
@@ -365,9 +405,11 @@ export const ChildStep: React.FC<{
             </h3>
             <div className="flex gap-3">
               <button
-                onClick={() =>
-                  setChildData({ ...childData, limitations: false })
-                }
+                onClick={useCallback(
+                  () =>
+                    setChildData((prev) => ({ ...prev, limitations: false })),
+                  []
+                )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.limitations === false
                     ? "bg-indigo-400 text-white"
@@ -378,9 +420,11 @@ export const ChildStep: React.FC<{
                 Нет
               </button>
               <button
-                onClick={() =>
-                  setChildData({ ...childData, limitations: true })
-                }
+                onClick={useCallback(
+                  () =>
+                    setChildData((prev) => ({ ...prev, limitations: true })),
+                  []
+                )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.limitations === true
                     ? "bg-indigo-400 text-white"
@@ -418,9 +462,14 @@ export const ChildStep: React.FC<{
                     : "Дополнительная информация о ребенке..."
                 }
                 value={childData.comment || ""}
-                onChange={(e) =>
-                  setChildData({ ...childData, comment: e.target.value })
-                }
+                onChange={useCallback(
+                  (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setChildData((prev) => ({
+                      ...prev,
+                      comment: e.target.value,
+                    })),
+                  []
+                )}
                 rows={3}
                 maxLength={200}
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -462,3 +511,5 @@ export const ChildStep: React.FC<{
     </div>
   );
 };
+
+ChildStep.whyDidYouRender = true;
