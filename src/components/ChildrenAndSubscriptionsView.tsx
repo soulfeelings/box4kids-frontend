@@ -240,12 +240,7 @@ function ChildCard({
         )}
         <button
           onClick={() => {
-            navigate(ROUTES.AUTH.ONBOARDING, {
-              state: {
-                step: AUTH_STEPS.CHILD,
-              },
-            });
-            setCurrentChildIdToUpdate(child.id);
+            navigate(`/app/edit-child/${child.id}`);
           }}
           className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium"
         >

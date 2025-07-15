@@ -2,6 +2,7 @@ import { InterestResponse, SkillResponse } from "../../../../api-client/model";
 import { UserChildData } from "../../../../types";
 import { calculateAge } from "../../../../utils/age/calculateAge";
 import { Tag } from "../../../Tag";
+import { ChildActionButtons } from "../../../../features/ChildActionButtons";
 
 // Child overview card component
 export const ChildOverviewCard: React.FC<{
@@ -164,62 +165,16 @@ export const ChildOverviewCard: React.FC<{
             <NoSubscription />
           )}
         </div>
-        <ActionButtons
+        <ChildActionButtons
           onEditData={onEditData}
           onEditSubscription={onEditSubscription}
           onDelete={onDelete}
-          child={child}
+          childId={child.id}
         />
       </div>
     </div>
   );
 };
-
-function ActionButtons({
-  onEditData,
-  onEditSubscription,
-  onDelete,
-  child,
-}: {
-  onEditData: (childId: number) => void;
-  onEditSubscription: (childId: number) => void;
-  onDelete: (childId: number) => void;
-  child: UserChildData;
-}) {
-  return (
-    <div className="space-y-3 pt-4">
-      <button
-        className="w-full py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
-        style={{
-          fontFamily: "Nunito, sans-serif",
-          borderRadius: "32px",
-          backgroundColor: "#E3E3E3",
-        }}
-        onClick={() => onEditData(child.id)}
-      >
-        Изменить данные ребёнка
-      </button>
-      <button
-        className="w-full py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
-        style={{
-          fontFamily: "Nunito, sans-serif",
-          borderRadius: "32px",
-          backgroundColor: "#E3E3E3",
-        }}
-        onClick={() => onEditSubscription(child.id)}
-      >
-        Изменить тариф
-      </button>
-      <button
-        className="w-full py-3 bg-red-100 text-red-700 font-medium hover:bg-red-200 transition-colors"
-        style={{ fontFamily: "Nunito, sans-serif", borderRadius: "32px" }}
-        onClick={() => onDelete(child.id)}
-      >
-        Удалить
-      </button>
-    </div>
-  );
-}
 
 function NoSubscription() {
   return (

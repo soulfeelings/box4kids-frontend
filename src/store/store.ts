@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { AuthStep } from "../constants/auth";
-import { UserData, DeliveryAddressData } from "../types";
+import { UserData, DeliveryAddressData, UserChildData } from "../types";
 import { Gender } from "../api-client/model/gender";
 import {
   getUserProfileUsersProfileGet,
@@ -136,6 +136,7 @@ interface State {
   addChild: (childData: CreateChildData) => void;
   removeChild: (childId: number) => void;
   updateChild: (childId: number, updateData: UpdateChildData) => void;
+  getChildById: (childId: number) => UserChildData | null;
 
   // Управление адресами доставки
   getUserDeliveryAddresses: () => DeliveryAddressData[];
@@ -350,6 +351,14 @@ export const useStore = create<State>()(
             children: updatedChildren,
           },
         });
+      },
+
+      getChildById: (childId: number) => {
+        const user = get().user;
+        if (!user) {
+          return null;
+        }
+        return user.children.find((child) => child.id === childId) || null;
       },
 
       // Управление адресами доставки

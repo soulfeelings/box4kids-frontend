@@ -10,7 +10,7 @@ export const SubscriptionStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-  currentChildToUpdate?: UserChildData;
+  currentChildToUpdate: UserChildData | null;
   onAddNewChild?: () => void;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate, onAddNewChild }) => {
   const [subscriptionId, setSubscriptionId] = useState<number | null>(

@@ -27,7 +27,7 @@ export const ChildStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-  currentChildToUpdate?: UserChildData;
+  currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
   const { setCurrentChildIdToUpdate, user, addChild, updateChild, setError } =
     useStore();

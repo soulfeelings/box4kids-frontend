@@ -28,6 +28,7 @@ import { OnboardingPage } from "./pages/OnboardingPage";
 import { DataGuard } from "./components/common/DataGuard";
 import { ChildrenPage } from "./pages/ChildrenPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { EditChildPage } from "./pages/EditChildPage";
 import { AdminPage } from "./pages/AdminPage";
 
 // Основное приложение с роутингом
@@ -83,6 +84,7 @@ const AppWithRoutes: React.FC = () => {
           <Route index element={<AppInterface />} />
           <Route path={ROUTES.APP.CHILDREN} element={<ChildrenPage />} />
           <Route path={ROUTES.APP.PROFILE} element={<ProfilePage />} />
+          <Route path={ROUTES.APP.EDIT_CHILD} element={<EditChildPage />} />
           {/* TODO: Адаптировать для router */}
           {/* <Route path="delivery-history" element={<DeliveryHistoryPage />} /> */}
           {/* <Route path="support" element={<SupportPage />} /> */}

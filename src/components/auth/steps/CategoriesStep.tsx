@@ -12,7 +12,7 @@ export const CategoriesStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
-  currentChildToUpdate?: UserChildData;
+  currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
   const { updateChild } = useStore();
   const { setError } = useStore();

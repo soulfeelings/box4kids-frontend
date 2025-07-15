@@ -40,11 +40,13 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     setError,
     setCurrentChildIdToUpdate,
     resetTemporaryState,
+    getChildById,
   } = useStore();
 
   const currentChildToUpdate = useMemo(
-    () => user?.children.find((child) => child.id === currentChildIdToUpdate),
-    [user, currentChildIdToUpdate]
+    () =>
+      currentChildIdToUpdate ? getChildById(currentChildIdToUpdate) : null,
+    [currentChildIdToUpdate, getChildById]
   );
 
   const navigate = useNavigate();

@@ -4,16 +4,21 @@ import { BottomNavigation } from "../../features/BottomNavigation";
 import { ToyBoxResponse } from "../../api-client/model/toyBoxResponse";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
+import { UserData } from "../../types";
+import { useStore } from "../../store";
 
 interface ToySetDetailViewProps {
+  userData: UserData;
   currentBox: ToyBoxResponse;
   close: () => void;
 }
 
 export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
+  userData,
   currentBox,
   close,
 }) => {
+  const { getChildById } = useStore();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
 
   const deliveryLabel = useMemo(() => {
@@ -33,6 +38,11 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
     }
   }, [currentBox.status]);
 
+  const child = useMemo(
+    () => getChildById(currentBox.child_id),
+    [currentBox.child_id, getChildById]
+  );
+
   return (
     <div
       className="w-full bg-gray-100 min-h-screen"
@@ -44,7 +54,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
           <ArrowLeft size={24} className="text-gray-600" />
         </button>
         <h1 className="text-lg font-semibold text-gray-800">
-          Текущий набор для {currentBox.child_id}
+          Текущий набор для {child?.name}
         </h1>
       </div>
 

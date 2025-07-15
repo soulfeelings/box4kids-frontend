@@ -277,6 +277,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   if (currentBox) {
     return (
       <ToySetDetailView
+        userData={user}
         currentBox={currentBox}
         close={() => setCurrentBox(null)}
       />

@@ -16,6 +16,7 @@ export const ROUTES = {
     ROOT: "/app",
     PROFILE: "/app/profile",
     CHILDREN: "/app/children",
+    EDIT_CHILD: "/app/edit-child/:childId",
     DELIVERY_HISTORY: "/app/delivery-history",
     SUPPORT: "/app/support",
   },
