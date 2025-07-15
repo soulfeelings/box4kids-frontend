@@ -147,21 +147,36 @@ function ChildCard({
 
       {/* Action buttons */}
       <div className="space-y-3">
-        {subscriptionPlan &&
-        subscription.status === SubscriptionStatus.active ? (
-          <button
-            onClick={() => {
-              navigate(
-                ROUTES.APP.CANCEL_SUBSCRIPTION.replace(
-                  ":childId",
-                  child.id.toString()
-                )
-              );
-            }}
-            className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
-          >
-            Остановить подписку
-          </button>
+        {subscriptionPlan && subscription ? (
+          subscription.status === SubscriptionStatus.active ? (
+            <button
+              onClick={() => {
+                navigate(
+                  ROUTES.APP.CANCEL_SUBSCRIPTION.replace(
+                    ":subscriptionId",
+                    subscription.id.toString()
+                  )
+                );
+              }}
+              className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+            >
+              Остановить подписку
+            </button>
+          ) : subscription.status === SubscriptionStatus.paused ? (
+            <button
+              onClick={() => {
+                navigate(
+                  ROUTES.APP.CANCEL_SUBSCRIPTION.replace(
+                    ":subscriptionId",
+                    subscription.id.toString()
+                  )
+                );
+              }}
+              className="w-full bg-[#4CAF50] text-white py-2 rounded-2xl text-sm font-medium"
+            >
+              Возобновить подписку
+            </button>
+          ) : null
         ) : (
           <button
             onClick={() => {

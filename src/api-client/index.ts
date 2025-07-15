@@ -48,6 +48,7 @@ import type {
   InterestsListResponse,
   NextBoxResponse,
   OTPRequest,
+  PauseSubscriptionResponse,
   PaymentReturnRequest,
   PaymentWebhookRequest,
   PhoneRequest,
@@ -55,6 +56,7 @@ import type {
   ProcessSubscriptionsRequest,
   ProcessSubscriptionsResponse,
   RefreshTokenRequest,
+  ResumeSubscriptionResponse,
   SkillsListResponse,
   SubscriptionCreateRequest,
   SubscriptionPlansListResponse,
@@ -1020,6 +1022,134 @@ export const useUpdateSubscriptionSubscriptionsSubscriptionIdPatch = <TError = H
       > => {
 
       const mutationOptions = getUpdateSubscriptionSubscriptionsSubscriptionIdPatchMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Приостанавливает подписку по ID
+ * @summary Pause Subscription
+ */
+export const pauseSubscriptionSubscriptionsSubscriptionIdPausePost = (
+    subscriptionId: number,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<PauseSubscriptionResponse>(
+      {url: `/subscriptions/${subscriptionId}/pause`, method: 'POST', signal
+    },
+      );
+    }
+  
+
+
+export const getPauseSubscriptionSubscriptionsSubscriptionIdPausePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pauseSubscriptionSubscriptionsSubscriptionIdPausePost>>, TError,{subscriptionId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof pauseSubscriptionSubscriptionsSubscriptionIdPausePost>>, TError,{subscriptionId: number}, TContext> => {
+
+const mutationKey = ['pauseSubscriptionSubscriptionsSubscriptionIdPausePost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pauseSubscriptionSubscriptionsSubscriptionIdPausePost>>, {subscriptionId: number}> = (props) => {
+          const {subscriptionId} = props ?? {};
+
+          return  pauseSubscriptionSubscriptionsSubscriptionIdPausePost(subscriptionId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PauseSubscriptionSubscriptionsSubscriptionIdPausePostMutationResult = NonNullable<Awaited<ReturnType<typeof pauseSubscriptionSubscriptionsSubscriptionIdPausePost>>>
+    
+    export type PauseSubscriptionSubscriptionsSubscriptionIdPausePostMutationError = HTTPValidationError
+
+    /**
+ * @summary Pause Subscription
+ */
+export const usePauseSubscriptionSubscriptionsSubscriptionIdPausePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pauseSubscriptionSubscriptionsSubscriptionIdPausePost>>, TError,{subscriptionId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pauseSubscriptionSubscriptionsSubscriptionIdPausePost>>,
+        TError,
+        {subscriptionId: number},
+        TContext
+      > => {
+
+      const mutationOptions = getPauseSubscriptionSubscriptionsSubscriptionIdPausePostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Возобновляет приостановленную подписку по ID
+ * @summary Resume Subscription
+ */
+export const resumeSubscriptionSubscriptionsSubscriptionIdResumePost = (
+    subscriptionId: number,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<ResumeSubscriptionResponse>(
+      {url: `/subscriptions/${subscriptionId}/resume`, method: 'POST', signal
+    },
+      );
+    }
+  
+
+
+export const getResumeSubscriptionSubscriptionsSubscriptionIdResumePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resumeSubscriptionSubscriptionsSubscriptionIdResumePost>>, TError,{subscriptionId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resumeSubscriptionSubscriptionsSubscriptionIdResumePost>>, TError,{subscriptionId: number}, TContext> => {
+
+const mutationKey = ['resumeSubscriptionSubscriptionsSubscriptionIdResumePost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resumeSubscriptionSubscriptionsSubscriptionIdResumePost>>, {subscriptionId: number}> = (props) => {
+          const {subscriptionId} = props ?? {};
+
+          return  resumeSubscriptionSubscriptionsSubscriptionIdResumePost(subscriptionId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResumeSubscriptionSubscriptionsSubscriptionIdResumePostMutationResult = NonNullable<Awaited<ReturnType<typeof resumeSubscriptionSubscriptionsSubscriptionIdResumePost>>>
+    
+    export type ResumeSubscriptionSubscriptionsSubscriptionIdResumePostMutationError = HTTPValidationError
+
+    /**
+ * @summary Resume Subscription
+ */
+export const useResumeSubscriptionSubscriptionsSubscriptionIdResumePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resumeSubscriptionSubscriptionsSubscriptionIdResumePost>>, TError,{subscriptionId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resumeSubscriptionSubscriptionsSubscriptionIdResumePost>>,
+        TError,
+        {subscriptionId: number},
+        TContext
+      > => {
+
+      const mutationOptions = getResumeSubscriptionSubscriptionsSubscriptionIdResumePostMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }

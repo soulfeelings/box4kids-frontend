@@ -6,7 +6,7 @@ export interface RouteParams {
     childId: string;
   };
   [ROUTES.APP.CANCEL_SUBSCRIPTION]: {
-    childId: string;
+    subscriptionId: string;
   };
 }
 
@@ -24,6 +24,7 @@ export const EDIT_CHILD_PARAMS: RouteParams[typeof ROUTES.APP.EDIT_CHILD] = {
   childId: ":childId",
 } as const;
 
-export const CANCEL_SUBSCRIPTION_PARAMS: RouteParams[typeof ROUTES.APP.CANCEL_SUBSCRIPTION] = {
-  childId: ":childId",
-} as const;
+export const CANCEL_SUBSCRIPTION_PARAMS: RouteParams[typeof ROUTES.APP.CANCEL_SUBSCRIPTION] =
+  {
+    subscriptionId: ":subscriptionId",
+  } as const;

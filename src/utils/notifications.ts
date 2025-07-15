@@ -44,6 +44,14 @@ export const notifications = {
     toast.success("Подписка добавлена!");
   },
 
+  subscriptionPaused: () => {
+    toast.success("Подписка приостановлена!");
+  },
+
+  subscriptionResumed: () => {
+    toast.success("Подписка возобновлена!");
+  },
+
   paymentSuccess: () => {
     toast.success("Оплата прошла успешно!");
   },

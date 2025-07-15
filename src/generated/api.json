@@ -549,6 +549,102 @@
         }
       }
     },
+    "/subscriptions/{subscription_id}/pause": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Pause Subscription",
+        "description": "Приостанавливает подписку по ID",
+        "operationId": "pause_subscription_subscriptions__subscription_id__pause_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Subscription Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PauseSubscriptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscription_id}/resume": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Resume Subscription",
+        "description": "Возобновляет приостановленную подписку по ID",
+        "operationId": "resume_subscription_subscriptions__subscription_id__resume_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Subscription Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeSubscriptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/payments/create-batch": {
       "post": {
         "tags": [
@@ -2672,6 +2768,21 @@
         ],
         "title": "OTPRequest"
       },
+      "PauseSubscriptionResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Сообщение о результате операции"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "PauseSubscriptionResponse",
+        "description": "Схема ответа при приостановке подписки"
+      },
       "PaymentReturnRequest": {
         "properties": {
           "external_payment_id": {
@@ -2810,6 +2921,21 @@
           "refresh_token"
         ],
         "title": "RefreshTokenRequest"
+      },
+      "ResumeSubscriptionResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Сообщение о результате операции"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ResumeSubscriptionResponse",
+        "description": "Схема ответа при возобновлении подписки"
       },
       "SkillResponse": {
         "properties": {
@@ -3163,14 +3289,7 @@
             "title": "User Id"
           },
           "user_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
             "title": "User Name"
           }
         },

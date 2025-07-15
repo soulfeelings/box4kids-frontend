@@ -8,7 +8,6 @@
 import type { SubscriptionWithDetailsResponseDeliveryInfoId } from './subscriptionWithDetailsResponseDeliveryInfoId';
 import type { SubscriptionStatus } from './subscriptionStatus';
 import type { SubscriptionWithDetailsResponseExpiresAt } from './subscriptionWithDetailsResponseExpiresAt';
-import type { SubscriptionWithDetailsResponseUserName } from './subscriptionWithDetailsResponseUserName';
 
 /**
  * Схема ответа с подробными данными подписки
@@ -26,5 +25,5 @@ export interface SubscriptionWithDetailsResponse {
   plan_name: string;
   plan_price: number;
   user_id: number;
-  user_name: SubscriptionWithDetailsResponseUserName;
+  user_name: string;
 }
