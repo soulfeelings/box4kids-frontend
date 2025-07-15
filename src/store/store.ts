@@ -123,6 +123,7 @@ interface State {
   // Аутентификация
   setUser: (user: UserData) => void;
   setUserName: (name: string) => void;
+  setUserPhone: (phone: string) => void;
   logout: () => void;
   setCurrentChildIdToUpdate: (childId: number | null) => void;
 
@@ -243,6 +244,15 @@ export const useStore = create<State>()(
           set({ user: { ...user, name } });
         } else {
           console.error("setUserName: User not found");
+        }
+      },
+
+      setUserPhone: (phone: string) => {
+        const user = get().user;
+        if (user) {
+          set({ user: { ...user, phone } });
+        } else {
+          console.error("setUserPhone: User not found");
         }
       },
 

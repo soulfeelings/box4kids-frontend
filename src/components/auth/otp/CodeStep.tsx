@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "../../../store/store";
+import { DevModeBanner } from "../../../features/DevModeBanner";
 import {
   useVerifyOtpAuthVerifyOtpPost,
   useSendOtpAuthSendOtpPost,
@@ -170,19 +171,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
       <div className="h-4"></div>
 
       {/* Dev Mode Auto-fill Indicator */}
-      {isAutoFilling && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-4">
-          <div className="flex items-center gap-2">
-            <div className="animate-spin w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full"></div>
-            <p
-              className="text-sm font-medium text-yellow-700"
-              style={{ fontFamily: "Nunito, sans-serif" }}
-            >
-              🛠️ DEV MODE: Получаем код автоматически...
-            </p>
-          </div>
-        </div>
-      )}
+      {isAutoFilling && <DevModeBanner />}
 
       {/* Code Input */}
       <div className="flex flex-col gap-1">

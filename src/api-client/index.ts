@@ -35,6 +35,7 @@ import type {
   ChildCreate,
   ChildResponse,
   ChildUpdate,
+  ConfirmPhoneChangeRequest,
   DeliveryInfoCreate,
   DeliveryInfoListResponse,
   DeliveryInfoResponse,
@@ -43,6 +44,7 @@ import type {
   GetBoxHistoryToyBoxesHistoryGetParams,
   GetUserDeliveryAddressesDeliveryAddressesGetParams,
   HTTPValidationError,
+  InitiatePhoneChangeRequest,
   InterestsListResponse,
   NextBoxResponse,
   OTPRequest,
@@ -264,6 +266,138 @@ export const useVerifyOtpAuthVerifyOtpPost = <TError = HTTPValidationError,
       > => {
 
       const mutationOptions = getVerifyOtpAuthVerifyOtpPostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Инициация смены номера телефона - проверяет текущий номер и отправляет OTP на новый
+ * @summary Initiate Phone Change
+ */
+export const initiatePhoneChangeAuthChangePhoneInitiatePost = (
+    initiatePhoneChangeRequest: InitiatePhoneChangeRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<unknown>(
+      {url: `/auth/change-phone/initiate`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: initiatePhoneChangeRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getInitiatePhoneChangeAuthChangePhoneInitiatePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof initiatePhoneChangeAuthChangePhoneInitiatePost>>, TError,{data: InitiatePhoneChangeRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof initiatePhoneChangeAuthChangePhoneInitiatePost>>, TError,{data: InitiatePhoneChangeRequest}, TContext> => {
+
+const mutationKey = ['initiatePhoneChangeAuthChangePhoneInitiatePost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof initiatePhoneChangeAuthChangePhoneInitiatePost>>, {data: InitiatePhoneChangeRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  initiatePhoneChangeAuthChangePhoneInitiatePost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InitiatePhoneChangeAuthChangePhoneInitiatePostMutationResult = NonNullable<Awaited<ReturnType<typeof initiatePhoneChangeAuthChangePhoneInitiatePost>>>
+    export type InitiatePhoneChangeAuthChangePhoneInitiatePostMutationBody = InitiatePhoneChangeRequest
+    export type InitiatePhoneChangeAuthChangePhoneInitiatePostMutationError = HTTPValidationError
+
+    /**
+ * @summary Initiate Phone Change
+ */
+export const useInitiatePhoneChangeAuthChangePhoneInitiatePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof initiatePhoneChangeAuthChangePhoneInitiatePost>>, TError,{data: InitiatePhoneChangeRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof initiatePhoneChangeAuthChangePhoneInitiatePost>>,
+        TError,
+        {data: InitiatePhoneChangeRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getInitiatePhoneChangeAuthChangePhoneInitiatePostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
+/**
+ * Подтверждение смены номера - проверяет OTP нового номера и обновляет пользователя
+ * @summary Confirm Phone Change
+ */
+export const confirmPhoneChangeAuthChangePhoneConfirmPost = (
+    confirmPhoneChangeRequest: ConfirmPhoneChangeRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customFetch<AuthResponse>(
+      {url: `/auth/change-phone/confirm`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: confirmPhoneChangeRequest, signal
+    },
+      );
+    }
+  
+
+
+export const getConfirmPhoneChangeAuthChangePhoneConfirmPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmPhoneChangeAuthChangePhoneConfirmPost>>, TError,{data: ConfirmPhoneChangeRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof confirmPhoneChangeAuthChangePhoneConfirmPost>>, TError,{data: ConfirmPhoneChangeRequest}, TContext> => {
+
+const mutationKey = ['confirmPhoneChangeAuthChangePhoneConfirmPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmPhoneChangeAuthChangePhoneConfirmPost>>, {data: ConfirmPhoneChangeRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  confirmPhoneChangeAuthChangePhoneConfirmPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmPhoneChangeAuthChangePhoneConfirmPostMutationResult = NonNullable<Awaited<ReturnType<typeof confirmPhoneChangeAuthChangePhoneConfirmPost>>>
+    export type ConfirmPhoneChangeAuthChangePhoneConfirmPostMutationBody = ConfirmPhoneChangeRequest
+    export type ConfirmPhoneChangeAuthChangePhoneConfirmPostMutationError = HTTPValidationError
+
+    /**
+ * @summary Confirm Phone Change
+ */
+export const useConfirmPhoneChangeAuthChangePhoneConfirmPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmPhoneChangeAuthChangePhoneConfirmPost>>, TError,{data: ConfirmPhoneChangeRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirmPhoneChangeAuthChangePhoneConfirmPost>>,
+        TError,
+        {data: ConfirmPhoneChangeRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getConfirmPhoneChangeAuthChangePhoneConfirmPostMutationOptions(options);
 
       return useMutation(mutationOptions , queryClient);
     }

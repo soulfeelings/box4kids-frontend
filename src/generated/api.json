@@ -130,6 +130,98 @@
         }
       }
     },
+    "/auth/change-phone/initiate": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Initiate Phone Change",
+        "description": "Инициация смены номера телефона - проверяет текущий номер и отправляет OTP на новый",
+        "operationId": "initiate_phone_change_auth_change_phone_initiate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiatePhoneChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/auth/change-phone/confirm": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Confirm Phone Change",
+        "description": "Подтверждение смены номера - проверяет OTP нового номера и обновляет пользователя",
+        "operationId": "confirm_phone_change_auth_change_phone_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPhoneChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/auth/refresh": {
       "post": {
         "tags": [
@@ -2105,6 +2197,26 @@
         "title": "ChildWithBoxesResponse",
         "description": "Схема для ребенка с наборами"
       },
+      "ConfirmPhoneChangeRequest": {
+        "properties": {
+          "new_phone": {
+            "type": "string",
+            "title": "New Phone",
+            "description": "Новый номер телефона"
+          },
+          "new_phone_code": {
+            "type": "string",
+            "title": "New Phone Code",
+            "description": "OTP код для нового номера"
+          }
+        },
+        "type": "object",
+        "required": [
+          "new_phone",
+          "new_phone_code"
+        ],
+        "title": "ConfirmPhoneChangeRequest"
+      },
       "DeliveryInfoCreate": {
         "properties": {
           "name": {
@@ -2331,6 +2443,26 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "InitiatePhoneChangeRequest": {
+        "properties": {
+          "current_phone_code": {
+            "type": "string",
+            "title": "Current Phone Code",
+            "description": "OTP код для текущего номера"
+          },
+          "new_phone": {
+            "type": "string",
+            "title": "New Phone",
+            "description": "Новый номер телефона"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_phone_code",
+          "new_phone"
+        ],
+        "title": "InitiatePhoneChangeRequest"
       },
       "InterestResponse": {
         "properties": {
