@@ -4,4 +4,3 @@ export { NextSetNotDeterminedView } from "./NextSetNotDeterminedView";
 export { NextSetDeterminedView } from "./NextSetDeterminedView";
 export { FeedbackView } from "./FeedbackView";
 export { ToySetDetailView } from "./ToySetDetailView";
-export { ChildrenAndSubscriptionsView } from "../ChildrenAndSubscriptionsView";

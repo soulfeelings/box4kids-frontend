@@ -1,15 +1,18 @@
 import React from "react";
 import { X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface CancelSubscriptionPageProps {
-  onCancel: () => void;
-  onConfirm: () => void;
-}
+export const CancelSubscriptionPage: React.FC = () => {
+  const navigate = useNavigate();
 
-export const CancelSubscriptionPage: React.FC<CancelSubscriptionPageProps> = ({
-  onCancel,
-  onConfirm,
-}) => {
+  const onCancel = () => {
+    navigate(-1);
+  };
+
+  const onConfirm = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}

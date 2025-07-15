@@ -109,7 +109,6 @@ export const ProfilePage: React.FC = () => {
   const [showEditName, setShowEditName] = useState(false);
   const [showEditPhone, setShowEditPhone] = useState(false);
 
-
   // Handle delivery history click
   const handleDeliveryHistoryClick = () => {
     setShowDeliveryHistory(true);
