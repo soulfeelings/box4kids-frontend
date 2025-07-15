@@ -51,6 +51,7 @@ import type {
   PaymentReturnRequest,
   PaymentWebhookRequest,
   PhoneRequest,
+  ProcessPaymentResponse,
   RefreshTokenRequest,
   SkillsListResponse,
   SubscriptionCreateRequest,
@@ -1097,7 +1098,7 @@ export const processPaymentPaymentsPaymentIdProcessPost = (
 ) => {
       
       
-      return customFetch<unknown>(
+      return customFetch<ProcessPaymentResponse>(
       {url: `/payments/${paymentId}/process`, method: 'POST', signal
     },
       );

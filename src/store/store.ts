@@ -148,6 +148,9 @@ interface State {
   canAccessStep: (step: AuthStep) => boolean;
   getNextValidStep: () => AuthStep;
 
+  // Сброс временных значений состояния
+  resetTemporaryState: () => void;
+
   // Инициализация данных
   fetchInitData: () => Promise<void>;
 }
@@ -423,6 +426,14 @@ export const useStore = create<State>()(
         set({ currentAppScreen: screen });
       },
 
+      // Сброс временных значений состояния
+      resetTemporaryState: () => {
+        set({
+          currentChildIdToUpdate: null,
+          selectedDeliveryAddressId: null,
+        });
+      },
+
       // Инициализация данных
       fetchInitData: async () => {
         set({ isInitDataLoading: true, initDataError: null });
@@ -514,10 +525,11 @@ export const useStore = create<State>()(
       },
     })),
     {
-      name: "registration-store",
+      name: "box4kids-store",
       partialize: (state: State) => ({
-        currentChildIdToUpdate: state.currentChildIdToUpdate,
-        selectedDeliveryAddressId: state.selectedDeliveryAddressId,
+        // Убираем кеширование этих полей, чтобы они не мешали работе
+        // currentChildIdToUpdate: state.currentChildIdToUpdate,
+        // selectedDeliveryAddressId: state.selectedDeliveryAddressId,
       }),
     }
   )

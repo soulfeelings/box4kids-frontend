@@ -71,6 +71,7 @@ export * from './oTPRequest';
 export * from './paymentReturnRequest';
 export * from './paymentWebhookRequest';
 export * from './phoneRequest';
+export * from './processPaymentResponse';
 export * from './refreshTokenRequest';
 export * from './skillResponse';
 export * from './skillsListResponse';

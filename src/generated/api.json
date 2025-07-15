@@ -625,7 +625,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessPaymentResponse"
+                }
               }
             }
           },
@@ -2670,6 +2672,24 @@
           "phone_number"
         ],
         "title": "PhoneRequest"
+      },
+      "ProcessPaymentResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "ProcessPaymentResponse"
       },
       "RefreshTokenRequest": {
         "properties": {

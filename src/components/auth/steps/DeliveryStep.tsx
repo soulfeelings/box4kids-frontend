@@ -35,8 +35,7 @@ export const DeliveryStep: React.FC<{
 
   const selectedAddressId = getSelectedDeliveryAddressId();
   const [isCreatingNew, setIsCreatingNew] = useState(
-    (!user?.deliveryAddresses || user.deliveryAddresses.length === 0) &&
-      selectedAddressId === null
+    !user?.deliveryAddresses || user.deliveryAddresses.length === 0
   );
 
   const [deliveryData, setDeliveryData] = useState({
@@ -216,7 +215,9 @@ export const DeliveryStep: React.FC<{
         )}
 
         {/* Show form when creating new address or no saved addresses */}
-        {isCreatingNew && (
+        {(isCreatingNew ||
+          !user?.deliveryAddresses ||
+          user.deliveryAddresses.length === 0) && (
           <div className="space-y-6">
             {/* Адрес */}
             <div>
@@ -437,7 +438,9 @@ export const DeliveryStep: React.FC<{
             ? "Создаем адрес..."
             : selectedAddressId !== null
             ? "Использовать этот адрес"
-            : "Создать адрес"}
+            : !user?.deliveryAddresses || user.deliveryAddresses.length === 0
+            ? "Создать адрес"
+            : "Создать новый адрес"}
         </button>
       </div>
     </div>

@@ -29,7 +29,8 @@
     "eject": "react-scripts eject",
     "ts-check": "npx tsc --noEmit -p tsconfig.json",
     "api:sync": "node scripts/download-api-json.js",
-    "api:gen": "orval --config orval.config.ts"
+    "api:gen": "orval --config orval.config.ts",
+    "api:upd": "npm run api:sync && npm run api:gen"
   },
   "eslintConfig": {
     "extends": [

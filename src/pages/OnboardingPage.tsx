@@ -39,6 +39,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     error,
     setError,
     setCurrentChildIdToUpdate,
+    resetTemporaryState,
   } = useStore();
 
   const currentChildToUpdate = useMemo(
@@ -49,6 +50,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
   const navigate = useNavigate();
 
   const handleClose = () => {
+    resetTemporaryState(); // Сбрасываем временные значения
     navigate(ROUTES.APP.ROOT);
   };
 
@@ -108,6 +110,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
             onClose={handleClose}
             currentChildToUpdate={currentChildToUpdate}
             onAddNewChild={() => {
+              resetTemporaryState(); // Сбрасываем временные значения
               setCurrentChildIdToUpdate(null);
               setCurrentStep(AUTH_STEPS.CHILD);
             }}
@@ -121,6 +124,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
             onNext={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
             onClose={handleClose}
             onAddNewChild={() => {
+              resetTemporaryState(); // Сбрасываем временные значения
               setCurrentChildIdToUpdate(null);
               setCurrentStep(AUTH_STEPS.CHILD);
             }}
@@ -149,6 +153,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
           <PaymentStep
             onBack={() => setCurrentStep(AUTH_STEPS.DELIVERY)}
             onNext={() => {
+              resetTemporaryState(); // Сбрасываем временные значения при успешном завершении
               navigate(ROUTES.AUTH.SUCCESS);
             }}
             onClose={handleClose}

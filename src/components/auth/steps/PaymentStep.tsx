@@ -7,6 +7,7 @@ import {
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { SubscriptionPlanResponse } from "../../../api-client/model/subscriptionPlanResponse";
 import { ToyCategoryConfigResponse } from "../../../api-client/model/toyCategoryConfigResponse";
+import { notifications } from "../../../utils/notifications";
 
 export const PaymentStep: React.FC<{
   onBack: () => void;
@@ -54,13 +55,22 @@ export const PaymentStep: React.FC<{
       });
 
       // Переходим к успешному завершению или обработке платежа
-      await processPaymentMutation.mutateAsync({
+      const processResult = await processPaymentMutation.mutateAsync({
         paymentId: paymentResponse.payment_id,
       });
 
-      onNext(); // или другой маршрут для завершения
+      // Проверяем результат обработки платежа
+      if (processResult.status === "success") {
+        notifications.paymentSuccess();
+        onNext(); // Переходим к успешному завершению
+      } else {
+        notifications.paymentError();
+        setError("Платеж не прошел. Попробуйте еще раз.");
+      }
     } catch (error) {
       console.error("Payment error:", error);
+      notifications.paymentError();
+      setError("Ошибка при обработке платежа. Попробуйте еще раз.");
     } finally {
       setPaymentProcessing(false);
     }
