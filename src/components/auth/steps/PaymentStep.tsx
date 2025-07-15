@@ -16,7 +16,7 @@ export const PaymentStep: React.FC<{
     isLoading,
     setPaymentData,
     user,
-    getChildrenWithoutActiveSubscription,
+    getChildrenWithoutSubscriptionByStatus,
     setError,
     subscriptionPlans,
     clearPaymentData,
@@ -110,7 +110,11 @@ export const PaymentStep: React.FC<{
   };
 
   // Получение детей из store
-  const children = getChildrenWithoutActiveSubscription() || [];
+  const children =
+    getChildrenWithoutSubscriptionByStatus([
+      SubscriptionStatus.pending_payment,
+      SubscriptionStatus.paused,
+    ]) || [];
 
   // Подсчет общей цены с учетом скидок
   const totalPrice = useMemo(

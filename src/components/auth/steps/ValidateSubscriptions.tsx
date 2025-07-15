@@ -1,5 +1,4 @@
 import {
-
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
 } from "../../../api-client";
@@ -28,7 +27,7 @@ export const ValidateSubscriptionsStep: React.FC<{
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
-  const { getSubscriptionPlan, getChildrenWithoutActiveSubscription } =
+  const { getSubscriptionPlan, getChildrenWithoutSubscriptionByStatus } =
     useStore();
 
   const { handleDeleteChild } = useHandleDeleteChilld();
@@ -43,7 +42,10 @@ export const ValidateSubscriptionsStep: React.FC<{
 
   // Получаем детей без активной подписки из store
   const childrenWithoutActiveSubscription =
-    getChildrenWithoutActiveSubscription();
+    getChildrenWithoutSubscriptionByStatus([
+      SubscriptionStatus.active,
+      SubscriptionStatus.paused,
+    ]);
 
   const interests: InterestResponse[] = interestsData?.interests || [];
   const skills: SkillResponse[] = skillsData?.skills || [];
