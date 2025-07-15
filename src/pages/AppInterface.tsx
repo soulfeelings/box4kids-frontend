@@ -10,8 +10,24 @@ import {
 import { useStore } from "../store/store";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
+import {
+  getCurrentBoxToyBoxesCurrentChildIdGet,
+  getNextBoxToyBoxesNextChildIdGet,
+} from "../api-client";
+import {
+  NextBoxResponse,
+  SubscriptionStatus,
+  ToyBoxResponse,
+} from "../api-client/model";
+import { UserChildData } from "../types";
 
 interface AppInterfaceProps {}
+
+export interface BoxesState {
+  child: UserChildData;
+  currentBox: ToyBoxResponse;
+  nextBox: NextBoxResponse;
+}
 
 export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
@@ -35,6 +51,36 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
       setShowFeedback(false);
     }
   }, [currentAppScreen]);
+
+  const [currentBoxes, setCurrentBoxes] = useState<BoxesState[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchData = async () => {
+      if (user?.children.length) {
+        const res = await Promise.all(
+          user?.children.map((child) =>
+            Promise.all([
+              getCurrentBoxToyBoxesCurrentChildIdGet(child.id),
+              getNextBoxToyBoxesNextChildIdGet(child.id),
+            ])
+          )
+        );
+
+        setCurrentBoxes(
+          res.map(([currentBox, nextBox], index) => ({
+            child: user?.children[index],
+            currentBox,
+            nextBox,
+          }))
+        );
+        console.log(res);
+      }
+    };
+
+    fetchData();
+  }, [user]);
 
   if (!user) {
     return <Navigate to={ROUTES.HOME} replace />;
@@ -183,35 +229,41 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   // Determine current screen state
   const getCurrentScreenState = ():
     | "not_subscribed"
-    | "just_subscribed"
-    | "next_set_not_determined"
-    | "next_set_determined" => {
+    // | "just_subscribed"
+    // | "next_set_not_determined"
+    | undefined => {
     // Check if user is not subscribed
-    if (user?.subscriptionStatus === "not_subscribed") {
+
+    const noSubscribedChild =
+      user?.children?.find((child) =>
+        child.subscriptions.find(
+          (subscription) => subscription.status === SubscriptionStatus.active
+        )
+      ) === undefined;
+
+    if (noSubscribedChild) {
       return "not_subscribed";
     }
 
     // Check if user just subscribed (first 2 hours)
-    if (
-      user?.subscriptionStatus === "just_subscribed" &&
-      user?.subscriptionDate
-    ) {
-      const subscriptionTime = new Date(user?.subscriptionDate);
-      const now = new Date();
-      const hoursDiff =
-        (now.getTime() - subscriptionTime.getTime()) / (1000 * 60 * 60);
+    // if (
+    //   user?.subscriptionStatus === "just_subscribed" &&
+    //   user?.subscriptionDate
+    // ) {
+    //   const subscriptionTime = new Date(user?.subscriptionDate);
+    //   const now = new Date();
+    //   const hoursDiff =
+    //     (now.getTime() - subscriptionTime.getTime()) / (1000 * 60 * 60);
 
-      if (hoursDiff <= 2) {
-        return "just_subscribed";
-      }
-    }
+    //   if (hoursDiff <= 2) {
+    //     return "just_subscribed";
+    //   }
+    // }
 
     // Check next set status
-    if (user?.nextSetStatus === "not_determined") {
-      return "next_set_not_determined";
-    }
-
-    return "next_set_determined";
+    // if (user?.nextSetStatus === "not_determined") {
+    //   return "next_set_not_determined";
+    // }
   };
 
   // Format current date for display
@@ -315,49 +367,34 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   switch (currentScreenState) {
     case "not_subscribed":
       return <NotSubscribedView userData={user} />;
-    case "just_subscribed":
-      return (
-        <JustSubscribedView
-          userData={user}
-          formatDeliveryDate={formatDeliveryDate}
-          formatDeliveryTime={formatDeliveryTime}
-          allToys={getAllCurrentToys()}
-          getCurrentDate={getCurrentDate}
-        />
-      );
-    case "next_set_not_determined":
-      return (
-        <NextSetNotDeterminedView
-          userData={user}
-          currentToys={currentToys}
-          rating={rating}
-          setShowAllToys={setShowAllToys}
-          handleStarClick={handleStarClick}
-          getCurrentDate={getCurrentDate}
-          formatDeliveryDate={formatDeliveryDate}
-          formatDeliveryTime={formatDeliveryTime}
-        />
-      );
-    case "next_set_determined":
-      return (
-        <NextSetDeterminedView
-          userData={user}
-          currentToys={currentToys}
-          nextToys={nextToys}
-          rating={rating}
-          setShowAllToys={setShowAllToys}
-          handleStarClick={handleStarClick}
-          getCurrentDate={getCurrentDate}
-          formatDeliveryDate={formatDeliveryDate}
-          formatDeliveryTime={formatDeliveryTime}
-        />
-      );
+    // case "just_subscribed":
+    //   return (
+    //     <JustSubscribedView
+    //       userData={user}
+    //       formatDeliveryDate={formatDeliveryDate}
+    //       formatDeliveryTime={formatDeliveryTime}
+    //       allToys={getAllCurrentToys()}
+    //       getCurrentDate={getCurrentDate}
+    //     />
+    //   );
+    // case "next_set_not_determined":
+    //   return (
+    //     <NextSetNotDeterminedView
+    //       userData={user}
+    //       currentToys={currentToys}
+    //       rating={rating}
+    //       setShowAllToys={setShowAllToys}
+    //       handleStarClick={handleStarClick}
+    //       getCurrentDate={getCurrentDate}
+    //       formatDeliveryDate={formatDeliveryDate}
+    //       formatDeliveryTime={formatDeliveryTime}
+    //     />
+    //   );
     default:
       return (
         <NextSetDeterminedView
           userData={user}
-          currentToys={currentToys}
-          nextToys={nextToys}
+          boxes={currentBoxes}
           rating={rating}
           setShowAllToys={setShowAllToys}
           handleStarClick={handleStarClick}
