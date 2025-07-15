@@ -4,6 +4,7 @@ import { AUTH_STEPS } from "../../constants/auth";
 import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../features/BottomNavigation";
+import { NoSubscribtionsView } from "../../features/NoSubscribtionsView";
 
 interface NotSubscribedViewProps {
   userData: UserData;
@@ -33,51 +34,14 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
         </h1>
 
         {/* Welcome Card - styled like welcome screen but half height */}
-        <div
-          className="relative flex flex-col rounded-3xl overflow-hidden"
-          style={{
-            backgroundColor: "#747EEC",
-            height: "50vh",
-            minHeight: "400px",
+        <NoSubscribtionsView
+          onClickButton={() => {
+            navigate(ROUTES.AUTH.ONBOARDING, {
+              state: { step: AUTH_STEPS.CHILD },
+            });
           }}
-        >
-          {/* Illustration area - takes remaining space above bottom container */}
-          <div
-            className="relative flex-1 overflow-hidden"
-            style={{ height: "calc(50vh - 140px)" }}
-          >
-            <img
-              src="/illustrations/continue.png"
-              alt="Girl with toy box"
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-          </div>
-
-          {/* Bottom container with text and button */}
-          <div className="px-6 py-4 flex flex-col justify-center">
-            <p
-              className="text-sm text-white/90 text-center mb-4"
-              style={{ fontFamily: "Open Sans, sans-serif" }}
-            >
-              Завершите оформление подпсики, чтобы мы могли собрать коробку с
-              игрушками и доставить её вам
-            </p>
-
-            <button
-              onClick={() =>
-                navigate(ROUTES.AUTH.ONBOARDING, {
-                  state: {
-                    step: AUTH_STEPS.SUBSCRIPTION,
-                  },
-                })
-              }
-              className="w-full bg-white text-[#30313D] py-3 rounded-3xl font-semibold text-sm"
-              style={{ fontFamily: "Open Sans, sans-serif" }}
-            >
-              Продолжить оформление
-            </button>
-          </div>
-        </div>
+          textButton="Добавить ребенка"
+        />
       </div>
 
       <BottomNavigation

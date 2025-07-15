@@ -15,6 +15,9 @@ import { Tag } from "./Tag";
 import { useStore } from "../store/store";
 import { InterestResponse } from "../api-client/model/interestResponse";
 import { SkillResponse } from "../api-client/model/skillResponse";
+import { useHandleDeleteChilld } from "../features/useHandleDeleteChilld";
+import { NoSubscribtionsView } from "../features/NoSubscribtionsView";
+import { SubscriptionStatus } from "../api-client/model";
 
 export const ChildrenAndSubscriptionsView: React.FC = () => {
   const { user, getSubscriptionPlan } = useStore();
@@ -22,12 +25,6 @@ export const ChildrenAndSubscriptionsView: React.FC = () => {
 
   const { data: interests } = useGetAllInterestsInterestsGet();
   const { data: skills } = useGetAllSkillsSkillsGet();
-
-  const plans = useMemo(() => {
-    return user?.children.map((child) =>
-      getSubscriptionPlan(child.subscriptions[0].id)
-    );
-  }, [user]);
 
   return (
     <div
@@ -53,6 +50,19 @@ export const ChildrenAndSubscriptionsView: React.FC = () => {
           />
         ))}
 
+        {user?.children.length === 0 && (
+          <NoSubscribtionsView
+            onClickButton={() => {
+              navigate(ROUTES.AUTH.ONBOARDING, {
+                state: {
+                  step: AUTH_STEPS.CHILD,
+                },
+              });
+            }}
+            textButton="Добавить ребенка"
+          />
+        )}
+
         <AddNewChildBanner
           onClick={() => {
             navigate(ROUTES.AUTH.ONBOARDING, {
@@ -63,11 +73,7 @@ export const ChildrenAndSubscriptionsView: React.FC = () => {
           }}
         />
       </div>
-      <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
-      />
+      <BottomNavigation />
     </div>
   );
 };
@@ -81,7 +87,8 @@ function ChildCard({
   interests: InterestResponse[];
   skills: SkillResponse[];
 }) {
-  const { getSubscriptionPlan } = useStore();
+  const { getSubscriptionPlan, setCurrentChildIdToUpdate } = useStore();
+  const navigate = useNavigate();
 
   const interestNames = useMemo(() => {
     return child.interests.map(
@@ -95,9 +102,15 @@ function ChildCard({
     );
   }, [child.skills, skills]);
 
+  const subscription = useMemo(() => {
+    return child.subscriptions[0] ?? null;
+  }, [child.subscriptions]);
+
   const subscriptionPlan = useMemo(() => {
-    return getSubscriptionPlan(child.subscriptions[0].id);
-  }, [child.subscriptions, getSubscriptionPlan]);
+    return getSubscriptionPlan(subscription?.plan_id);
+  }, [subscription, getSubscriptionPlan]);
+
+  const { handleDeleteChild } = useHandleDeleteChilld();
 
   return (
     <div className="bg-white rounded-2xl p-4 mb-4" key={child.id}>
@@ -177,19 +190,70 @@ function ChildCard({
 
       {/* Action buttons */}
       <div className="space-y-3">
-        {subscriptionPlan ? (
-          <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-2xl text-sm font-medium">
-            Изменить тариф
-          </button>
+        {subscriptionPlan &&
+        subscription.status === SubscriptionStatus.active ? (
+          <>
+            <button
+              onClick={() => {
+                navigate(ROUTES.AUTH.ONBOARDING, {
+                  state: {
+                    step: AUTH_STEPS.SUBSCRIPTION,
+                  },
+                });
+                setCurrentChildIdToUpdate(child.id);
+              }}
+              className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+            >
+              Остановить подписку
+            </button>
+            <button
+              onClick={() => {
+                navigate(ROUTES.AUTH.ONBOARDING, {
+                  state: {
+                    step: AUTH_STEPS.SUBSCRIPTION,
+                  },
+                });
+                setCurrentChildIdToUpdate(child.id);
+              }}
+              className="w-full bg-gray-100 text-gray-700 py-2 rounded-2xl text-sm font-medium"
+            >
+              Остановить подписку
+            </button>
+          </>
         ) : (
-          <button className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium">
+          <button
+            onClick={() => {
+              navigate(ROUTES.AUTH.ONBOARDING, {
+                state: {
+                  step: AUTH_STEPS.SUBSCRIPTION,
+                },
+              });
+              setCurrentChildIdToUpdate(child.id);
+            }}
+            className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+          >
             Выбрать тариф
           </button>
         )}
-        <button className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium">
+        <button
+          onClick={() => {
+            navigate(ROUTES.AUTH.ONBOARDING, {
+              state: {
+                step: AUTH_STEPS.CHILD,
+              },
+            });
+            setCurrentChildIdToUpdate(child.id);
+          }}
+          className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium"
+        >
           Изменить данные ребенка
         </button>
-        <button className="w-full bg-[#FBC8D5] text-[#E14F75] py-2 rounded-2xl text-sm font-medium">
+        <button
+          onClick={() => {
+            handleDeleteChild(child.id);
+          }}
+          className="w-full bg-[#FBC8D5] text-[#E14F75] py-2 rounded-2xl text-sm font-medium"
+        >
           Удалить
         </button>
       </div>

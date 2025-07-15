@@ -5,6 +5,7 @@ import {
 } from "../../../api-client";
 import { InterestResponse } from "../../../api-client/model";
 import { SkillResponse } from "../../../api-client/model/skillResponse";
+import { useHandleDeleteChilld } from "../../../features/useHandleDeleteChilld";
 import { useStore } from "../../../store";
 import { ChildrenOverviewView } from "./subscription-step-components/ChildrenOverviewView";
 
@@ -26,19 +27,9 @@ export const ValidateSubscriptionsStep: React.FC<{
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
-  const { getSubscriptionPlan, removeChild, user } = useStore();
+  const { getSubscriptionPlan, user } = useStore();
 
-  const useDeleteChild = useDeleteChildChildrenChildIdDelete();
-
-  const handleDeleteChild = async (childId: number) => {
-    const child = user?.children.find((c) => c.id === childId);
-    if (child && window.confirm(`Удалить данные ребёнка ${child.name}?`)) {
-      await useDeleteChild.mutateAsync({
-        childId: childId,
-      });
-      removeChild(childId);
-    }
-  };
+  const { handleDeleteChild } = useHandleDeleteChilld();
 
   const handleEditChildSubscription = (childId: number) => {
     onEditChildSubscription(childId);
