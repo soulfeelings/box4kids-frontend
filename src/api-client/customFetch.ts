@@ -133,6 +133,17 @@ export const customFetch = async <T>({
         return undefined as T;
       }
 
+      // 🔍 Обработка 404 - пользователь не найден (удален из БД или JWT устарел)
+      if (response.status === 404 && url.includes("/users/profile")) {
+        console.warn(
+          "[customFetch] Пользователь не найден (404), делаем logout"
+        );
+        localStorage.clear();
+        clearPersistedStore();
+        window.location.href = "/";
+        return undefined as T;
+      }
+
       let errorMessage = `API error ${response.status}`;
       try {
         const errorJson = await response.json();

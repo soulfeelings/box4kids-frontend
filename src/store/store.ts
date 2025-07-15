@@ -11,7 +11,6 @@ import {
   getAllInterestsInterestsGet,
   getAllSkillsSkillsGet,
   getUserDeliveryAddressesDeliveryAddressesGet,
-  getCurrentBoxToyBoxesCurrentChildIdGet,
 } from "../api-client";
 import { retryAsync } from "../utils/retry";
 import { InterestResponse } from "../api-client/model/interestResponse";
@@ -250,7 +249,14 @@ export const useStore = create<State>()(
       setCurrentChildIdToUpdate: (childId: number | null) =>
         set({ currentChildIdToUpdate: childId }),
 
-      logout: () => set({ user: null }),
+      logout: () => {
+        // Очищаем localStorage
+        localStorage.clear();
+        // Сбрасываем состояние store
+        set({ user: null });
+        // Перенаправляем на главную страницу
+        window.location.href = "/";
+      },
 
       // Управление детьми
       addChild: (childData: CreateChildData) => {
