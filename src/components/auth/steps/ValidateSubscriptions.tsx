@@ -1,10 +1,11 @@
 import {
-  useDeleteChildChildrenChildIdDelete,
+
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
 } from "../../../api-client";
 import { InterestResponse } from "../../../api-client/model";
 import { SkillResponse } from "../../../api-client/model/skillResponse";
+import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { useHandleDeleteChilld } from "../../../features/useHandleDeleteChilld";
 import { useStore } from "../../../store";
 import { ChildrenOverviewView } from "./subscription-step-components/ChildrenOverviewView";
@@ -27,7 +28,8 @@ export const ValidateSubscriptionsStep: React.FC<{
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
-  const { getSubscriptionPlan, user } = useStore();
+  const { getSubscriptionPlan, getChildrenWithoutActiveSubscription } =
+    useStore();
 
   const { handleDeleteChild } = useHandleDeleteChilld();
 
@@ -39,8 +41,9 @@ export const ValidateSubscriptionsStep: React.FC<{
     onAddNewChild();
   };
 
-  // Определяем текущий режим отображения
-  const allChildren = user?.children || [];
+  // Получаем детей без активной подписки из store
+  const childrenWithoutActiveSubscription =
+    getChildrenWithoutActiveSubscription();
 
   const interests: InterestResponse[] = interestsData?.interests || [];
   const skills: SkillResponse[] = skillsData?.skills || [];
@@ -102,6 +105,12 @@ export const ValidateSubscriptionsStep: React.FC<{
           >
             Проверьте состав наборов для Ваших детей
           </h1>
+          <p
+            className="text-sm text-gray-600 mt-2"
+            style={{ fontFamily: "Nunito, sans-serif" }}
+          >
+            Показаны только дети без активной подписки
+          </p>
         </div>
 
         <div className="space-y-4">
@@ -118,7 +127,7 @@ export const ValidateSubscriptionsStep: React.FC<{
 
           {/* Conditional content based on mode */}
           <ChildrenOverviewView
-            children={allChildren}
+            children={childrenWithoutActiveSubscription}
             interests={interests}
             skills={skills}
             onEditData={onEditChildData}

@@ -137,6 +137,7 @@ interface State {
   removeChild: (childId: number) => void;
   updateChild: (childId: number, updateData: UpdateChildData) => void;
   getChildById: (childId: number) => UserChildData | null;
+  getChildrenWithoutActiveSubscription: () => UserChildData[];
   updateChildSubscription: (
     childId: number,
     subscriptionId: number,
@@ -364,6 +365,18 @@ export const useStore = create<State>()(
           return null;
         }
         return user.children.find((child) => child.id === childId) || null;
+      },
+
+      getChildrenWithoutActiveSubscription: () => {
+        const user = get().user;
+        if (!user) return [];
+        return user.children.filter(
+          (child) =>
+            !child.subscriptions.some(
+              (subscription) =>
+                subscription.status === SubscriptionStatus.active
+            )
+        );
       },
 
       updateChildSubscription: (

@@ -29,10 +29,28 @@ export const ChildStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
-  const { setCurrentChildIdToUpdate, user, addChild, updateChild, setError } =
-    useStore();
+  const {
+    setCurrentChildIdToUpdate,
+    user,
+    addChild,
+    updateChild,
+    setError,
+    getChildrenWithoutActiveSubscription,
+  } = useStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
+
+  // Получаем детей без активной подписки
+  const childrenWithoutActiveSubscription =
+    getChildrenWithoutActiveSubscription();
+
+  // Создаем объект пользователя с отфильтрованными детьми для передачи в ChoseChildCards
+  const userWithFilteredChildren = user
+    ? {
+        ...user,
+        children: childrenWithoutActiveSubscription,
+      }
+    : null;
 
   const [childData, setChildData] = useState<ChildData>({
     name: currentChildToUpdate?.name || "",
@@ -216,12 +234,18 @@ export const ChildStep: React.FC<{
           >
             Кому собираем набор?
           </h1>
+          <p
+            className="text-sm text-gray-600 mt-2"
+            style={{ fontFamily: "Nunito, sans-serif" }}
+          >
+            Показаны только дети без активной подписки
+          </p>
         </div>
 
         {/* Children Cards */}
-        {user && (
+        {userWithFilteredChildren && (
           <ChoseChildCards
-            user={user}
+            user={userWithFilteredChildren}
             handleChildSelect={handleChildSelect}
             selectedChildId={currentChildToUpdate?.id || null}
             handleAddNewChild={handleAddNewChild}

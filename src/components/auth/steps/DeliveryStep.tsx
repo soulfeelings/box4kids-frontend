@@ -89,16 +89,19 @@ export const DeliveryStep: React.FC<{
 
   const dateOptions = useMemo(() => generateDateOptions(), []);
 
+  const subscriptionsIds = useMemo(
+    () => getAllChildrenSubscriptionsIds(),
+    [user]
+  );
+
   const updateSubscriptionsDeliveryInfoId = async (deliveryInfoId: number) => {
-    const subscriptionsIds = getAllChildrenSubscriptionsIds();
-    for (const subscriptionId of subscriptionsIds) {
-      await Promise.all([
-        await updateSubscriptionMutation.mutateAsync({
-          subscriptionId,
-          data: { delivery_info_id: deliveryInfoId },
-        }),
-      ]);
-    }
+    const updatePromises = subscriptionsIds.map((subscriptionId) =>
+      updateSubscriptionMutation.mutateAsync({
+        subscriptionId,
+        data: { delivery_info_id: deliveryInfoId },
+      })
+    );
+    await Promise.all(updatePromises);
   };
 
   const handleDeliverySubmit = async () => {

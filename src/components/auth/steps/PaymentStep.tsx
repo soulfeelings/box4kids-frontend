@@ -16,10 +16,9 @@ export const PaymentStep: React.FC<{
     isLoading,
     setPaymentData,
     user,
+    getChildrenWithoutActiveSubscription,
     setError,
     subscriptionPlans,
-    hasActivePayment,
-    getActivePaymentId,
     clearPaymentData,
   } = useStore();
 
@@ -28,13 +27,17 @@ export const PaymentStep: React.FC<{
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  const allChildrenSubscriptionsIds = user?.children.flatMap((child) =>
-    child.subscriptions
-      .filter(
-        (subscription) =>
-          subscription.status === SubscriptionStatus.pending_payment
-      )
-      .map((subscription) => subscription.id)
+  const allChildrenSubscriptionsIds = useMemo(
+    () =>
+      user?.children.flatMap((child) =>
+        child.subscriptions
+          .filter(
+            (subscription) =>
+              subscription.status === SubscriptionStatus.pending_payment
+          )
+          .map((subscription) => subscription.id)
+      ),
+    [user]
   );
   console.log("Подписки для оплаты:", allChildrenSubscriptionsIds);
 
@@ -107,7 +110,7 @@ export const PaymentStep: React.FC<{
   };
 
   // Получение детей из store
-  const children = user?.children || [];
+  const children = getChildrenWithoutActiveSubscription() || [];
 
   // Подсчет общей цены с учетом скидок
   const totalPrice = useMemo(
@@ -200,22 +203,15 @@ export const PaymentStep: React.FC<{
             );
 
             if (subscription.length === 0) {
-              setError("Нет доступных подписок");
               return null;
             }
 
             if (subscription.length > 1) {
-              setError(
-                "У ребенка не может быть несколько подписок, обратитесь к администратору"
-              );
               return null;
             }
 
             const plan = getPlanById(subscription[0].plan_id);
             if (!plan) {
-              setError(
-                "Не удалось получить план подписки, обратитесь к администратору"
-              );
               return null;
             }
 
