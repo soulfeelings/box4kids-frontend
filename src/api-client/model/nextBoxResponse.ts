@@ -8,6 +8,8 @@
 import type { NextBoxItemResponse } from './nextBoxItemResponse';
 import type { NextBoxResponseDeliveryDate } from './nextBoxResponseDeliveryDate';
 import type { NextBoxResponseReturnDate } from './nextBoxResponseReturnDate';
+import type { NextBoxResponseDeliveryTime } from './nextBoxResponseDeliveryTime';
+import type { NextBoxResponseReturnTime } from './nextBoxResponseReturnTime';
 
 /**
  * Следующий набор (генерируется на лету)
@@ -16,5 +18,7 @@ export interface NextBoxResponse {
   items: NextBoxItemResponse[];
   delivery_date?: NextBoxResponseDeliveryDate;
   return_date?: NextBoxResponseReturnDate;
+  delivery_time?: NextBoxResponseDeliveryTime;
+  return_time?: NextBoxResponseReturnTime;
   message: string;
 }

@@ -31,7 +31,9 @@ export interface BoxesState {
 
 export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const [rating, setRating] = useState<number>(0);
-  const [showAllToys, setShowAllToys] = useState<boolean>(false);
+  const [currentBox, setCurrentBox] = useState<BoxesState["currentBox"] | null>(
+    null
+  );
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
 
@@ -40,14 +42,12 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
 
   useEffect(() => {
     if (currentAppScreen === "home") {
-      setShowAllToys(false);
       setShowFeedback(false);
       navigate(ROUTES.APP.ROOT);
     } else if (currentAppScreen === "children") {
       navigate(ROUTES.APP.CHILDREN);
     } else if (currentAppScreen === "profile") {
       navigate(ROUTES.APP.PROFILE);
-      setShowAllToys(false);
       setShowFeedback(false);
     }
   }, [currentAppScreen]);
@@ -89,59 +89,6 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
   const handleStarClick = (starIndex: number): void => {
     setRating(starIndex + 1);
     setShowFeedback(true);
-  };
-
-  // Get toys based on real API data
-  const getCurrentToys = () => {
-    const currentChild = user?.children[0]; // Упрощение для примера
-    if (!currentChild) return [];
-
-    // const currentBox = currentToyBoxes.get(currentChild.id);
-
-    // if (currentBox) {
-    //   return transformToyBoxToToys(currentBox);
-    // }
-
-    // Fallback на существующую логику если нет API данных
-    const toys: Array<{
-      icon: string;
-      count: number;
-      name: string;
-      color: string;
-    }> = [];
-
-    // user?.children.forEach((child) => {
-    //   if (child.subscription === "premium") {
-    //     toys.push(
-    //       { icon: "🔧", count: 3, name: "Конструктор", color: "#F8CAAF" },
-    //       { icon: "🎨", count: 2, name: "Творческий набор", color: "#F8CAAF" }
-    //     );
-    //   } else if (child.subscription === "base") {
-    //     toys.push(
-    //       { icon: "🔧", count: 2, name: "Конструктор", color: "#F8CAAF" },
-    //       { icon: "🎨", count: 2, name: "Творческий набор", color: "#F8CAAF" }
-    //     );
-    //   }
-    // });
-
-    // Remove duplicates and combine counts
-    const toyMap = new Map();
-    toys.forEach((toy) => {
-      const key = toy.name;
-      if (toyMap.has(key)) {
-        toyMap.get(key).count += toy.count;
-      } else {
-        toyMap.set(key, { ...toy });
-      }
-    });
-
-    return Array.from(toyMap.values()).slice(0, 2); // Show first 2 types
-  };
-
-  // Get all toys for detailed view
-  const getAllCurrentToys = () => {
-    // Используем ту же логику что и getCurrentToys, но возвращаем все
-    return getCurrentToys();
   };
 
   // Обновить функцию обработки отзывов
@@ -351,18 +298,16 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
     );
   }
 
-  if (showAllToys) {
+  if (currentBox) {
     return (
       <ToySetDetailView
-        allToys={getAllCurrentToys()}
-        setShowAllToys={setShowAllToys}
+        currentBox={currentBox}
+        close={() => setCurrentBox(null)}
       />
     );
   }
 
   const currentScreenState = getCurrentScreenState();
-  const currentToys = getCurrentToys();
-  const nextToys = getNextToys();
 
   switch (currentScreenState) {
     case "not_subscribed":
@@ -396,7 +341,7 @@ export const AppInterface: React.FC<AppInterfaceProps> = ({}) => {
           userData={user}
           boxes={currentBoxes}
           rating={rating}
-          setShowAllToys={setShowAllToys}
+          setShowAllToys={setCurrentBox}
           handleStarClick={handleStarClick}
           getCurrentDate={getCurrentDate}
           formatDeliveryDate={formatDeliveryDate}

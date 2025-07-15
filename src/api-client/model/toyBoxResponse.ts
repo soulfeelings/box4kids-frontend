@@ -9,6 +9,8 @@ import type { ToyBoxResponseDeliveryInfoId } from './toyBoxResponseDeliveryInfoI
 import type { ToyBoxStatus } from './toyBoxStatus';
 import type { ToyBoxResponseDeliveryDate } from './toyBoxResponseDeliveryDate';
 import type { ToyBoxResponseReturnDate } from './toyBoxResponseReturnDate';
+import type { ToyBoxResponseDeliveryTime } from './toyBoxResponseDeliveryTime';
+import type { ToyBoxResponseReturnTime } from './toyBoxResponseReturnTime';
 import type { ToyBoxItemResponse } from './toyBoxItemResponse';
 import type { ToyBoxReviewResponse } from './toyBoxReviewResponse';
 
@@ -23,6 +25,8 @@ export interface ToyBoxResponse {
   status: ToyBoxStatus;
   delivery_date?: ToyBoxResponseDeliveryDate;
   return_date?: ToyBoxResponseReturnDate;
+  delivery_time?: ToyBoxResponseDeliveryTime;
+  return_time?: ToyBoxResponseReturnTime;
   created_at: string;
   items?: ToyBoxItemResponse[];
   reviews?: ToyBoxReviewResponse[];

@@ -45,6 +45,21 @@ export const ChildOverviewCard: React.FC<{
       </div>
 
       <div className="p-6 space-y-6">
+        {/* Особенности */}
+        {child.limitations && child.comment && (
+          <div>
+            <h2
+              className="text-md font-semibold text-[#686564] mb-3"
+              style={{ fontFamily: "Nunito, sans-serif" }}
+            >
+              Особенности
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              <Tag selected={true}>{child.comment}</Tag>
+            </div>
+          </div>
+        )}
+
         {/* Интересы */}
         <div>
           <h2
