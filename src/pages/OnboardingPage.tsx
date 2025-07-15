@@ -9,6 +9,7 @@ import { SubscriptionStep } from "../components/auth/steps/SubscriptionStep";
 import { DeliveryStep } from "../components/auth/steps/DeliveryStep";
 import { PaymentStep } from "../components/auth/steps/PaymentStep";
 import { useStore } from "../store/store";
+import { selectChildById } from "../store/selectors";
 import { WelcomeStep } from "../components/auth/steps/WelcomeStep";
 import { ROUTES } from "../constants/routes";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -40,13 +41,10 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     setError,
     setCurrentChildIdToUpdate,
     resetTemporaryState,
-    getChildById,
   } = useStore();
 
-  const currentChildToUpdate = useMemo(
-    () =>
-      currentChildIdToUpdate ? getChildById(currentChildIdToUpdate) : null,
-    [currentChildIdToUpdate, getChildById]
+  const currentChildToUpdate = useStore(
+    selectChildById(currentChildIdToUpdate)
   );
 
   const navigate = useNavigate();

@@ -7,6 +7,10 @@ import { SkillResponse } from "../../../api-client/model/skillResponse";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { useHandleDeleteChilld } from "../../../features/useHandleDeleteChilld";
 import { useStore } from "../../../store";
+import {
+  selectChildrenWithoutSubscriptionByStatus,
+  selectSubscriptionPlan,
+} from "../../../store/selectors";
 import { ChildrenOverviewView } from "./subscription-step-components/ChildrenOverviewView";
 
 export const ValidateSubscriptionsStep: React.FC<{
@@ -27,9 +31,6 @@ export const ValidateSubscriptionsStep: React.FC<{
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
-  const { getSubscriptionPlan, getChildrenWithoutSubscriptionByStatus } =
-    useStore();
-
   const { handleDeleteChild } = useHandleDeleteChilld();
 
   const handleEditChildSubscription = (childId: number) => {
@@ -41,11 +42,12 @@ export const ValidateSubscriptionsStep: React.FC<{
   };
 
   // Получаем детей без активной подписки из store
-  const childrenWithoutActiveSubscription =
-    getChildrenWithoutSubscriptionByStatus([
+  const childrenWithoutActiveSubscription = useStore(
+    selectChildrenWithoutSubscriptionByStatus([
       SubscriptionStatus.active,
       SubscriptionStatus.paused,
-    ]);
+    ])
+  );
 
   const interests: InterestResponse[] = interestsData?.interests || [];
   const skills: SkillResponse[] = skillsData?.skills || [];
@@ -136,7 +138,11 @@ export const ValidateSubscriptionsStep: React.FC<{
             onEditSubscription={handleEditChildSubscription}
             onDelete={handleDeleteChild}
             onAddNewChild={handleAddNewChild}
-            getSubscriptionPlan={getSubscriptionPlan}
+            getSubscriptionPlan={(id: number) =>
+              useStore
+                .getState()
+                .subscriptionPlans.find((plan) => plan.id === id) || null
+            }
           />
         </div>
       </div>

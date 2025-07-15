@@ -6,11 +6,7 @@ interface ProfileItemProps {
   hasArrow?: boolean;
   isEditable?: boolean;
   icon?: React.ReactNode;
-  isDelivery?: boolean;
   isLogout?: boolean;
-  deliveryAddress?: string;
-  deliveryDate?: string;
-  deliveryTime?: string;
   customRadius?: string;
   isMenuItem?: boolean;
   onEditClick?: () => void;
@@ -21,11 +17,7 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({
   value,
   hasArrow = false,
   isEditable = false,
-  isDelivery = false,
   isLogout = false,
-  deliveryAddress,
-  deliveryDate,
-  deliveryTime,
   customRadius = "rounded-lg",
   isMenuItem = false,
   onEditClick,
@@ -51,27 +43,6 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({
               }`}
             >
               {value}
-            </div>
-          )}
-          {isDelivery && (
-            <div className="mt-2">
-              <div className="flex items-center text-base text-black mb-1">
-                <div className="bg-[#F9F9F9] rounded-full w-6 h-6 flex items-center justify-center mr-2">
-                  <span className="text-xs">📍</span>
-                </div>
-                {deliveryAddress}
-              </div>
-              <div className="flex items-center text-base text-black">
-                <div className="bg-[#F9F9F9] rounded-full w-6 h-6 flex items-center justify-center mr-2">
-                  <span className="text-xs">🗓</span>
-                </div>
-                {deliveryDate}, {deliveryTime}
-              </div>
-              <div className="mt-3">
-                <button className="w-full bg-[#E3E3E3] text-sm text-black py-2 px-4 rounded-[32px] text-center hover:bg-gray-300 transition-colors">
-                  Изменить адрес или дату доставки
-                </button>
-              </div>
             </div>
           )}
         </div>

@@ -95,7 +95,6 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
       }
 
       console.log("✅ Аутентификация успешна:", response.user);
-      notifications.success("Вход выполнен успешно!");
 
       onSuccess();
     } catch (error) {

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
+import { selectChildrenWithoutSubscriptionByStatus } from "../../../store/selectors";
 import { useProcessSubscriptionsPaymentsProcessSubscriptionsPost } from "../../../api-client/";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { SubscriptionPlanResponse } from "../../../api-client/model/subscriptionPlanResponse";
@@ -12,15 +13,7 @@ export const PaymentStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
-  const {
-    isLoading,
-    setPaymentData,
-    user,
-    getChildrenWithoutSubscriptionByStatus,
-    setError,
-    subscriptionPlans,
-    clearPaymentData,
-  } = useStore();
+  const { isLoading, user, setError, subscriptionPlans } = useStore();
 
   const processSubscriptionsMutation =
     useProcessSubscriptionsPaymentsProcessSubscriptionsPost();
@@ -42,12 +35,10 @@ export const PaymentStep: React.FC<{
   console.log("Подписки для оплаты:", allChildrenSubscriptionsIds);
 
   const handleBack = () => {
-    clearPaymentData(); // Очищаем данные платежа при переходе назад
     onBack();
   };
 
   const handleClose = () => {
-    clearPaymentData(); // Очищаем данные платежа при закрытии
     onClose();
   };
 
@@ -66,16 +57,9 @@ export const PaymentStep: React.FC<{
         },
       });
 
-      // Сохраняем данные платежа в store для возможного повторного использования
-      setPaymentData({
-        paymentId: result.payment_id,
-        status: result.status,
-      });
-
       // Проверяем результат обработки платежа
       if (result.status === PaymentStatusEnum.success) {
         notifications.paymentSuccess();
-        clearPaymentData(); // Очищаем данные платежа после успешной оплаты
         onNext(); // Переходим к успешному завершению
       } else {
         notifications.paymentError();
@@ -110,11 +94,12 @@ export const PaymentStep: React.FC<{
   };
 
   // Получение детей из store
-  const children =
-    getChildrenWithoutSubscriptionByStatus([
+  const children = useStore(
+    selectChildrenWithoutSubscriptionByStatus([
       SubscriptionStatus.pending_payment,
       SubscriptionStatus.paused,
-    ]) || [];
+    ])
+  );
 
   // Подсчет общей цены с учетом скидок
   const totalPrice = useMemo(

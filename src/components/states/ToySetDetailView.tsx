@@ -6,6 +6,7 @@ import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
 import { UserData } from "../../types";
 import { useStore } from "../../store";
+import { selectChildById } from "../../store/selectors";
 
 interface ToySetDetailViewProps {
   userData: UserData;
@@ -18,7 +19,6 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
   currentBox,
   close,
 }) => {
-  const { getChildById } = useStore();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
 
   const deliveryLabel = useMemo(() => {
@@ -38,10 +38,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
     }
   }, [currentBox.status]);
 
-  const child = useMemo(
-    () => getChildById(currentBox.child_id),
-    [currentBox.child_id, getChildById]
-  );
+  const child = useStore(selectChildById(currentBox.child_id));
 
   return (
     <div

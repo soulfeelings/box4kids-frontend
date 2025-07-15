@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useStore } from "../../../store/store";
+import { selectSelectedDeliveryAddressId } from "../../../store/selectors";
 import {
   useCreateDeliveryAddressDeliveryAddressesPost,
   useUpdateSubscriptionSubscriptionsSubscriptionIdPatch,
@@ -7,6 +8,7 @@ import {
 import { DeliveryAddressCards } from "../../../features/DeliveryAddressCards";
 import { generateDateOptions } from "../../../utils/date/generateDateOptions";
 import { convertDeliveryDateToISO } from "../../../utils/date/convert";
+import { selectAllChildrenSubscriptionsIds } from "../../../store/selectors";
 
 const timeOptions = [
   { value: "", label: "Выберите время" },
@@ -21,19 +23,14 @@ export const DeliveryStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
-  const {
-    user,
-    getSelectedDeliveryAddressId,
-    setSelectedDeliveryAddressId,
-    addDeliveryAddress,
-    getAllChildrenSubscriptionsIds,
-  } = useStore();
+  const { user, setSelectedDeliveryAddressId, addDeliveryAddress } = useStore();
+  const subscriptionsIds = useStore(selectAllChildrenSubscriptionsIds());
   const createDeliveryAddressMutation =
     useCreateDeliveryAddressDeliveryAddressesPost();
   const updateSubscriptionMutation =
     useUpdateSubscriptionSubscriptionsSubscriptionIdPatch();
 
-  const selectedAddressId = getSelectedDeliveryAddressId();
+  const selectedAddressId = useStore(selectSelectedDeliveryAddressId);
   const [isCreatingNew, setIsCreatingNew] = useState(
     !user?.deliveryAddresses || user.deliveryAddresses.length === 0
   );
@@ -88,11 +85,6 @@ export const DeliveryStep: React.FC<{
   };
 
   const dateOptions = useMemo(() => generateDateOptions(), []);
-
-  const subscriptionsIds = useMemo(
-    () => getAllChildrenSubscriptionsIds(),
-    [user]
-  );
 
   const updateSubscriptionsDeliveryInfoId = async (deliveryInfoId: number) => {
     const updatePromises = subscriptionsIds.map((subscriptionId) =>

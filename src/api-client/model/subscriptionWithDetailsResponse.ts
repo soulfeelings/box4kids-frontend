@@ -8,6 +8,7 @@
 import type { SubscriptionWithDetailsResponseDeliveryInfoId } from './subscriptionWithDetailsResponseDeliveryInfoId';
 import type { SubscriptionStatus } from './subscriptionStatus';
 import type { SubscriptionWithDetailsResponseExpiresAt } from './subscriptionWithDetailsResponseExpiresAt';
+import type { SubscriptionWithDetailsResponseUserName } from './subscriptionWithDetailsResponseUserName';
 
 /**
  * Схема ответа с подробными данными подписки
@@ -21,9 +22,11 @@ export interface SubscriptionWithDetailsResponse {
   discount_percent: number;
   created_at: string;
   expires_at: SubscriptionWithDetailsResponseExpiresAt;
+  /** Приостановлена ли подписка */
+  is_paused?: boolean;
   child_name: string;
   plan_name: string;
   plan_price: number;
   user_id: number;
-  user_name: string;
+  user_name: SubscriptionWithDetailsResponseUserName;
 }

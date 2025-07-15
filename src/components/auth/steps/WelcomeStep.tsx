@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useStore } from "../../../store/store";
+import React, { useEffect, useState } from "react";
 
 const welcomeScreens = [
   {
@@ -23,13 +22,13 @@ export const WelcomeStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
 }> = ({ onNext, onClose }) => {
-  const { welcomeData, setWelcomeData } = useStore();
+  const [welcomeIndex, setWelcomeIndex] = useState(0);
 
-  const w = welcomeScreens[welcomeData.welcomeIndex];
+  const w = welcomeScreens[welcomeIndex];
 
   const handleNext = () => {
-    if (welcomeData.welcomeIndex < welcomeScreens.length - 1) {
-      setWelcomeData({ welcomeIndex: welcomeData.welcomeIndex + 1 });
+    if (welcomeIndex < welcomeScreens.length - 1) {
+      setWelcomeIndex(welcomeIndex + 1);
     } else {
       onNext();
     }
@@ -103,9 +102,7 @@ export const WelcomeStep: React.FC<{
             className="w-full bg-white text-[#747EEC] py-4 rounded-[32px] font-semibold text-base"
             style={{ fontFamily: "Open Sans, sans-serif" }}
           >
-            {welcomeData.welcomeIndex < welcomeScreens.length - 1
-              ? "Далее"
-              : "Начать"}
+            {welcomeIndex < welcomeScreens.length - 1 ? "Далее" : "Начать"}
           </button>
         </div>
       </div>

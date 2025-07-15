@@ -11,6 +11,7 @@ import {
   useGetAllSkillsSkillsGet,
 } from "../api-client";
 import { useStore } from "../store/store";
+import { selectSubscriptionPlan } from "../store/selectors";
 import { InterestResponse } from "../api-client/model/interestResponse";
 import { SkillResponse } from "../api-client/model/skillResponse";
 import { useHandleDeleteChilld } from "../features/useHandleDeleteChilld";
@@ -20,7 +21,7 @@ import { Tag } from "../components/Tag";
 import { ChildInfoWidget } from "../widgets/child-info";
 
 export const ChildrenPage: React.FC = () => {
-  const { user, getSubscriptionPlan } = useStore();
+  const { user } = useStore();
   const navigate = useNavigate();
 
   const { data: interests } = useGetAllInterestsInterestsGet();
@@ -90,7 +91,7 @@ function ChildCard({
   interests: InterestResponse[];
   skills: SkillResponse[];
 }) {
-  const { getSubscriptionPlan, setCurrentChildIdToUpdate } = useStore();
+  const { setCurrentChildIdToUpdate } = useStore();
   const navigate = useNavigate();
 
   const childInterest = useMemo(() => {
@@ -109,9 +110,9 @@ function ChildCard({
     return child.subscriptions[0] ?? null;
   }, [child.subscriptions]);
 
-  const subscriptionPlan = useMemo(() => {
-    return getSubscriptionPlan(subscription?.plan_id);
-  }, [subscription, getSubscriptionPlan]);
+  const subscriptionPlan = useStore(
+    selectSubscriptionPlan(subscription?.plan_id || 0)
+  );
 
   const { handleDeleteChild } = useHandleDeleteChilld();
 

@@ -6,6 +6,7 @@ import { clearPersistedStore, useStore } from "../store/store";
 import { EditNamePage } from "./EditNamePage";
 import { EditPhonePage } from "./EditPhonePage";
 import { ProfileItem } from "../components/profile/ProfileItem";
+import { DeliveryProfileSections } from "../features/DeliveryProfileSections";
 
 export const ProfilePage: React.FC = () => {
   const { user } = useStore();
@@ -82,13 +83,12 @@ export const ProfilePage: React.FC = () => {
         />
 
         {/* Delivery */}
-        <ProfileItem
-          label="Доставка"
-          isDelivery={true}
-          deliveryAddress={user?.deliveryAddresses[0]?.address}
-          deliveryDate={formatDeliveryDate(user?.deliveryAddresses[0]?.date)}
-          deliveryTime={formatDeliveryTime(user?.deliveryAddresses[0]?.time)}
-          customRadius="rounded-[24px]"
+        <DeliveryProfileSections
+          user={user || undefined}
+          deliveryAddresses={user?.deliveryAddresses}
+          onEditDelivery={(addressId) => {
+            console.log("Edit delivery address:", addressId);
+          }}
         />
 
         {/* Menu Items */}

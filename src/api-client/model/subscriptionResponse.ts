@@ -21,4 +21,6 @@ export interface SubscriptionResponse {
   discount_percent: number;
   created_at: string;
   expires_at: SubscriptionResponseExpiresAt;
+  /** Приостановлена ли подписка */
+  is_paused?: boolean;
 }

@@ -7,6 +7,7 @@ import { ChildEditForm } from "../features/ChildEditForm";
 import { CategoriesSelector } from "../features/CategoriesSelector";
 import { ActionButton } from "../features/ActionButton";
 import { useStore } from "../store/store";
+import { selectChildById } from "../store/selectors";
 import {
   useGetAllInterestsInterestsGet,
   useGetAllSkillsSkillsGet,
@@ -30,17 +31,16 @@ interface ChildData {
 export const EditChildPage: React.FC = () => {
   const { childId } = useEditChildParams();
   const navigate = useNavigate();
-  const { updateChild, setError, getChildById } = useStore();
+  const { updateChild, setError } = useStore();
 
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
   // Находим ребенка по ID
-  const currentChild = useMemo(() => {
-    if (!childId) return null;
-    return getChildById(parseInt(childId));
-  }, [childId, getChildById]);
+  const currentChild = useStore(
+    selectChildById(childId ? parseInt(childId) : 0)
+  );
 
   // Состояние для данных ребенка
   const [childData, setChildData] = useState<ChildData>({

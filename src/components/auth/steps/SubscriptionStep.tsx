@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../../store/store";
+import { selectSubscriptionPlan } from "../../../store/selectors";
 import { useCreateSubscriptionOrderSubscriptionsPost } from "../../../api-client/";
 import { UserChildData } from "../../../types";
 import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
@@ -23,13 +24,7 @@ export const SubscriptionStep: React.FC<{
     }
   }, [currentChildToUpdate]);
 
-  const {
-    isLoading,
-    setError,
-    getSubscriptionPlan,
-    updateChild,
-    subscriptionPlans,
-  } = useStore();
+  const { isLoading, setError, updateChild, subscriptionPlans } = useStore();
 
   const createSubscriptionMutation =
     useCreateSubscriptionOrderSubscriptionsPost();
@@ -37,6 +32,8 @@ export const SubscriptionStep: React.FC<{
   const handleClose = () => {
     onClose();
   };
+
+  const subscriptionPlan = useStore(selectSubscriptionPlan(subscriptionId));
 
   const handleSubscriptionSubmit = async () => {
     const targetChild = currentChildToUpdate;
@@ -51,7 +48,6 @@ export const SubscriptionStep: React.FC<{
       return;
     }
 
-    const subscriptionPlan = getSubscriptionPlan(subscriptionId);
     if (!subscriptionPlan) {
       setError("Не загрузились планы подписки");
       return;

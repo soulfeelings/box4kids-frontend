@@ -3,12 +3,13 @@ import { useStore } from "../store/store";
 import { notifications } from "../utils/notifications";
 
 export const useHandleDeleteChilld = () => {
-  const { user, removeChild, getChildById } = useStore();
+  const { removeChild } = useStore();
 
   const useDeleteChild = useDeleteChildChildrenChildIdDelete();
 
   const handleDeleteChild = async (childId: number) => {
-    const child = getChildById(childId);
+    const child =
+      useStore.getState().user?.children.find((c) => c.id === childId) || null;
     if (child && window.confirm(`Удалить данные ребёнка ${child.name}?`)) {
       try {
         await useDeleteChild.mutateAsync({

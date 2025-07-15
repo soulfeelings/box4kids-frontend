@@ -11,6 +11,7 @@ import {
 import { formatDateInput } from "../../../utils/date/format";
 import { validateBirthDate } from "../../../utils/date/validate";
 import { useStore } from "../../../store";
+import { selectChildrenWithoutSubscriptionByStatus } from "../../../store/selectors";
 import { UserChildData } from "../../../types";
 import { ChoseChildCards } from "../../../features/ChoseChildCards";
 import { notifications } from "../../../utils/notifications";
@@ -30,23 +31,18 @@ export const ChildStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
-  const {
-    setCurrentChildIdToUpdate,
-    user,
-    addChild,
-    updateChild,
-    setError,
-    getChildrenWithoutSubscriptionByStatus,
-  } = useStore();
+  const { setCurrentChildIdToUpdate, user, addChild, updateChild, setError } =
+    useStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
   // Получаем детей без активной подписки
-  const childrenWithoutActiveSubscription =
-    getChildrenWithoutSubscriptionByStatus([
+  const childrenWithoutActiveSubscription = useStore(
+    selectChildrenWithoutSubscriptionByStatus([
       SubscriptionStatus.active,
       SubscriptionStatus.paused,
-    ]);
+    ])
+  );
 
   // Создаем объект пользователя с отфильтрованными детьми для передачи в ChoseChildCards
   const userWithFilteredChildren = user

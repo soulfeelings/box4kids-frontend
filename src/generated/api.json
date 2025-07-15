@@ -3117,6 +3117,12 @@
               }
             ],
             "title": "Expires At"
+          },
+          "is_paused": {
+            "type": "boolean",
+            "title": "Is Paused",
+            "description": "Приостановлена ли подписка",
+            "default": false
           }
         },
         "type": "object",
@@ -3272,6 +3278,12 @@
             ],
             "title": "Expires At"
           },
+          "is_paused": {
+            "type": "boolean",
+            "title": "Is Paused",
+            "description": "Приостановлена ли подписка",
+            "default": false
+          },
           "child_name": {
             "type": "string",
             "title": "Child Name"
@@ -3289,7 +3301,14 @@
             "title": "User Id"
           },
           "user_name": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "User Name"
           }
         },
