@@ -8,6 +8,8 @@
 
 export * from './adminLoginRequest';
 export * from './adminLoginResponse';
+export * from './adminUserResponse';
+export * from './adminUserResponseName';
 export * from './authResponse';
 export * from './authResponseRefreshToken';
 export * from './batchPaymentCreateRequest';
@@ -25,6 +27,10 @@ export * from './childUpdateHasLimitations';
 export * from './childUpdateInterestIds';
 export * from './childUpdateName';
 export * from './childUpdateSkillIds';
+export * from './childWithBoxesResponse';
+export * from './childWithBoxesResponseComment';
+export * from './childWithBoxesResponseCurrentBox';
+export * from './childWithBoxesResponseNextBox';
 export * from './createChildChildrenPostParams';
 export * from './createDeliveryAddressDeliveryAddressesPostParams';
 export * from './deleteDeliveryAddressDeliveryAddressesAddressIdDeleteParams';

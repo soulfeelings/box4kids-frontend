@@ -27,6 +27,7 @@ import type {
 import type {
   AdminLoginRequest,
   AdminLoginResponse,
+  AdminUserResponse,
   AuthResponse,
   BatchPaymentCreateRequest,
   BatchPaymentResponse,
@@ -1224,7 +1225,7 @@ export const getAllUsersAdminUsersGet = (
 ) => {
       
       
-      return customFetch<unknown>(
+      return customFetch<AdminUserResponse[]>(
       {url: `/admin/users`, method: 'GET', signal
     },
       );

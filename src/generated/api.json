@@ -685,7 +685,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUserResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get All Users Admin Users Get"
+                }
               }
             }
           }
@@ -1668,6 +1674,67 @@
         ],
         "title": "AdminLoginResponse"
       },
+      "AdminUserResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "phone_number": {
+            "type": "string",
+            "title": "Phone Number"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/ChildWithBoxesResponse"
+            },
+            "type": "array",
+            "title": "Children"
+          },
+          "delivery_addresses": {
+            "$ref": "#/components/schemas/DeliveryInfoListResponse"
+          },
+          "subscriptions": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionWithDetailsResponse"
+            },
+            "type": "array",
+            "title": "Subscriptions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "phone_number",
+          "role",
+          "created_at",
+          "children",
+          "delivery_addresses",
+          "subscriptions"
+        ],
+        "title": "AdminUserResponse",
+        "description": "Схема для пользователя в админке"
+      },
       "AuthResponse": {
         "properties": {
           "user": {
@@ -1972,6 +2039,71 @@
         },
         "type": "object",
         "title": "ChildUpdate"
+      },
+      "ChildWithBoxesResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "title": "Date Of Birth"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "has_limitations": {
+            "type": "boolean",
+            "title": "Has Limitations"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "current_box": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ToyBoxResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "next_box": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextBoxResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "date_of_birth",
+          "gender",
+          "has_limitations"
+        ],
+        "title": "ChildWithBoxesResponse",
+        "description": "Схема для ребенка с наборами"
       },
       "DeliveryInfoCreate": {
         "properties": {

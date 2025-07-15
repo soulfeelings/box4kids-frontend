@@ -1,10 +1,18 @@
 import React, { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Eye, X } from "lucide-react";
 import {
   useGetAllUsersAdminUsersGet,
   useUpdateToyBoxStatusAdminToyBoxesBoxIdStatusPut,
   useAdminLoginAdminLoginPost,
 } from "../api-client";
+import type {
+  AdminUserResponse,
+  ChildWithBoxesResponse,
+  ToyBoxResponse,
+  NextBoxResponse,
+  DeliveryInfoResponse,
+  SubscriptionWithDetailsResponse,
+} from "../api-client/model";
 
 interface ClientData {
   id: number;
@@ -12,7 +20,13 @@ interface ClientData {
   name: string;
   registeredWithoutSubscription: boolean;
   subscriptionStatus: string;
-  deliveryAddress: string;
+  deliveryAddresses: Array<{
+    id: number;
+    name: string;
+    address: string;
+    isUsedInSubscription?: boolean;
+    isUsedInBox?: boolean;
+  }>;
   nextDeliveryDate: string;
   childName: string;
   currentSet: string;
@@ -20,6 +34,7 @@ interface ClientData {
   currentBoxId?: number;
   nextSet: string;
   nextSetStatus: string;
+  fullData: AdminUserResponse;
 }
 
 export const AdminPage: React.FC = () => {
@@ -33,6 +48,10 @@ export const AdminPage: React.FC = () => {
   const [filterColumn, setFilterColumn] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("nextDeliveryDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Состояние для модальных окон
+  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // API запросы
   const loginMutation = useAdminLoginAdminLoginPost();
@@ -78,8 +97,11 @@ export const AdminPage: React.FC = () => {
     }
   };
 
-  const transformUserToClientData = (user: any): ClientData[] => {
+  const transformUserToClientData = (user: AdminUserResponse): ClientData[] => {
     const result: ClientData[] = [];
+
+    // Получаем все адреса пользователя
+    const userAddresses = user.delivery_addresses?.addresses || [];
 
     // Если у пользователя нет детей, создаем одну запись
     if (!user.children || user.children.length === 0) {
@@ -89,13 +111,18 @@ export const AdminPage: React.FC = () => {
         name: user.name || "",
         registeredWithoutSubscription: true,
         subscriptionStatus: "Нет подписки",
-        deliveryAddress: user.delivery_addresses?.[0]?.address || "",
+        deliveryAddresses: userAddresses.map((addr: DeliveryInfoResponse) => ({
+          id: addr.id || 0,
+          name: addr.name || "Адрес",
+          address: addr.address || "Не указан",
+        })),
         nextDeliveryDate: "",
         childName: "",
         currentSet: "---",
         currentSetStatus: "",
         nextSet: "---",
         nextSetStatus: "",
+        fullData: user,
       });
       return result;
     }
@@ -107,7 +134,18 @@ export const AdminPage: React.FC = () => {
 
       // Получаем подписку для этого ребенка
       const childSubscription = user.subscriptions?.find(
-        (sub: any) => sub.child_id === child.id
+        (sub: SubscriptionWithDetailsResponse) => sub.child_id === child.id
+      );
+
+      // Помечаем адреса, которые используются в подписке и боксе
+      const addressesWithUsage = userAddresses.map(
+        (addr: DeliveryInfoResponse) => ({
+          id: addr.id || 0,
+          name: addr.name || "Адрес",
+          address: addr.address || "Не указан",
+          isUsedInSubscription: childSubscription?.delivery_info_id === addr.id,
+          isUsedInBox: currentBox?.delivery_info_id === addr.id,
+        })
       );
 
       result.push({
@@ -116,7 +154,7 @@ export const AdminPage: React.FC = () => {
         name: user.name || "",
         registeredWithoutSubscription: !childSubscription,
         subscriptionStatus: childSubscription?.status || "Нет подписки",
-        deliveryAddress: user.delivery_addresses?.[0]?.address || "",
+        deliveryAddresses: addressesWithUsage,
         nextDeliveryDate:
           currentBox?.delivery_date || nextBox?.delivery_date || "",
         childName: child.name || "",
@@ -125,13 +163,14 @@ export const AdminPage: React.FC = () => {
         currentBoxId: currentBox?.id,
         nextSet: nextBox ? formatNextBox(nextBox) : "---",
         nextSetStatus: nextBox ? "Запланирован" : "",
+        fullData: user,
       });
     }
 
     return result;
   };
 
-  const formatToyBox = (box: any): string => {
+  const formatToyBox = (box: ToyBoxResponse): string => {
     if (!box.items || box.items.length === 0) return "---";
 
     const totalToys = box.items.reduce(
@@ -145,7 +184,7 @@ export const AdminPage: React.FC = () => {
     return `Набор на ${totalToys} игрушек: ${itemsList}`;
   };
 
-  const formatNextBox = (box: any): string => {
+  const formatNextBox = (box: NextBoxResponse): string => {
     if (!box.items || box.items.length === 0) return "---";
 
     const totalToys = box.items.reduce(
@@ -164,7 +203,7 @@ export const AdminPage: React.FC = () => {
 
     // Преобразуем пользователей в записи для таблицы (каждый ребенок = отдельная запись)
     let data: ClientData[] = [];
-    (users as any[]).forEach((user: any) => {
+    (users as AdminUserResponse[]).forEach((user: AdminUserResponse) => {
       const userRecords = transformUserToClientData(user);
       data.push(...userRecords);
     });
@@ -183,8 +222,6 @@ export const AdminPage: React.FC = () => {
     if (filterColumn) {
       data = data.filter((client) => {
         switch (filterColumn) {
-          case "registeredWithoutSubscription":
-            return client.registeredWithoutSubscription;
           case "subscriptionStatus":
             return client.subscriptionStatus === "Активна";
           case "currentSet":
@@ -288,9 +325,6 @@ export const AdminPage: React.FC = () => {
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Все</option>
-                <option value="registeredWithoutSubscription">
-                  Не оформили подписку
-                </option>
                 <option value="subscriptionStatus">Активные подписки</option>
                 <option value="currentSet">Есть текущий набор</option>
                 <option value="nextSet">Есть следующий набор</option>
@@ -321,41 +355,29 @@ export const AdminPage: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID клиента
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Клиент
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Номер телефона
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Имя
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Не оформил подписку
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Статус подписки
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Адрес доставки
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Дата след. доставки
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Имя ребенка
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ребенок
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Текущий набор
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Статус набора
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Следующий набор
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Статус след. набора
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Действия
                   </th>
                 </tr>
               </thead>
@@ -363,8 +385,8 @@ export const AdminPage: React.FC = () => {
                 {usersLoading ? (
                   <tr>
                     <td
-                      colSpan={12}
-                      className="px-6 py-4 text-center text-gray-500"
+                      colSpan={8}
+                      className="px-4 py-4 text-center text-gray-500"
                     >
                       Загрузка...
                     </td>
@@ -372,8 +394,8 @@ export const AdminPage: React.FC = () => {
                 ) : filteredAndSortedData.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={12}
-                      className="px-6 py-4 text-center text-gray-500"
+                      colSpan={8}
+                      className="px-4 py-4 text-center text-gray-500"
                     >
                       Нет данных
                     </td>
@@ -381,22 +403,18 @@ export const AdminPage: React.FC = () => {
                 ) : (
                   filteredAndSortedData.map((client) => (
                     <tr
-                      key={client.id}
-                      className="hover:bg-gray-50 cursor-pointer"
+                      key={`${client.id}-${client.childName}`}
+                      className="hover:bg-gray-50"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {client.id}
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        <div>
+                          <div className="font-medium">
+                            #{client.id} {client.name}
+                          </div>
+                          <div className="text-gray-500">{client.phone}</div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {client.phone}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {client.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {client.registeredWithoutSubscription ? "Да" : "Нет"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         <span
                           className={`px-2 py-1 text-xs rounded-full ${
                             client.subscriptionStatus === "Активна"
@@ -407,19 +425,50 @@ export const AdminPage: React.FC = () => {
                           {client.subscriptionStatus}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                        {client.deliveryAddress}
+                      <td className="px-4 py-4 text-sm text-gray-900 max-w-xs">
+                        {client.deliveryAddresses &&
+                        client.deliveryAddresses.length > 0 ? (
+                          <div className="space-y-1">
+                            {client.deliveryAddresses.map((addr, index) => (
+                              <div key={addr.id || index} className="text-xs">
+                                <span className="font-medium">
+                                  {addr.name || "Адрес"}:
+                                </span>{" "}
+                                <span
+                                  className="truncate block"
+                                  title={addr.address || "Не указан"}
+                                >
+                                  {addr.address || "Не указан"}
+                                </span>
+                                <span className="text-gray-500 text-xs">
+                                  ID: {addr.id}
+                                </span>
+                                {(addr.isUsedInSubscription ||
+                                  addr.isUsedInBox) && (
+                                  <span className="text-blue-600 text-xs ml-1">
+                                    {addr.isUsedInSubscription && "📋"}
+                                    {addr.isUsedInBox && "📦"}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">Нет адресов</span>
+                        )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {client.nextDeliveryDate}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {client.childName}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                        {client.currentSet}
+                      <td className="px-4 py-4 text-sm text-gray-900 max-w-xs">
+                        <div className="truncate" title={client.currentSet}>
+                          {client.currentSet}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {client.currentBoxId ? (
                           <select
                             value={client.currentSetStatus}
@@ -445,11 +494,17 @@ export const AdminPage: React.FC = () => {
                           client.currentSetStatus
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                        {client.nextSet}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {client.nextSetStatus}
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <button
+                          onClick={() => {
+                            setSelectedClient(client);
+                            setShowDetailsModal(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                        >
+                          <Eye className="h-4 w-4" />
+                          Детали
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -459,6 +514,139 @@ export const AdminPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Модальное окно с деталями */}
+      {showDetailsModal && selectedClient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Детали клиента</h2>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Информация о клиенте */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">
+                  Информация о клиенте
+                </h3>
+                <div className="space-y-2">
+                  <div>
+                    <strong>ID:</strong> {selectedClient.id}
+                  </div>
+                  <div>
+                    <strong>Имя:</strong> {selectedClient.name}
+                  </div>
+                  <div>
+                    <strong>Телефон:</strong> {selectedClient.phone}
+                  </div>
+                  <div>
+                    <strong>Адреса доставки:</strong>
+                    {selectedClient.deliveryAddresses &&
+                    selectedClient.deliveryAddresses.length > 0 ? (
+                      <div className="mt-2 space-y-2">
+                        {selectedClient.deliveryAddresses.map((addr, index) => (
+                          <div
+                            key={addr.id || index}
+                            className="bg-gray-50 p-3 rounded-lg"
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">
+                                  {addr.name || "Адрес"}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {addr.address || "Не указан"}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  ID: {addr.id}
+                                </div>
+                              </div>
+                              <div className="flex gap-1 ml-2">
+                                {addr.isUsedInSubscription && (
+                                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                    Подписка
+                                  </span>
+                                )}
+                                {addr.isUsedInBox && (
+                                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                    Текущий бокс
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-2 text-gray-500">
+                        Нет сохраненных адресов
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <strong>Статус подписки:</strong>{" "}
+                    {selectedClient.subscriptionStatus}
+                  </div>
+                </div>
+              </div>
+
+              {/* Информация о ребенке */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">
+                  Информация о ребенке
+                </h3>
+                <div className="space-y-2">
+                  <div>
+                    <strong>Имя ребенка:</strong> {selectedClient.childName}
+                  </div>
+                  <div>
+                    <strong>Дата следующей доставки:</strong>{" "}
+                    {selectedClient.nextDeliveryDate}
+                  </div>
+                </div>
+              </div>
+
+              {/* Текущий набор */}
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold mb-3">Текущий набор</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="mb-2">
+                    <strong>Статус:</strong> {selectedClient.currentSetStatus}
+                  </div>
+                  <div>
+                    <strong>Описание:</strong>
+                  </div>
+                  <div className="whitespace-pre-line text-sm">
+                    {selectedClient.currentSet}
+                  </div>
+                </div>
+              </div>
+
+              {/* Следующий набор */}
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold mb-3">Следующий набор</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="mb-2">
+                    <strong>Статус:</strong> {selectedClient.nextSetStatus}
+                  </div>
+                  <div>
+                    <strong>Описание:</strong>
+                  </div>
+                  <div className="whitespace-pre-line text-sm">
+                    {selectedClient.nextSet}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
