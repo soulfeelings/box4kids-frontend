@@ -77,7 +77,6 @@ export const EditDeliveryInfoPage: React.FC = () => {
     try {
       const updateData: any = {};
 
-      debugger;
       // Добавляем данные адреса если они изменились
       if (isDeliveryDataChanged) {
         updateData.name = deliveryData.name;

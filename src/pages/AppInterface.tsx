@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FeedbackView,
   ToySetDetailView,
@@ -125,21 +125,8 @@ export const AppInterface: React.FC = () => {
     fetchData();
   }, [user]);
 
-  if (!user) {
-    return <Navigate to={ROUTES.HOME} replace />;
-  }
-
-  const handleStarClick = (starIndex: number): void => {
-    setRating(starIndex + 1);
-    setShowFeedback(true);
-  };
-
   // Determine current screen state
-  const getCurrentScreenState = ():
-    | "not_subscribed"
-    // | "just_subscribed"
-    // | "next_set_not_determsined"
-    | undefined => {
+  const currentScreenState = useMemo((): "not_subscribed" | undefined => {
     const noSubscribedChild =
       user?.children?.find((child) =>
         child.subscriptions.find(
@@ -151,25 +138,16 @@ export const AppInterface: React.FC = () => {
       return "not_subscribed";
     }
 
-    // Check if user just subscribed (first 2 hours)
-    // if (
-    //   user?.subscriptionStatus === "just_subscribed" &&
-    //   user?.subscriptionDate
-    // ) {
-    //   const subscriptionTime = new Date(user?.subscriptionDate);
-    //   const now = new Date();
-    //   const hoursDiff =
-    //     (now.getTime() - subscriptionTime.getTime()) / (1000 * 60 * 60);
+    return undefined;
+  }, [user]);
 
-    //   if (hoursDiff <= 2) {
-    //     return "just_subscribed";
-    //   }
-    // }
+  if (!user) {
+    return <Navigate to={ROUTES.HOME} replace />;
+  }
 
-    // Check next set status
-    // if (user?.nextSetStatus === "not_determined") {
-    //   return "next_set_not_determined";
-    // }
+  const handleStarClick = (starIndex: number): void => {
+    setRating(starIndex + 1);
+    setShowFeedback(true);
   };
 
   // Format current date for display
@@ -278,8 +256,6 @@ export const AppInterface: React.FC = () => {
       />
     );
   }
-
-  const currentScreenState = getCurrentScreenState();
 
   switch (currentScreenState) {
     case "not_subscribed":

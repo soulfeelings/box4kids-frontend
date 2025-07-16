@@ -70,10 +70,10 @@ export const DeliveryAddressCards = ({
             </h3>
 
             {user.deliveryAddresses.map((address, index) => (
-              <button
+              <div
                 key={address.id}
                 onClick={() => onAddressSelect(address.id)}
-                className={`w-full p-4 rounded-2xl border-2 transition-all text-left mb-3 ${
+                className={`w-full p-4 rounded-2xl border-2 transition-all text-left mb-3 cursor-pointer ${
                   selectedAddressId === address.id
                     ? "border-[#7782F5] bg-[#7782F5]/5"
                     : "border-gray-200 bg-gray-50 hover:border-gray-300"
@@ -172,7 +172,7 @@ export const DeliveryAddressCards = ({
                     )}
                   </div>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
 
