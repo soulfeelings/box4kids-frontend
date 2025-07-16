@@ -75,4 +75,16 @@ export const notifications = {
   authError: () => {
     toast.error("Ошибка авторизации");
   },
+
+  deliveryAddressAdded: () => {
+    toast.success("Адрес доставки добавлен!");
+  },
+
+  deliveryAddressUpdated: () => {
+    toast.success("Адрес доставки обновлен!");
+  },
+
+  deliveryAddressRemoved: () => {
+    toast.success("Адрес доставки удален");
+  },
 };

@@ -17,6 +17,7 @@ export const ROUTES = {
     PROFILE: "/app/profile",
     CHILDREN: "/app/children",
     EDIT_CHILD: "/app/edit-child/:childId",
+    EDIT_DELIVERY: "/app/edit-delivery/:addressId",
     DELIVERY_HISTORY: "/app/delivery-history",
     SUPPORT: "/app/support",
     CANCEL_SUBSCRIPTION: "/app/cancel-subscription/:subscriptionId",

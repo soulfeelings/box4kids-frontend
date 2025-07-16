@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { DeliveryHistoryPage } from "./DeliveryHistoryPage";
 import { SupportPage } from "./SupportPage";
 import { BottomNavigation } from "../features/BottomNavigation";
@@ -8,27 +8,29 @@ import { EditPhonePage } from "./EditPhonePage";
 import { ProfileItem } from "../components/profile/ProfileItem";
 import { DeliveryProfileSections } from "../features/DeliveryProfileSections";
 import { PaymentDataPage } from "./PaymentDataPage";
+import { useNavigateToEditDelivery } from "../hooks/useNavigateHooks";
 
 export const ProfilePage: React.FC = () => {
   const { user } = useStore();
+  const navigateToEditDelivery = useNavigateToEditDelivery();
   const [showDeliveryHistory, setShowDeliveryHistory] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [showEditName, setShowEditName] = useState(false);
   const [showEditPhone, setShowEditPhone] = useState(false);
   const [showPaymentData, setShowPaymentData] = useState(false);
   // Handle delivery history click
-  const handleDeliveryHistoryClick = () => {
+  const handleDeliveryHistoryClick = useCallback(() => {
     setShowDeliveryHistory(true);
-  };
+  }, []);
 
   // Handle support click
-  const handleSupportClick = () => {
+  const handleSupportClick = useCallback(() => {
     setShowSupport(true);
-  };
+  }, []);
 
-  const handlePaymentDataClick = () => {
+  const handlePaymentDataClick = useCallback(() => {
     setShowPaymentData(true);
-  };
+  }, []);
 
   // Show delivery history page if requested
   if (showDeliveryHistory) {
@@ -95,9 +97,7 @@ export const ProfilePage: React.FC = () => {
         <DeliveryProfileSections
           user={user || undefined}
           deliveryAddresses={user?.deliveryAddresses}
-          onEditDelivery={(addressId) => {
-            console.log("Edit delivery address:", addressId);
-          }}
+          onEditDelivery={(addressId) => navigateToEditDelivery({ addressId })}
         />
 
         {/* Menu Items */}

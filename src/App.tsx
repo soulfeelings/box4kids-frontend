@@ -19,6 +19,7 @@ import { DataGuard } from "./components/common/DataGuard";
 import { ChildrenPage } from "./pages/ChildrenPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { EditChildPage } from "./pages/EditChildPage";
+import { EditDeliveryInfoPage } from "./pages/EditDeliveryInfoPage";
 import { AdminPage } from "./pages/AdminPage";
 import { CancelSubscriptionPage } from "./pages/CancelSubscriptionPage";
 
@@ -73,6 +74,10 @@ const AppWithRoutes: React.FC = () => {
           <Route path={ROUTES.APP.CHILDREN} element={<ChildrenPage />} />
           <Route path={ROUTES.APP.PROFILE} element={<ProfilePage />} />
           <Route path={ROUTES.APP.EDIT_CHILD} element={<EditChildPage />} />
+          <Route
+            path={ROUTES.APP.EDIT_DELIVERY}
+            element={<EditDeliveryInfoPage />}
+          />
           <Route
             path={ROUTES.APP.CANCEL_SUBSCRIPTION}
             element={<CancelSubscriptionPage />}

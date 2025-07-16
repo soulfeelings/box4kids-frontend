@@ -24,6 +24,11 @@ interface NavigateParams {
   state?: NavigateState;
 }
 
+interface NavigateToEditDeliveryParams {
+  addressId: number;
+  state?: NavigateState;
+}
+
 // Хуки для навигации с параметрами
 export const useNavigateToEditChild = () => {
   const navigate = useNavigate();
@@ -145,6 +150,20 @@ export const useNavigateToAdmin = () => {
     [navigate]
   );
 };
+
+export const useNavigateToEditDelivery = () => {
+  const navigate = useNavigate();
+  return useCallback(
+    ({ addressId, state }: NavigateToEditDeliveryParams) => {
+      navigate(
+        ROUTES.APP.EDIT_DELIVERY.replace(":addressId", addressId.toString()),
+        { state }
+      );
+    },
+    [navigate]
+  );
+};
+
 export const useNavigateBack = () => {
   const navigate = useNavigate();
 
