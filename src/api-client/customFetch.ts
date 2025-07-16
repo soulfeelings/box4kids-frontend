@@ -72,7 +72,20 @@ export const customFetch = async <T>({
 
   // 🧩 Собираем query string
   const queryString = params
-    ? "?" + new URLSearchParams(params as Record<string, string>).toString()
+    ? "?" +
+      Object.entries(params)
+        .flatMap(([key, value]) => {
+          if (Array.isArray(value)) {
+            // Для массивов создаем отдельный параметр для каждого элемента
+            return value.map(
+              (item) => `${encodeURIComponent(key)}=${encodeURIComponent(item)}`
+            );
+          } else {
+            // Для обычных значений создаем один параметр
+            return [`${encodeURIComponent(key)}=${encodeURIComponent(value)}`];
+          }
+        })
+        .join("&")
     : "";
 
   const fullUrl = `${baseUrl}${url}${queryString}`;

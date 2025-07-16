@@ -5,7 +5,12 @@
  * API для Box4Kids - сервис аренды игрушек для детей
  * OpenAPI spec version: 0.1.0
  */
+import type { ToyBoxStatus } from './toyBoxStatus';
 
 export type GetBoxHistoryToyBoxesHistoryGetParams = {
 limit?: number;
+/**
+ * Filter by status
+ */
+status?: ToyBoxStatus[];
 };

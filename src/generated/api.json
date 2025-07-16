@@ -1787,6 +1787,21 @@
               "default": 10,
               "title": "Limit"
             }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ToyBoxStatus"
+              },
+              "description": "Filter by status",
+              "default": [],
+              "title": "Status"
+            },
+            "description": "Filter by status"
           }
         ],
         "responses": {

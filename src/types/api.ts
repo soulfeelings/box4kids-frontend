@@ -1,3 +1,5 @@
+import { ToyBoxStatus } from "../api-client/model/toyBoxStatus";
+
 // Централизованные API типы для всего приложения
 
 // === AUTH ===
@@ -147,7 +149,7 @@ export interface ToyBoxResponse {
   subscription_id: number;
   child_id: number;
   delivery_info_id: number | null;
-  status: "PLANNED" | "ASSEMBLED" | "SHIPPED" | "DELIVERED" | "RETURNED";
+  status: ToyBoxStatus;
   delivery_date: string | null;
   return_date: string | null;
   created_at: string;
