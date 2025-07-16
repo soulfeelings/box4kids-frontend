@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DeliveryAddressData } from "../types";
-import { generateDateOptions } from "../utils/date/generateDateOptions";
+import { dateManager } from "../utils/date/DateManager";
 
 interface DeliveryData {
   name: string;
@@ -43,7 +43,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
       setDeliveryData({
         name: deliveryAddress.name,
         address: deliveryAddress.address,
-        date: deliveryAddress.date,
+        date: deliveryAddress.date, // Уже в ISO формате
         time: deliveryAddress.time,
         comment: deliveryAddress.comment,
       });
@@ -55,7 +55,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     onDataChange(deliveryData);
   }, [deliveryData, onDataChange]);
 
-  const dateOptions = generateDateOptions();
+  const dateOptions = dateManager.generateDateOptions();
 
   return (
     <div className="space-y-6">
@@ -148,9 +148,10 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         </label>
         <div className="relative">
           <select
-            value={deliveryData.date}
+            value={dateManager.toShort(deliveryData.date)}
             onChange={(e) => {
-              setDeliveryData({ ...deliveryData, date: e.target.value });
+              const isoDate = dateManager.toISO(e.target.value);
+              setDeliveryData({ ...deliveryData, date: isoDate });
             }}
             className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
             style={{ fontFamily: "Nunito, sans-serif" }}
