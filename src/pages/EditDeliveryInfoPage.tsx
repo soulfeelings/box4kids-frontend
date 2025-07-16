@@ -38,11 +38,11 @@ export const EditDeliveryInfoPage: React.FC = () => {
 
   // Состояние для данных адреса
   const [deliveryData, setDeliveryData] = useState<DeliveryData>({
-    name: "",
-    address: "",
-    date: "",
-    time: "",
-    comment: "",
+    name: currentAddress?.name || "",
+    address: currentAddress?.address || "",
+    date: currentAddress?.date || "",
+    time: currentAddress?.time || "",
+    comment: currentAddress?.comment || "",
   });
 
   const handleClose = useCallback(() => {
@@ -55,6 +55,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
 
   const isDeliveryDataChanged = useMemo(() => {
     if (!currentAddress) return false;
+
     return (
       deliveryData.name !== currentAddress.name ||
       deliveryData.address !== currentAddress.address ||
@@ -69,8 +70,6 @@ export const EditDeliveryInfoPage: React.FC = () => {
     deliveryData.address.trim() &&
     deliveryData.date &&
     deliveryData.time;
-
-  const hasChanges = isDeliveryDataChanged;
 
   const handleSave = useCallback(async () => {
     if (!isFormValid || !currentAddress) return;
@@ -170,7 +169,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
       <div className="fixed bottom-24 left-4 right-4">
         <ActionButton
           onClick={handleSave}
-          disabled={!isFormValid || !hasChanges}
+          disabled={!isFormValid || !isDeliveryDataChanged}
           isLoading={updateDeliveryAddressMutation.isPending}
           variant="primary"
         >
