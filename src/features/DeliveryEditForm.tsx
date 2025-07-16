@@ -67,13 +67,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         >
           Название адреса
         </label>
-        <div
-          className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-            deliveryData.name
-              ? "border-[#7782F5]"
-              : "border-gray-200 focus-within:border-[#7782F5]"
-          }`}
-        >
+        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all border-gray-200 focus-within:border-[#7782F5]">
           <input
             type="text"
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
@@ -97,13 +91,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         >
           Адрес
         </label>
-        <div
-          className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative ${
-            deliveryData.address
-              ? "border-[#7782F5]"
-              : "border-gray-200 focus-within:border-[#7782F5]"
-          }`}
-        >
+        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative border-gray-200 focus-within:border-[#7782F5]">
           <input
             type="text"
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 pr-9"
@@ -227,13 +215,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         >
           Комментарий для курьера
         </label>
-        <div
-          className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
-            deliveryData.comment
-              ? "border-[#7782F5]"
-              : "border-gray-200 focus-within:border-[#7782F5]"
-          }`}
-        >
+        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all border-gray-200 focus-within:border-[#7782F5]">
           <textarea
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
             placeholder="Дополнительная информация для курьера"
