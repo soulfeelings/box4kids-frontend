@@ -3,7 +3,7 @@ import { BottomNavigation } from "../../features/BottomNavigation";
 import { RatingSection } from "../../features/RatingSection";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { UserData } from "../../types";
-import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
+import { dateManager } from "../../utils/date/DateManager";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
 import { useNavigateToEditChild } from "../../hooks/useNavigateHooks";
 
@@ -58,7 +58,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
                   Текущий набор для {box.child.name}
                 </h2>
                 <span className="text-white text-sm">
-                  {formatFullDeliveryDateTime(
+                  {dateManager.formatFullDeliveryDateTime(
                     box.currentBox.delivery_date ?? "",
                     box.currentBox.delivery_time ?? ""
                   )}
@@ -152,7 +152,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
               <div>
                 <p className="text-gray-600 text-sm mb-1">Доставка</p>
                 <p className="text-gray-800 font-medium">
-                  {formatFullDeliveryDateTime(
+                  {dateManager.formatFullDeliveryDateTime(
                     box.nextBox.delivery_date ?? "",
                     box.nextBox.delivery_time ?? ""
                   )}

@@ -1,6 +1,6 @@
 import { InterestResponse, SkillResponse } from "../../../../api-client/model";
 import { UserChildData } from "../../../../types";
-import { calculateAge } from "../../../../utils/age/calculateAge";
+import { dateManager } from "../../../../utils/date/DateManager";
 import { Tag } from "../../../Tag";
 import { ChildActionButtons } from "../../../../features/ChildActionButtons";
 
@@ -40,7 +40,8 @@ export const ChildOverviewCard: React.FC<{
             className="font-semibold text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            {child.name}, {calculateAge(child.date_of_birth)} лет
+            {child.name},{" "}
+            {dateManager.getAgeWithDeclension(child.date_of_birth)}
           </h1>
         </div>
       </div>

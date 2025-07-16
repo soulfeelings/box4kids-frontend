@@ -17,7 +17,7 @@ import {
   getUserDeliveryAddressesDeliveryAddressesGet,
 } from "../api-client";
 import { retryAsync } from "../utils/retry";
-import { convertDateFromISO } from "../utils/date/convert";
+import { dateManager } from "../utils/date/DateManager";
 
 // Основное состояние store (без мутаций)
 export interface BaseState {
@@ -114,7 +114,7 @@ export const useStore = create<State>()(
           children: userChildren.map((child) => ({
             id: child.id,
             name: child.name,
-            date_of_birth: convertDateFromISO(child.date_of_birth),
+            date_of_birth: dateManager.toDisplay(child.date_of_birth),
             gender: child.gender,
             limitations: child.has_limitations,
             comment: child.comment || "",

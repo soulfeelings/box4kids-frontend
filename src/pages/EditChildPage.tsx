@@ -14,8 +14,7 @@ import {
   useUpdateChildChildrenChildIdPut,
 } from "../api-client/";
 import { Gender } from "../api-client/model/gender";
-import { convertDateFromISO, convertDateToISO } from "../utils/date/convert";
-import { validateBirthDate } from "../utils/date/validate";
+import { dateManager } from "../utils/date/DateManager";
 import { notifications } from "../utils/notifications";
 
 interface ChildData {
@@ -103,7 +102,9 @@ export const EditChildPage: React.FC = () => {
   }, [selectedInterestsIds, selectedSkillsIds, currentChild]);
 
   // Валидация формы
-  const birthDateValidation = validateBirthDate(childData.date_of_birth);
+  const birthDateValidation = dateManager.validateBirthDate(
+    childData.date_of_birth
+  );
   const isChildFormValid =
     childData.name.trim() &&
     birthDateValidation.isValid &&
@@ -126,7 +127,7 @@ export const EditChildPage: React.FC = () => {
       // Добавляем данные ребенка если они изменились
       if (isChildDataChanged) {
         updateData.name = childData.name;
-        updateData.date_of_birth = convertDateToISO(childData.date_of_birth);
+        updateData.date_of_birth = dateManager.toISO(childData.date_of_birth);
         updateData.gender = childData.gender as Gender;
         updateData.has_limitations = childData.limitations;
         updateData.comment = childData.comment;
@@ -146,7 +147,7 @@ export const EditChildPage: React.FC = () => {
       // Обновляем в store
       updateChild(currentChild.id, {
         name: updatedChild.name,
-        date_of_birth: convertDateFromISO(updatedChild.date_of_birth),
+        date_of_birth: dateManager.toDisplay(updatedChild.date_of_birth),
         gender: updatedChild.gender,
         limitations: updatedChild.has_limitations,
         comment: updatedChild.comment,

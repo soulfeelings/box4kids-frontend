@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Gender } from "../api-client/model/gender";
-import { formatDateInput } from "../utils/date/format";
-import { validateBirthDate } from "../utils/date/validate";
+import { dateManager } from "../utils/date/DateManager";
 import { UserChildData } from "../types";
 
 interface ChildData {
@@ -49,7 +48,9 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
     onDataChange(childData);
   }, [childData, onDataChange]);
 
-  const birthDateValidation = validateBirthDate(childData.date_of_birth);
+  const birthDateValidation = dateManager.validateBirthDate(
+    childData.date_of_birth
+  );
 
   return (
     <div className="space-y-6">
@@ -103,7 +104,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             placeholder=""
             value={childData.date_of_birth}
             onChange={(e) => {
-              const formatted = formatDateInput(e.target.value);
+              const formatted = dateManager.formatDateInput(e.target.value);
               setChildData({ ...childData, date_of_birth: formatted });
             }}
             maxLength={10}

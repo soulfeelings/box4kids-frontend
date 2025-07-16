@@ -6,7 +6,7 @@ import { DeliveryEditForm } from "../features/DeliveryEditForm";
 import { ActionButton } from "../features/ActionButton";
 import { useStore } from "../store/store";
 import { useUpdateDeliveryAddressDeliveryAddressesAddressIdPut } from "../api-client/";
-import { convertDeliveryDateToISO } from "../utils/date/convert";
+import { dateManager } from "../utils/date/DateManager";
 import { notifications } from "../utils/notifications";
 
 interface DeliveryData {
@@ -82,7 +82,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
       if (isDeliveryDataChanged) {
         updateData.name = deliveryData.name;
         updateData.address = deliveryData.address;
-        updateData.date = convertDeliveryDateToISO(deliveryData.date);
+        updateData.date = dateManager.toISO(deliveryData.date);
         updateData.time = deliveryData.time;
         updateData.courier_comment = deliveryData.comment;
       }

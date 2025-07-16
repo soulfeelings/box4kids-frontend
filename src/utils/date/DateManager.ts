@@ -250,6 +250,53 @@ export class DateManager {
     return Math.max(0, age);
   }
 
+  /**
+   * Возвращает возраст с правильным склонением (год/года/лет)
+   */
+  getAgeWithDeclension(dateOfBirth: string): string {
+    const age = this.calculateAge(dateOfBirth);
+
+    if (age === 1) {
+      return `${age} год`;
+    } else if (age >= 2 && age <= 4) {
+      return `${age} года`;
+    } else {
+      return `${age} лет`;
+    }
+  }
+
+  /**
+   * Форматирует дату доставки (например: "21 июля, Пн")
+   */
+  formatDeliveryDate(dateString: string | null | undefined): string {
+    if (!dateString) return "Не указано";
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = this.monthNamesFull[date.getMonth()];
+    const weekday = this.dayNames[date.getDay()];
+    return `${day} ${month}, ${weekday}`;
+  }
+
+  /**
+   * Форматирует время доставки (например: "14:00 – 18:00")
+   */
+  formatDeliveryTime(time?: string): string {
+    return time || "14:00 – 18:00";
+  }
+
+  /**
+   * Форматирует дату и время доставки в одну строку
+   */
+  formatFullDeliveryDateTime(
+    dateString: string | null | undefined,
+    time?: string
+  ): string {
+    const formattedDate = this.formatDeliveryDate(dateString);
+    const formattedTime = this.formatDeliveryTime(time);
+    if (formattedDate === "Не указано") return formattedDate;
+    return `${formattedDate} • ${formattedTime}`;
+  }
+
   // Приватные методы для определения форматов
   private isISOFormat(dateString: string): boolean {
     return /^\d{4}-\d{2}-\d{2}$/.test(dateString);

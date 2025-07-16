@@ -1,6 +1,6 @@
 import React from "react";
 import { Tag } from "../../components/Tag";
-import { calculateAge } from "../../utils/age/calculateAge";
+import { dateManager } from "../../utils/date/DateManager";
 import { UserChildData } from "../../types";
 import { InterestResponse, SkillResponse } from "../../api-client/model";
 
@@ -27,7 +27,7 @@ export const ChildInfoWidget: React.FC<ChildInfoWidgetProps> = ({
         <div>
           <h3 className="text-lg font-semibold text-gray-800">
             {child.gender === "male" ? "👦🏻" : "👩🏻"} {child.name},{" "}
-            {calculateAge(child?.date_of_birth)} лет
+            {dateManager.getAgeWithDeclension(child?.date_of_birth)}
           </h3>
         </div>
       </div>

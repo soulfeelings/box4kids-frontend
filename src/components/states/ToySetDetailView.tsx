@@ -3,8 +3,8 @@ import { ArrowLeft } from "lucide-react";
 import { BottomNavigation } from "../../features/BottomNavigation";
 import { ToyBoxResponse } from "../../api-client/model/toyBoxResponse";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
-import { formatFullDeliveryDateTime } from "../../utils/date/dateFormatter";
 import { useChildById } from "../../store/hooks";
+import { dateManager } from "../../utils/date/DateManager";
 
 interface ToySetDetailViewProps {
   currentBox: ToyBoxResponse;
@@ -58,7 +58,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
           <div className="mb-2">
             <p className="text-gray-600 text-sm">{deliveryLabel}</p>
             <p className="text-gray-800 font-medium">
-              {formatFullDeliveryDateTime(
+              {dateManager.formatFullDeliveryDateTime(
                 currentBox.delivery_date,
                 currentBox.delivery_time ?? undefined
               )}
@@ -67,7 +67,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
           <div>
             <p className="text-gray-600 text-sm">Возврат</p>
             <p className="text-gray-800 font-medium">
-              {formatFullDeliveryDateTime(
+              {dateManager.formatFullDeliveryDateTime(
                 currentBox.return_date,
                 currentBox.return_time ?? undefined
               )}

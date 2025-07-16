@@ -4,12 +4,7 @@ import {
   useUpdateChildChildrenChildIdPut,
 } from "../../../api-client/";
 import { Gender } from "../../../api-client/model/gender";
-import {
-  convertDateFromISO,
-  convertDateToISO,
-} from "../../../utils/date/convert";
-import { formatDateInput } from "../../../utils/date/format";
-import { validateBirthDate } from "../../../utils/date/validate";
+import { dateManager } from "../../../utils/date/DateManager";
 import { useStore } from "../../../store";
 import {
   useChildrenWithoutSubscriptionByStatus,
@@ -91,7 +86,9 @@ export const ChildStep: React.FC<{
     setCurrentChildIdToUpdate(null);
   }, [setCurrentChildIdToUpdate]);
 
-  const birthDateValidation = validateBirthDate(childData.date_of_birth);
+  const birthDateValidation = dateManager.validateBirthDate(
+    childData.date_of_birth
+  );
   const isFormValid =
     childData.name.trim() &&
     birthDateValidation.isValid &&
@@ -142,7 +139,7 @@ export const ChildStep: React.FC<{
           childId: currentChildToUpdate.id,
           data: {
             name: childData.name,
-            date_of_birth: convertDateToISO(childData.date_of_birth),
+            date_of_birth: dateManager.toISO(childData.date_of_birth),
             gender: childData.gender as Gender,
             has_limitations: childData.limitations,
             comment: childData.comment,
@@ -151,7 +148,7 @@ export const ChildStep: React.FC<{
 
         updateChild(updatedChild.id, {
           name: updatedChild.name,
-          date_of_birth: convertDateFromISO(updatedChild.date_of_birth),
+          date_of_birth: dateManager.toDisplay(updatedChild.date_of_birth),
           gender: updatedChild.gender,
           limitations: updatedChild.has_limitations,
           comment: updatedChild.comment,
@@ -162,7 +159,7 @@ export const ChildStep: React.FC<{
         const newChild = await createChildMutation.mutateAsync({
           data: {
             name: childData.name,
-            date_of_birth: convertDateToISO(childData.date_of_birth),
+            date_of_birth: dateManager.toISO(childData.date_of_birth),
             gender: childData.gender as Gender,
             has_limitations: childData.limitations,
             comment: childData.comment,
@@ -173,7 +170,7 @@ export const ChildStep: React.FC<{
         addChild({
           id: newChild.id,
           name: newChild.name,
-          date_of_birth: convertDateFromISO(newChild.date_of_birth),
+          date_of_birth: dateManager.toDisplay(newChild.date_of_birth),
           gender: newChild.gender,
           limitations: newChild.has_limitations,
           comment: newChild.comment || "",
@@ -333,7 +330,9 @@ export const ChildStep: React.FC<{
                 value={childData.date_of_birth}
                 onChange={useCallback(
                   (e: React.ChangeEvent<HTMLInputElement>) => {
-                    const formatted = formatDateInput(e.target.value);
+                    const formatted = dateManager.formatDateInput(
+                      e.target.value
+                    );
                     setChildData((prev) => ({
                       ...prev,
                       date_of_birth: formatted,

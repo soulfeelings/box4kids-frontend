@@ -7,7 +7,7 @@ import {
 } from "../../../api-client/";
 import { DeliveryAddressCards } from "../../../features/DeliveryAddressCards";
 import { DeliveryEditForm } from "../../../features/DeliveryEditForm";
-import { convertDeliveryDateToISO } from "../../../utils/date/convert";
+import { dateManager } from "../../../utils/date/DateManager";
 import { useChildrenSubscriptionsIds } from "../../../store/hooks";
 import { useNavigateToEditDelivery } from "../../../hooks/useNavigateHooks";
 
@@ -108,7 +108,7 @@ export const DeliveryStep: React.FC<{
         data: {
           name: deliveryData.name,
           address: deliveryData.address,
-          date: convertDeliveryDateToISO(deliveryData.date),
+          date: dateManager.toISO(deliveryData.date),
           time: deliveryData.time,
           courier_comment: deliveryData.comment,
         },

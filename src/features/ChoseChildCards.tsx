@@ -1,5 +1,5 @@
 import { UserData } from "../types";
-import { calculateAge } from "../utils/age/calculateAge";
+import { dateManager } from "../utils/date/DateManager";
 
 export const ChoseChildCards = ({
   user,
@@ -49,13 +49,8 @@ export const ChoseChildCards = ({
                       className="text-sm text-gray-500"
                       style={{ fontFamily: "Nunito, sans-serif" }}
                     >
-                      {calculateAge(child.date_of_birth)}{" "}
-                      {calculateAge(child.date_of_birth) === 1
-                        ? "год"
-                        : calculateAge(child.date_of_birth) < 5
-                        ? "года"
-                        : "лет"}{" "}
-                      • {child.gender === "male" ? "Мальчик" : "Девочка"}
+                      {dateManager.getAgeWithDeclension(child.date_of_birth)} •{" "}
+                      {child.gender === "male" ? "Мальчик" : "Девочка"}
                     </p>
                   </div>
                 </div>
