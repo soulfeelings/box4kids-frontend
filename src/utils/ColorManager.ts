@@ -1,5 +1,5 @@
 class ColorManager {
-  private static readonly colors = [
+  private readonly colors = [
     "bg-blue-100",
     "bg-green-100",
     "bg-yellow-100",
@@ -12,7 +12,7 @@ class ColorManager {
     "bg-cyan-100",
   ];
 
-  private static readonly hexColors = [
+  private readonly hexColors = [
     "#DBEAFE", // blue-100
     "#D1FAE5", // green-100
     "#FEF3C7", // yellow-100
@@ -28,7 +28,7 @@ class ColorManager {
   /**
    * Получить Tailwind класс цвета по ID
    */
-  static getTailwindColor(id: number): string {
+  getTailwindColor(id: number): string {
     const colorIndex = id % this.colors.length;
     return this.colors[colorIndex];
   }
@@ -36,7 +36,7 @@ class ColorManager {
   /**
    * Получить HEX цвет по ID
    */
-  static getHexColor(id: number): string {
+  getHexColor(id: number): string {
     const colorIndex = id % this.hexColors.length;
     return this.hexColors[colorIndex];
   }
@@ -44,10 +44,7 @@ class ColorManager {
   /**
    * Получить цвет по ID с fallback на индекс
    */
-  static getColorById(
-    id: number | undefined,
-    fallbackIndex: number = 0
-  ): string {
+  getColorById(id: number | undefined, fallbackIndex: number = 0): string {
     if (id !== undefined) {
       return this.getTailwindColor(id);
     }
@@ -57,10 +54,7 @@ class ColorManager {
   /**
    * Получить HEX цвет по ID с fallback на индекс
    */
-  static getHexColorById(
-    id: number | undefined,
-    fallbackIndex: number = 0
-  ): string {
+  getHexColorById(id: number | undefined, fallbackIndex: number = 0): string {
     if (id !== undefined) {
       return this.getHexColor(id);
     }

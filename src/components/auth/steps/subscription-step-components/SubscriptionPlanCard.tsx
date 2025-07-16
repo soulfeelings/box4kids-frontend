@@ -1,3 +1,5 @@
+import { colorManager } from "../../../../utils/ColorManager";
+
 // Subscription plan card component
 export const SubscriptionPlanCard: React.FC<{
   plan: any;
@@ -54,7 +56,9 @@ export const SubscriptionPlanCard: React.FC<{
             <div key={config.id} className="flex items-center gap-3">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                style={{ backgroundColor: "#A4B9ED" }}
+                style={{
+                  backgroundColor: colorManager.getHexColor(config.id),
+                }}
               >
                 {config.icon || "🎯"}
               </div>

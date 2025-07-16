@@ -5,6 +5,7 @@ import { ToyBoxResponse } from "../../api-client/model/toyBoxResponse";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { useChildById } from "../../store/hooks";
 import { dateManager } from "../../utils/date/DateManager";
+import { colorManager } from "../../utils/ColorManager";
 
 interface ToySetDetailViewProps {
   currentBox: ToyBoxResponse;
@@ -87,6 +88,11 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
                 <div key={index} className="flex items-center">
                   <div
                     className={`w-10 h-10 rounded-full mr-3 flex items-center justify-center text-lg`}
+                    style={{
+                      backgroundColor: colorManager.getHexColor(
+                        category?.id ?? 0
+                      ),
+                    }}
                   >
                     {category?.icon}
                   </div>
