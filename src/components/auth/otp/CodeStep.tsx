@@ -36,7 +36,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         return null;
       }
     },
-    [devGetCodeMutation]
+    []
   );
 
   // Таймер для повторной отправки
@@ -73,7 +73,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         clearTimeout(id);
       }
     };
-  }, [phoneData.phone, phoneData.code, setPhoneData, getDevCode]);
+  }, [phoneData.phone, phoneData.code]);
 
   const handleCheckCode = async () => {
     if (!phoneData.code || phoneData.code.length !== 4) {

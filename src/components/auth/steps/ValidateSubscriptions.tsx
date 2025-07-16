@@ -9,10 +9,6 @@ import { useHandleDeleteChilld } from "../../../features/useHandleDeleteChilld";
 import { useStore } from "../../../store";
 import { useChildrenWithoutSubscriptionByStatus } from "../../../store/hooks";
 import { ChildrenOverviewView } from "./subscription-step-components/ChildrenOverviewView";
-import {
-  useNavigateToEditChild,
-  useNavigateToOnboarding,
-} from "../../../hooks/useNavigateHooks";
 
 export const ValidateSubscriptionsStep: React.FC<{
   onBack: () => void;
@@ -25,29 +21,25 @@ export const ValidateSubscriptionsStep: React.FC<{
   onBack,
   onNext,
   onClose,
-  // onAddNewChild,
-  // onEditChildSubscription,
-  // onEditChildData,
-  ...props
+  onAddNewChild,
+  onEditChildSubscription,
+  onEditChildData,
 }) => {
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
   const { handleDeleteChild } = useHandleDeleteChilld();
 
-  const navigateToEditChild = useNavigateToEditChild();
-  const navigateToOnboarding = useNavigateToOnboarding();
-
   const handleEditChildSubscription = (childId: number) => {
-    navigateToOnboarding({ step: "subscription" });
+    onEditChildSubscription(childId);
   };
 
   const handleAddNewChild = () => {
-    navigateToOnboarding({ step: "child" });
+    onAddNewChild();
   };
 
   const handleEditChildData = (childId: number) => {
-    navigateToEditChild({ childId });
+    onEditChildData(childId);
   };
 
   // Получаем детей без активной подписки из store

@@ -53,7 +53,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
   // Уведомляем родительский компонент об изменениях
   useEffect(() => {
     onDataChange(deliveryData);
-  }, [deliveryData, onDataChange]);
+  }, [deliveryData]);
 
   const dateOptions = dateManager.generateDateOptions();
 
