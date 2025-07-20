@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
+import { LandingPage } from "./pages/LandingPage";
 import { KidsAppInterface } from "./pages/KidsAppInterface";
 import { UserData } from "./types";
 import { useScenarioNavigation, scenarioConfigs } from "./hooks/useScenarioNavigation";
@@ -277,11 +278,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DemoPage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPageWrapper />} />
         <Route path="/demo/:scenario" element={<DemoState />} />
+        <Route path="/demo" element={<DemoPage />} />
         {/* Fallback для неизвестных маршрутов */}
-        <Route path="*" element={<DemoPage />} />
+        <Route path="*" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>
   );
