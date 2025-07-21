@@ -8,6 +8,7 @@ export const LandingPage: React.FC = () => {
   const [isAgeMenuOpen, setIsAgeMenuOpen] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
+  const [showAllToys, setShowAllToys] = useState<boolean>(false);
 
   const handleLoginClick = () => {
     navigate('/login');
@@ -38,6 +39,10 @@ export const LandingPage: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedBox(null);
+  };
+
+  const handleShowMoreToys = () => {
+    setShowAllToys(true);
   };
 
   return (
@@ -85,22 +90,22 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* Benefits Section */}
-      <div className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-bold leading-tight text-[26px] md:text-[32px] lg:text-[36px] text-gray-800 mb-4">
+      <div className="px-4 py-12 ">
+        <div className="max-w-sm mx-auto text-center">
+          <h2 className="font-bold leading-tight text-[26px] text-gray-800 mb-4">
             Освобождайте пространство, развивайте ребёнка и экономьте ресурсы
           </h2>
-          <p className="mb-0 text-[16px] md:text-[18px] text-[#686564]">
+          <p className="mb-0 text-[16px] text-[#686564]">
             90% детей теряют интерес к игрушке меньше чем за 16 дней. Им хочется чего-то нового — и это нормально!
           </p>
         </div>
       </div>
 
       {/* Карусель карточек */}
-      <div className="px-4 md:px-8 lg:px-12 mt-1 max-w-7xl mx-auto">
-        <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible">
+      <div className="px-4 mt-1">
+        <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
           {/* Карточка 1 */}
-          <div className="min-w-[246px] max-w-[246px] md:min-w-full md:max-w-full bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
+          <div className="min-w-[246px] max-w-[246px] bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
             {/* Иллюстрация */}
             <div className="bg-[#E6E6FA] w-full overflow-hidden" style={{ height: 160 }}>
               <img src="/illustrations/bear.png" alt="Меньше хаоса" className="w-full h-full object-contain" />
@@ -116,7 +121,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
           {/* Карточка 2 */}
-          <div className="min-w-[246px] max-w-[246px] md:min-w-full md:max-w-full bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
+          <div className="min-w-[246px] max-w-[246px] bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
             {/* Иллюстрация */}
             <div className="bg-[#E6E6FA] w-full overflow-hidden" style={{ height: 160 }}>
               <img src="/illustrations/toys.png" className="w-full h-full object-contain" />
@@ -131,7 +136,7 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="min-w-[246px] max-w-[246px] md:min-w-full md:max-w-full bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
+          <div className="min-w-[246px] max-w-[246px] bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
             {/* Иллюстрация */}
             <div className="bg-[#E6E6FA] w-full overflow-hidden" style={{ height: 160 }}>
               <img src="/illustrations/toys2.png" className="w-full h-full object-contain" />
@@ -146,7 +151,7 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="min-w-[246px] max-w-[246px] md:min-w-full md:max-w-full bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
+          <div className="min-w-[246px] max-w-[246px] bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
             {/* Иллюстрация */}
             <div className="bg-[#E6E6FA] w-full overflow-hidden" style={{ height: 160 }}>
               <img src="/illustrations/toys3.png" className="w-full h-full object-contain" />
@@ -347,18 +352,18 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* Reviews Section */}
-      <div className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-8 md:mb-12">
-          <h2 className="font-bold leading-tight text-[26px] md:text-[32px] lg:text-[36px] text-gray-800 mb-4">
+      <div className="px-4 py-12">
+        <div className="max-w-sm mx-auto text-center mb-8">
+          <h2 className="font-bold leading-tight text-[26px] text-gray-800 mb-4">
             Что говорят наши клиенты
           </h2>
         </div>
         
         {/* Reviews Table */}
         <div className="w-full">
-          <div className="flex space-x-6 overflow-x-auto pb-4 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible">
+          <div className="flex space-x-6 overflow-x-auto pb-4 scrollbar-hide">
             {/* First Review Column */}
-            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0 md:w-full">
+            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0">
               {/* Video Container */}
               <div 
                 className="relative overflow-hidden cursor-pointer"
@@ -411,7 +416,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Second Review Column - Three Reviews */}
-            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0 md:w-full">
+            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0">
               {/* First Review */}
               <div 
                 className="p-6"
@@ -510,7 +515,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Third Review Column - Review on top, Video on bottom */}
-            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0 md:w-full">
+            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0">
               {/* Review Container */}
               <div 
                 className="p-6"
@@ -563,7 +568,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Fourth Review Column - Three Reviews */}
-            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0 md:w-full">
+            <div className="flex flex-col space-y-4 w-[300px] flex-shrink-0">
               {/* First Review */}
               <div 
                 className="p-6"
@@ -877,8 +882,8 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm text-gray-700 text-center">Городской гараж с машинками</p>
             </div>
             
-            {/* Toy Card 5 */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Toy Card 5 - Hidden on mobile by default */}
+            <div className={`${showAllToys ? 'block' : 'hidden'} md:block bg-white rounded-2xl p-4 shadow-sm`}>
               <div className="mb-3">
                 <img 
                   src="/illustrations/brick.svg" 
@@ -889,8 +894,8 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm text-gray-700 text-center">Мозаика для малышей</p>
             </div>
             
-            {/* Toy Card 6 */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Toy Card 6 - Hidden on mobile by default */}
+            <div className={`${showAllToys ? 'block' : 'hidden'} md:block bg-white rounded-2xl p-4 shadow-sm`}>
               <div className="mb-3">
                 <img 
                   src="/illustrations/dino.svg" 
@@ -901,8 +906,8 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm text-gray-700 text-center">Деревянные кубики</p>
             </div>
             
-            {/* Toy Card 7 */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Toy Card 7 - Hidden on mobile by default */}
+            <div className={`${showAllToys ? 'block' : 'hidden'} md:block bg-white rounded-2xl p-4 shadow-sm`}>
               <div className="mb-3">
                 <img 
                   src="/illustrations/sorter.svg" 
@@ -913,8 +918,8 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm text-gray-700 text-center">Музыкальный ксилофон</p>
             </div>
             
-            {/* Toy Card 8 */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Toy Card 8 - Hidden on mobile by default */}
+            <div className={`${showAllToys ? 'block' : 'hidden'} md:block bg-white rounded-2xl p-4 shadow-sm`}>
               <div className="mb-3">
                 <img 
                   src="/illustrations/synt.svg" 
@@ -925,8 +930,8 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm text-gray-700 text-center">Пазл-головоломка</p>
             </div>
             
-            {/* Toy Card 9 */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Toy Card 9 - Hidden on mobile by default */}
+            <div className={`${showAllToys ? 'block' : 'hidden'} md:block bg-white rounded-2xl p-4 shadow-sm`}>
               <div className="mb-3">
                 <img 
                   src="/illustrations/hero.svg" 
@@ -937,8 +942,8 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm text-gray-700 text-center">Конструктор-трансформер</p>
             </div>
             
-            {/* Toy Card 10 */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {/* Toy Card 10 - Hidden on mobile by default */}
+            <div className={`${showAllToys ? 'block' : 'hidden'} md:block bg-white rounded-2xl p-4 shadow-sm`}>
               <div className="mb-3">
                 <img 
                   src="/illustrations/cosmo.svg" 
@@ -952,9 +957,15 @@ export const LandingPage: React.FC = () => {
           
           {/* Show More Button - Mobile Only */}
           <div className="text-center md:hidden">
-            <button className="text-gray-700 px-6 py-3 rounded-2xl font-medium hover:bg-gray-200 transition-colors" style={{ backgroundColor: '#E3E3E3' }}>
-              Показать еще
-            </button>
+            {!showAllToys && (
+              <button 
+                onClick={handleShowMoreToys}
+                className="text-gray-700 px-6 py-3 rounded-2xl font-medium hover:bg-gray-200 transition-colors" 
+                style={{ backgroundColor: '#E3E3E3' }}
+              >
+                Показать еще
+              </button>
+            )}
           </div>
           
 
