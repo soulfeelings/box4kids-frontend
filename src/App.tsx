@@ -3,8 +3,12 @@ import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
 import { LandingPage } from "./pages/LandingPage";
 import { KidsAppInterface } from "./pages/KidsAppInterface";
+import { AdminPage } from "./pages/AdminPage";
 import { UserData } from "./types";
-import { useScenarioNavigation, scenarioConfigs } from "./hooks/useScenarioNavigation";
+import {
+  useScenarioNavigation,
+  scenarioConfigs,
+} from "./hooks/useScenarioNavigation";
 
 // Test data scenarios for different states
 const testUserDataScenarios: Record<string, UserData> = {
@@ -22,16 +26,16 @@ const testUserDataScenarios: Record<string, UserData> = {
         comment: "",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
-        subscription: ""
-      }
+        subscription: "",
+      },
     ],
     deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
     deliveryDate: "24.04",
     deliveryTime: "14-18",
     subscriptionStatus: "not_subscribed",
-    nextSetStatus: "not_determined"
+    nextSetStatus: "not_determined",
   },
-  
+
   // 2. User just subscribed (first 2 hours)
   justSubscribed: {
     name: "Елена",
@@ -46,17 +50,17 @@ const testUserDataScenarios: Record<string, UserData> = {
         comment: "",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base"
-      }
+        subscription: "base",
+      },
     ],
     deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
     deliveryDate: "24.04",
     deliveryTime: "14-18",
     subscriptionStatus: "just_subscribed",
     nextSetStatus: "not_determined",
-    subscriptionDate: new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 minutes ago
+    subscriptionDate: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
   },
-  
+
   // 3. Next set not determined
   nextSetNotDetermined: {
     name: "Елена",
@@ -68,19 +72,20 @@ const testUserDataScenarios: Record<string, UserData> = {
         birthDate: "2016-03-15",
         gender: "female",
         limitations: "has_limitations",
-        comment: "Не любит слишком громкие игрушки, предпочитает спокойные занятия",
+        comment:
+          "Не любит слишком громкие игрушки, предпочитает спокойные занятия",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base"
-      }
+        subscription: "base",
+      },
     ],
     deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
     deliveryDate: "24.04",
     deliveryTime: "14-18",
     subscriptionStatus: "active",
-    nextSetStatus: "not_determined"
+    nextSetStatus: "not_determined",
   },
-  
+
   // 4. Next set determined (original state)
   nextSetDetermined: {
     name: "Елена",
@@ -95,16 +100,16 @@ const testUserDataScenarios: Record<string, UserData> = {
         comment: "Очень активная, любит подвижные игры и творчество",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base"
-      }
+        subscription: "base",
+      },
     ],
     deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
     deliveryDate: "24.04",
     deliveryTime: "14-18",
     subscriptionStatus: "active",
-    nextSetStatus: "determined"
+    nextSetStatus: "determined",
   },
-  
+
   // 5. Multiple children scenario
   multipleChildren: {
     name: "Елена",
@@ -119,7 +124,7 @@ const testUserDataScenarios: Record<string, UserData> = {
         comment: "Очень активная, любит подвижные игры и творчество",
         interests: ["Конструкторы", "Творчество"],
         skills: ["Логика", "Воображение", "Творчество"],
-        subscription: "base"
+        subscription: "base",
       },
       {
         id: "2",
@@ -127,10 +132,11 @@ const testUserDataScenarios: Record<string, UserData> = {
         birthDate: "2018-07-22",
         gender: "male",
         limitations: "has_limitations",
-        comment: "Спокойный ребенок, любит книги и пазлы. Не переносит слишком яркий свет",
+        comment:
+          "Спокойный ребенок, любит книги и пазлы. Не переносит слишком яркий свет",
         interests: ["Чтение", "Пазлы"],
         skills: ["Внимание", "Память"],
-        subscription: "premium"
+        subscription: "premium",
       },
       {
         id: "3",
@@ -141,15 +147,15 @@ const testUserDataScenarios: Record<string, UserData> = {
         comment: "",
         interests: ["Музыка", "Танцы"],
         skills: ["Координация", "Ритм"],
-        subscription: "base"
-      }
+        subscription: "base",
+      },
     ],
     deliveryAddress: "г. Москва, ул. Тверская, д. 1, кв. 10",
     deliveryDate: "24.04",
     deliveryTime: "14-18",
     subscriptionStatus: "active",
-    nextSetStatus: "determined"
-  }
+    nextSetStatus: "determined",
+  },
 };
 
 // Demo page component
@@ -161,16 +167,21 @@ function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
+    <div
+      className="min-h-screen bg-gray-100 p-4"
+      style={{ fontFamily: "Nunito, sans-serif" }}
+    >
       <div className="max-w-md mx-auto bg-white rounded-2xl p-6 shadow-lg">
         <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
           Демонстрация состояний приложения
         </h1>
-        
+
         <div className="space-y-4">
           <div>
-            <h2 className="text-lg font-medium text-gray-800 mb-3">Выберите состояние:</h2>
-            
+            <h2 className="text-lg font-medium text-gray-800 mb-3">
+              Выберите состояние:
+            </h2>
+
             <div className="space-y-3">
               {Object.entries(scenarioConfigs).map(([key, config]) => (
                 <button
@@ -180,35 +191,31 @@ function DemoPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">
-                        {config.title}
+                      <div className="font-medium">{config.title}</div>
+                      <div className="text-sm opacity-75">
+                        {config.description}
                       </div>
-                      <div className="text-sm opacity-75">{config.description}</div>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      → /demo/{key}
-                    </div>
+                    <div className="text-sm text-gray-500">→ /demo/{key}</div>
                   </div>
                 </button>
               ))}
             </div>
           </div>
-          
+
           <div className="border-t pt-4">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
               className="w-full bg-gray-100 text-gray-800 py-3 px-4 rounded-lg text-left font-medium hover:bg-gray-200 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">
-                    Перейти к логину
+                  <div className="font-medium">Перейти к логину</div>
+                  <div className="text-sm opacity-75">
+                    Обычный вход в приложение
                   </div>
-                  <div className="text-sm opacity-75">Обычный вход в приложение</div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  → /login
-                </div>
+                <div className="text-sm text-gray-500">→ /login</div>
               </div>
             </button>
           </div>
@@ -220,27 +227,26 @@ function DemoPage() {
 
 // Demo state component
 function DemoState() {
-  const { 
-    currentScenario, 
-    navigateToDemo
-  } = useScenarioNavigation();
+  const { currentScenario, navigateToDemo } = useScenarioNavigation();
 
-  const initialUserData = currentScenario && testUserDataScenarios[currentScenario] 
-    ? testUserDataScenarios[currentScenario] 
-    : testUserDataScenarios.nextSetDetermined;
+  const initialUserData =
+    currentScenario && testUserDataScenarios[currentScenario]
+      ? testUserDataScenarios[currentScenario]
+      : testUserDataScenarios.nextSetDetermined;
 
   const [userData, setUserData] = React.useState(initialUserData);
 
   // Обновляем данные при смене сценария
   React.useEffect(() => {
-    const newUserData = currentScenario && testUserDataScenarios[currentScenario] 
-      ? testUserDataScenarios[currentScenario] 
-      : testUserDataScenarios.nextSetDetermined;
+    const newUserData =
+      currentScenario && testUserDataScenarios[currentScenario]
+        ? testUserDataScenarios[currentScenario]
+        : testUserDataScenarios.nextSetDetermined;
     setUserData(newUserData);
   }, [currentScenario]);
 
   const handleUpdateUserData = (updatedData: UserData) => {
-    console.log('Updated user data:', updatedData);
+    console.log("Updated user data:", updatedData);
     setUserData(updatedData);
   };
 
@@ -255,9 +261,12 @@ function DemoState() {
           ← Назад к демо
         </button>
       </div>
-      
+
       <div className="pt-16">
-        <KidsAppInterface userData={userData} onUpdateUserData={handleUpdateUserData} />
+        <KidsAppInterface
+          userData={userData}
+          onUpdateUserData={handleUpdateUserData}
+        />
       </div>
     </div>
   );
@@ -268,7 +277,7 @@ function LoginPageWrapper() {
   const handleNavigateToKidsPage = (data: UserData) => {
     // В реальном приложении здесь была бы логика аутентификации
     // Для демо просто переходим к состоянию по умолчанию
-    window.location.href = '/demo/nextSetDetermined';
+    window.location.href = "/demo/nextSetDetermined";
   };
 
   return <LoginPage onNavigateToKidsPage={handleNavigateToKidsPage} />;
@@ -280,6 +289,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPageWrapper />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="/demo/:scenario" element={<DemoState />} />
         <Route path="/demo" element={<DemoPage />} />
         {/* Fallback для неизвестных маршрутов */}
