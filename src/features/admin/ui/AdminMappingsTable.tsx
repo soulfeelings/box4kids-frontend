@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useAdminMappings } from "../hooks/useAdminMappings";
+import { useAdminInterests } from "../hooks/useAdminInterests";
+import { useAdminSkills } from "../hooks/useAdminSkills";
 import { AdminMapping } from "../types";
 
 export const AdminMappingsTable: React.FC = () => {
@@ -12,6 +14,8 @@ export const AdminMappingsTable: React.FC = () => {
     removeInterest,
     removeSkill,
   } = useAdminMappings();
+  const { interests } = useAdminInterests();
+  const { skills } = useAdminSkills();
   const [expandedMapping, setExpandedMapping] = useState<number | null>(null);
   const [newInterestId, setNewInterestId] = useState<string>("");
   const [newSkillId, setNewSkillId] = useState<string>("");
@@ -46,23 +50,51 @@ export const AdminMappingsTable: React.FC = () => {
     categoryId: number,
     interestName: string
   ) => {
-    // Здесь нужно получить ID интереса по имени, но пока используем заглушку
-    const interestId = 1; // TODO: Получать реальный ID
+    // Находим ID интереса по имени
+    const interest = interests.find((i) => i.name === interestName);
+    if (!interest) {
+      console.error("Интерес не найден:", interestName);
+      return;
+    }
+
     try {
-      await removeInterest(categoryId, interestId);
+      await removeInterest(categoryId, interest.id);
     } catch (err) {
       console.error("Ошибка удаления интереса:", err);
     }
   };
 
   const handleRemoveSkill = async (categoryId: number, skillName: string) => {
-    // Здесь нужно получить ID навыка по имени, но пока используем заглушку
-    const skillId = 1; // TODO: Получать реальный ID
+    // Находим ID навыка по имени
+    const skill = skills.find((s) => s.name === skillName);
+    if (!skill) {
+      console.error("Навык не найден:", skillName);
+      return;
+    }
+
     try {
-      await removeSkill(categoryId, skillId);
+      await removeSkill(categoryId, skill.id);
     } catch (err) {
       console.error("Ошибка удаления навыка:", err);
     }
+  };
+
+  // Получаем доступные интересы (те, которые еще не добавлены к категории)
+  const getAvailableInterests = (categoryId: number) => {
+    const mapping = mappings.find((m) => m.category_id === categoryId);
+    if (!mapping) return interests;
+
+    return interests.filter(
+      (interest) => !mapping.interests.includes(interest.name)
+    );
+  };
+
+  // Получаем доступные навыки (те, которые еще не добавлены к категории)
+  const getAvailableSkills = (categoryId: number) => {
+    const mapping = mappings.find((m) => m.category_id === categoryId);
+    if (!mapping) return skills;
+
+    return skills.filter((skill) => !mapping.skills.includes(skill.name));
   };
 
   if (isLoading) {
@@ -177,20 +209,31 @@ export const AdminMappingsTable: React.FC = () => {
                               </div>
                             ))}
                             <div className="flex space-x-2">
-                              <input
-                                type="number"
-                                placeholder="ID интереса"
+                              <select
                                 value={newInterestId}
                                 onChange={(e) =>
                                   setNewInterestId(e.target.value)
                                 }
                                 className="flex-1 text-sm border-gray-300 rounded-md px-2 py-1"
-                              />
+                              >
+                                <option value="">Выберите интерес</option>
+                                {getAvailableInterests(mapping.category_id).map(
+                                  (interest) => (
+                                    <option
+                                      key={interest.id}
+                                      value={interest.id}
+                                    >
+                                      {interest.name}
+                                    </option>
+                                  )
+                                )}
+                              </select>
                               <button
                                 onClick={() =>
                                   handleAddInterest(mapping.category_id)
                                 }
-                                className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
+                                disabled={!newInterestId}
+                                className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 Добавить
                               </button>
@@ -224,18 +267,26 @@ export const AdminMappingsTable: React.FC = () => {
                               </div>
                             ))}
                             <div className="flex space-x-2">
-                              <input
-                                type="number"
-                                placeholder="ID навыка"
+                              <select
                                 value={newSkillId}
                                 onChange={(e) => setNewSkillId(e.target.value)}
                                 className="flex-1 text-sm border-gray-300 rounded-md px-2 py-1"
-                              />
+                              >
+                                <option value="">Выберите навык</option>
+                                {getAvailableSkills(mapping.category_id).map(
+                                  (skill) => (
+                                    <option key={skill.id} value={skill.id}>
+                                      {skill.name}
+                                    </option>
+                                  )
+                                )}
+                              </select>
                               <button
                                 onClick={() =>
                                   handleAddSkill(mapping.category_id)
                                 }
-                                className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
+                                disabled={!newSkillId}
+                                className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 Добавить
                               </button>

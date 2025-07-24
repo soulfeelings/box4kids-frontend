@@ -10,6 +10,8 @@ export { useAdminAuth } from "./hooks/useAdminAuth";
 export { useAdminUsers } from "./hooks/useAdminUsers";
 export { useAdminInventory } from "./hooks/useAdminInventory";
 export { useAdminMappings } from "./hooks/useAdminMappings";
+export { useAdminInterests } from "./hooks/useAdminInterests";
+export { useAdminSkills } from "./hooks/useAdminSkills";
 
 // Types
 export type {
@@ -26,3 +28,7 @@ export type {
   NextBoxResponse,
   NextBoxItemResponse,
 } from "./types";
+
+// Hook types
+export type { Interest } from "./hooks/useAdminInterests";
+export type { Skill } from "./hooks/useAdminSkills";

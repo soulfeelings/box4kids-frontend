@@ -29,6 +29,42 @@ export const adminLogin = async (
   return response.json();
 };
 
+// Admin Interests API
+export const getAllInterests = async (): Promise<
+  Array<{ id: number; name: string }>
+> => {
+  const token = localStorage.getItem("adminToken");
+  const response = await fetch(`${API_BASE}/admin/interests`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Ошибка получения интересов");
+  }
+
+  return response.json();
+};
+
+// Admin Skills API
+export const getAllSkills = async (): Promise<
+  Array<{ id: number; name: string }>
+> => {
+  const token = localStorage.getItem("adminToken");
+  const response = await fetch(`${API_BASE}/admin/skills`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Ошибка получения навыков");
+  }
+
+  return response.json();
+};
+
 // Users API
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
   const token = localStorage.getItem("adminToken");
