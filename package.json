@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@tanstack/react-query": "^5.83.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -14,16 +15,22 @@
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hot-toast": "^2.5.2",
     "react-router-dom": "^7.6.3",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zustand": "^5.0.6"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "ts-check": "npx tsc --noEmit -p tsconfig.json",
+    "api:sync": "node scripts/download-api-json.js",
+    "api:gen": "orval --config orval.config.ts",
+    "api:upd": "npm run api:sync && npm run api:gen"
   },
   "eslintConfig": {
     "extends": [
@@ -42,5 +49,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "@welldone-software/why-did-you-render": "^10.0.1",
+    "dotenv": "^17.2.0",
+    "orval": "^7.10.0"
   }
 }

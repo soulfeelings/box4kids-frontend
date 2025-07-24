@@ -1,0 +1,1 @@
+export { ChildInfoWidget } from "./ChildInfoWidget";
