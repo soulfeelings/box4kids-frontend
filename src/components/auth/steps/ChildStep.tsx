@@ -487,7 +487,7 @@ export const ChildStep: React.FC<{
       </div>
 
       {/* Bottom action button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 max-w-[800px] mx-auto">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
             isFormValid && !createChildMutation.isPending

@@ -43,7 +43,7 @@ export const WelcomeStep: React.FC<{
 
   return (
     <div
-      className="fixed inset-0 w-full h-full flex flex-col"
+      className="fixed inset-0 w-full h-full flex flex-col "
       style={{
         background: "linear-gradient(180deg, #747EEC 0%, #9098F0 100%)",
       }}
