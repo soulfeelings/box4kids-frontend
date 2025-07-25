@@ -20,8 +20,7 @@ const welcomeScreens = [
 
 export const WelcomeStep: React.FC<{
   onNext: () => void;
-  onClose: () => void;
-}> = ({ onNext, onClose }) => {
+}> = ({ onNext }) => {
   const [welcomeIndex, setWelcomeIndex] = useState(0);
 
   const w = welcomeScreens[welcomeIndex];
@@ -34,9 +33,9 @@ export const WelcomeStep: React.FC<{
     }
   };
 
-  const handleClose = () => {
-    onClose();
-  };
+  // const handleClose = () => {
+  //   onClose();
+  // };
 
   useEffect(() => {
     localStorage.setItem("hasSeenWelcome", "true");
@@ -57,13 +56,13 @@ export const WelcomeStep: React.FC<{
         >
           BOX4BABY
         </h1>
-        <button
+        {/* <button
           onClick={handleClose}
           className="absolute right-4 w-6 h-6 rounded-lg bg-white flex items-center justify-center text-lg hover:bg-gray-100 transition-colors"
           style={{ color: "#6667C4" }}
         >
           ×
-        </button>
+        </button> */}
       </div>
 
       {/* Illustration area - takes remaining space above bottom container */}

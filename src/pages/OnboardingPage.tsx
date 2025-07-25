@@ -67,10 +67,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     switch (currentStep) {
       case AUTH_STEPS.WELCOME:
         return (
-          <WelcomeStep
-            onNext={() => setCurrentStep(AUTH_STEPS.UPDATE_NAME)}
-            onClose={handleClose}
-          />
+          <WelcomeStep onNext={() => setCurrentStep(AUTH_STEPS.UPDATE_NAME)} />
         );
 
       case AUTH_STEPS.UPDATE_NAME:
@@ -164,10 +161,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
       default:
         // Fallback на первый шаг если неизвестный step
         return (
-          <WelcomeStep
-            onNext={() => setCurrentStep(AUTH_STEPS.UPDATE_NAME)}
-            onClose={handleClose}
-          />
+          <WelcomeStep onNext={() => setCurrentStep(AUTH_STEPS.UPDATE_NAME)} />
         );
     }
   };

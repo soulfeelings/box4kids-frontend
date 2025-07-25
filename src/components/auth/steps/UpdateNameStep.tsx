@@ -64,6 +64,10 @@ export const UpdateNameStep: React.FC<{
         <button
           onClick={onClose}
           className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+          style={{
+            // To make flow simple, we hide this button, but we save it for html markdown
+            visibility: "hidden",
+          }}
         >
           <svg
             width="16"

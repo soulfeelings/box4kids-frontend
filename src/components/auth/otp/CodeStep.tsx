@@ -73,7 +73,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         clearTimeout(id);
       }
     };
-  }, [phoneData.phone, phoneData.code, setPhoneData, getDevCode]);
+  }, [phoneData.phone, phoneData.code, setPhoneData]);
 
   const handleCheckCode = async () => {
     if (!phoneData.code || phoneData.code.length !== 4) {
