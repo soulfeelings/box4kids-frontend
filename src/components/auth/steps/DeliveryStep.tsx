@@ -10,6 +10,7 @@ import { DeliveryEditForm } from "../../../features/DeliveryEditForm";
 import { dateManager } from "../../../utils/date/DateManager";
 import { useChildrenSubscriptionsIds } from "../../../store/hooks";
 import { useNavigateToEditDelivery } from "../../../hooks/useNavigateHooks";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 export const DeliveryStep: React.FC<{
   onBack: () => void;
@@ -158,12 +159,7 @@ export const DeliveryStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-sm font-medium text-gray-600"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 5/6
-        </span>
+        <StepIndicator currentStep={6} />
 
         <button
           onClick={handleClose}

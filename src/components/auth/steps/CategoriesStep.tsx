@@ -7,6 +7,7 @@ import {
 } from "../../../api-client/";
 import { UserChildData } from "../../../types";
 import { notifications } from "../../../utils/notifications";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 export const CategoriesStep: React.FC<{
   onBack: () => void;
@@ -157,12 +158,7 @@ export const CategoriesStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-sm font-medium text-gray-600"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 3/6
-        </span>
+        <StepIndicator currentStep={3} />
 
         <button
           onClick={handleClose}

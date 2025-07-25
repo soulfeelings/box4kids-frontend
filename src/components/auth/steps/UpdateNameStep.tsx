@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useStore } from "../../../store/store";
 import { useUpdateUserProfileUsersProfilePut } from "../../../api-client";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 export const UpdateNameStep: React.FC<{
   onBack: () => void;
@@ -54,12 +55,7 @@ export const UpdateNameStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-gray-700 font-semibold text-base"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 1/6
-        </span>
+        <StepIndicator currentStep={1} />
 
         <button
           onClick={onClose}

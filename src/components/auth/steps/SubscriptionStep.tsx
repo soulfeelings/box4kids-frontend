@@ -6,6 +6,7 @@ import { UserChildData } from "../../../types";
 import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 import { SingleChildSubscriptionView } from "./subscription-step-components/SingleChildSubscriptionView";
 import { notifications } from "../../../utils/notifications";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 export const SubscriptionStep: React.FC<{
   onBack: () => void;
@@ -118,12 +119,7 @@ export const SubscriptionStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-sm font-medium text-gray-600"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 4/6
-        </span>
+        <StepIndicator currentStep={4} />
 
         <button
           onClick={handleClose}

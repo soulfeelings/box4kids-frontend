@@ -13,6 +13,7 @@ import {
   useNavigateToEditChild,
   useNavigateToOnboarding,
 } from "../../../hooks/useNavigateHooks";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 export const ValidateSubscriptionsStep: React.FC<{
   onBack: () => void;
@@ -83,12 +84,7 @@ export const ValidateSubscriptionsStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-sm font-medium text-gray-600"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 4/6
-        </span>
+        <StepIndicator currentStep={5} />
 
         <button
           onClick={onClose}

@@ -14,6 +14,7 @@ import { UserChildData } from "../../../types";
 import { ChoseChildCards } from "../../../features/ChoseChildCards";
 import { notifications } from "../../../utils/notifications";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 interface ChildData {
   name: string;
@@ -222,12 +223,7 @@ export const ChildStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-gray-700 font-semibold text-base"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 2/6
-        </span>
+        <StepIndicator currentStep={2} />
 
         <button
           onClick={handleClose}

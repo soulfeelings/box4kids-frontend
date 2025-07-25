@@ -7,6 +7,7 @@ import { SubscriptionPlanResponse } from "../../../api-client/model/subscription
 import { ToyCategoryConfigResponse } from "../../../api-client/model/toyCategoryConfigResponse";
 import { PaymentStatusEnum } from "../../../api-client/model/paymentStatusEnum";
 import { notifications } from "../../../utils/notifications";
+import { StepIndicator } from "../../ui/StepIndicator";
 
 export const PaymentStep: React.FC<{
   onBack: () => void;
@@ -144,12 +145,7 @@ export const PaymentStep: React.FC<{
           </svg>
         </button>
 
-        <span
-          className="text-sm font-medium text-gray-600"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          Шаг 6/6
-        </span>
+        <StepIndicator currentStep={7} />
 
         <button
           onClick={handleClose}
