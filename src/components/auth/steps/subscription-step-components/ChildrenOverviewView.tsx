@@ -26,6 +26,8 @@ export const ChildrenOverviewView: React.FC<{
 }) => {
   return (
     <div className="space-y-6">
+      {/* Add Child Banner */}
+      <AddNewChildBanner onClick={onAddNewChild} />
       {children.map((child) => (
         <ChildOverviewCard
           key={child.id}
@@ -38,9 +40,6 @@ export const ChildrenOverviewView: React.FC<{
           getSubscriptionPlan={getSubscriptionPlan}
         />
       ))}
-
-      {/* Add Child Banner */}
-      <AddNewChildBanner onClick={onAddNewChild} />
     </div>
   );
 };

@@ -162,14 +162,14 @@ export const SubscriptionStep: React.FC<{
             </p>
           </div>
 
+          {onAddNewChild && <AddNewChildBanner onClick={handleAddNewChild} />}
+
           <SingleChildSubscriptionView
             subscriptionPlans={subscriptionPlans}
             selectedSubscriptionId={subscriptionId}
             onSelectSubscription={setSubscriptionId}
             isLoading={isLoading}
           />
-
-          {onAddNewChild && <AddNewChildBanner onClick={handleAddNewChild} />}
         </div>
       </div>
 
