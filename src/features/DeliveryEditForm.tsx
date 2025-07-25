@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DeliveryAddressData } from "../types";
 import { dateManager } from "../utils/date/DateManager";
 
-interface DeliveryData {
+export interface DeliveryData {
   name: string;
   address: string;
   date: string; // ISO
@@ -37,18 +37,34 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     comment: "",
   });
 
+  const { name, address, date, time, comment } = useMemo(() => {
+    return {
+      name: deliveryAddress?.name,
+      address: deliveryAddress?.address,
+      date: deliveryAddress?.date, // Уже в ISO формате
+      time: deliveryAddress?.time,
+      comment: deliveryAddress?.comment,
+    };
+  }, [
+    deliveryAddress?.name,
+    deliveryAddress?.address,
+    deliveryAddress?.date,
+    deliveryAddress?.time,
+    deliveryAddress?.comment,
+  ]);
+
   // Инициализация данных при загрузке
   useEffect(() => {
-    if (deliveryAddress) {
+    if (name && address && date && time && comment) {
       setDeliveryData({
-        name: deliveryAddress.name,
-        address: deliveryAddress.address,
-        date: deliveryAddress.date, // Уже в ISO формате
-        time: deliveryAddress.time,
-        comment: deliveryAddress.comment,
+        name,
+        address,
+        date,
+        time,
+        comment,
       });
     }
-  }, [deliveryAddress]);
+  }, [name, address, date, time, comment]);
 
   // Уведомляем родительский компонент об изменениях
   useEffect(() => {

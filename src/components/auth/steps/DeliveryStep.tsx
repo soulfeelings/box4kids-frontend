@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useStore } from "../../../store";
 import { selectSelectedDeliveryAddressId } from "../../../store/selectors";
 import {
@@ -6,7 +6,10 @@ import {
   useUpdateSubscriptionSubscriptionsSubscriptionIdPatch,
 } from "../../../api-client/";
 import { DeliveryAddressCards } from "../../../features/DeliveryAddressCards";
-import { DeliveryEditForm } from "../../../features/DeliveryEditForm";
+import {
+  DeliveryData,
+  DeliveryEditForm,
+} from "../../../features/DeliveryEditForm";
 import { dateManager } from "../../../utils/date/DateManager";
 import { useChildrenSubscriptionsIds } from "../../../store/hooks";
 import { useNavigateToEditDelivery } from "../../../hooks/useNavigateHooks";
@@ -29,13 +32,17 @@ export const DeliveryStep: React.FC<{
     !user?.deliveryAddresses || user.deliveryAddresses.length === 0
   );
 
-  const [deliveryData, setDeliveryData] = useState({
+  const [deliveryData, setDeliveryData] = useState<DeliveryData>({
     name: "",
     address: "",
-    date: "",
+    date: "", // ISO
     time: "",
     comment: "",
   });
+
+  const handleDeliveryDataChange = useCallback((data: DeliveryData) => {
+    setDeliveryData(data);
+  }, []);
 
   const handleAddressSelect = (id: number) => {
     setSelectedDeliveryAddressId(id);
@@ -208,15 +215,7 @@ export const DeliveryStep: React.FC<{
           user.deliveryAddresses.length === 0) && (
           <div className="space-y-6">
             <DeliveryEditForm
-              onDataChange={(data) =>
-                setDeliveryData({
-                  name: data.name,
-                  address: data.address,
-                  date: data.date,
-                  time: data.time,
-                  comment: data.comment || "",
-                })
-              }
+              onDataChange={handleDeliveryDataChange}
               isDisabled={isLoading}
             />
           </div>
