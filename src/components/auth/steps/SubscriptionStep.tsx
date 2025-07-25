@@ -150,7 +150,7 @@ export const SubscriptionStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Какой набор подойдёт {currentChildToUpdate?.name || "ребёнку"}?
+            Какой набор подойдёт для ребенка {currentChildToUpdate?.name}?
           </h1>
         </div>
 
