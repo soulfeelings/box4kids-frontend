@@ -30,7 +30,7 @@ export const ChildStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
-  const { setCurrentChildIdToUpdate, addChild, updateChild, setError } =
+  const { setCurrentChildIdToUpdate, addChild, updateChild, setError, fetchInitData } =
     useStore();
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
@@ -130,6 +130,7 @@ export const ChildStep: React.FC<{
 
     if (!isFormChanged) {
       console.log("isFormChanged: false");
+      await fetchInitData(); // <--- обновляем данные
       onNext();
       return;
     }
@@ -182,6 +183,8 @@ export const ChildStep: React.FC<{
         setCurrentChildIdToUpdate(newChild.id);
         notifications.childAdded();
       }
+      // После добавления/обновления ребёнка обновляем все данные (в том числе подписки и скидки)
+      await fetchInitData();
       // Переходим на следующий шаг
       onNext();
     } catch (error) {
@@ -200,6 +203,8 @@ export const ChildStep: React.FC<{
     addChild,
     setCurrentChildIdToUpdate,
     setError,
+    notifications,
+    fetchInitData,
     onNext,
   ]);
 
