@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export const NoSubscribtionsView = ({
   onClickButton,
   textButton,
@@ -7,6 +9,7 @@ export const NoSubscribtionsView = ({
   textButton: string;
   text?: string;
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className="relative flex flex-col rounded-3xl overflow-hidden"
@@ -35,7 +38,7 @@ export const NoSubscribtionsView = ({
           style={{ fontFamily: "Open Sans, sans-serif" }}
         >
           {text ||
-            "Завершите оформление подписки, чтобы мы могли собрать коробку с игрушками и доставить её вам"}
+            t('complete_subscription_to_get_toy_box')}
         </p>
 
         <button

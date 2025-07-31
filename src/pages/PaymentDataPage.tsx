@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { BottomNavigation } from "../features/BottomNavigation";
+import { useTranslation } from 'react-i18next';
 
 interface PaymentDataPageProps {
   onClose: () => void;
@@ -9,6 +10,8 @@ interface PaymentDataPageProps {
 export const PaymentDataPage: React.FC<PaymentDataPageProps> = ({
   onClose,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div
       className="min-h-screen bg-[#FFFFFF] pb-20"
@@ -18,7 +21,7 @@ export const PaymentDataPage: React.FC<PaymentDataPageProps> = ({
       <div className="px-4 py-6">
         <div className="flex items-center justify-center relative">
           <h1 className="text-[20px] font-semibold text-gray-900 text-center">
-            Платежные данные
+            {t('payment_data')}
           </h1>
           <button
             onClick={onClose}
@@ -49,12 +52,10 @@ export const PaymentDataPage: React.FC<PaymentDataPageProps> = ({
               </svg>
             </div>
             <h2 className="text-lg font-medium text-gray-900 mb-2">
-              Платежные данные
+              {t('payment_data')}
             </h2>
             <p className="text-gray-600 leading-relaxed">
-              Здесь будут отображаться ваши платежные данные и история платежей.
-              <br />
-              Функция находится в разработке.
+              {t('payment_data_description')}
             </p>
           </div>
         </div>

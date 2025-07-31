@@ -1,4 +1,5 @@
 import { colorManager } from "../../../../utils/ColorManager";
+import { useTranslation } from 'react-i18next';
 
 // Subscription plan card component
 export const SubscriptionPlanCard: React.FC<{
@@ -7,6 +8,8 @@ export const SubscriptionPlanCard: React.FC<{
   onSelect: (planId: number) => void;
   isLoading: boolean;
 }> = ({ plan, isSelected, onSelect, isLoading }) => {
+  const { t } = useTranslation();
+  
   return (
     <div
       className={`rounded-3xl p-6 shadow-sm border transition-all cursor-pointer ${
@@ -31,7 +34,7 @@ export const SubscriptionPlanCard: React.FC<{
           className="text-gray-700"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          {plan.toy_count} игрушек
+          {plan.toy_count} {t('toys')}
         </span>
         <span className="text-gray-500">•</span>
         <div className="text-right">
@@ -39,7 +42,7 @@ export const SubscriptionPlanCard: React.FC<{
             className="text-gray-700"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            ${plan.price_monthly}/мес.
+            ${plan.price_monthly}{t('per_month')}
           </span>
         </div>
       </div>
@@ -49,7 +52,7 @@ export const SubscriptionPlanCard: React.FC<{
           className="text-gray-600 text-sm mb-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Состав набора игрушек
+          {t('toy_set_composition')}
         </p>
         <div className="space-y-3">
           {plan.toy_configurations?.map((config: any) => (
@@ -91,7 +94,7 @@ export const SubscriptionPlanCard: React.FC<{
         }}
         disabled={isLoading}
       >
-        {isSelected ? "Выбрано" : "Выбрать"}
+        {isSelected ? t('selected') : t('select')}
       </button>
     </div>
   );

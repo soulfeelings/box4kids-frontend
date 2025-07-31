@@ -3,6 +3,7 @@ import { BottomNavigation } from "../../features/BottomNavigation";
 import { UserData } from "../../types";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
 import { CurrentToyBoxCard, NextToyBoxCard } from "../../widgets";
+import { useTranslation } from 'react-i18next';
 
 interface NextSetDeterminedViewProps {
   userData: UserData;
@@ -22,6 +23,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
   setCurrentBox,
   handleStarClick,
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className="w-full min-h-screen pb-24"
@@ -37,7 +39,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
         }}
       >
         <h1 className="text-xl text-center font-semibold text-gray-800 mb-6">
-          Привет, {userData.name}! 🦋
+          {t('hello_user', { name: userData.name })}
         </h1>
 
         {boxes.map((box) => (

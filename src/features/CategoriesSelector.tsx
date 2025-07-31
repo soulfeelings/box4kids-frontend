@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { InterestResponse, SkillResponse } from "../api-client/model";
 import { UserChildData } from "../types";
+import { useTranslation } from 'react-i18next';
 
 interface CategoriesSelectorProps {
   child?: UserChildData;
@@ -19,6 +20,7 @@ export const CategoriesSelector: React.FC<CategoriesSelectorProps> = ({
   onSkillsChange,
   isDisabled = false,
 }) => {
+  const { t } = useTranslation();
   const [selectedInterestsIds, setSelectedInterestsIds] = useState<number[]>(
     []
   );
@@ -65,7 +67,7 @@ export const CategoriesSelector: React.FC<CategoriesSelectorProps> = ({
           className="text-lg font-semibold text-gray-900"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Интересы
+          {t('interests')}
         </h3>
         <div className="flex flex-wrap gap-3">
           {interests.map((interest) => (
@@ -92,7 +94,7 @@ export const CategoriesSelector: React.FC<CategoriesSelectorProps> = ({
           className="text-lg font-semibold text-gray-900"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Навыки для развития
+          {t('skills_for_development')}
         </h3>
         <div className="flex flex-wrap gap-3">
           {skills.map((skill) => (

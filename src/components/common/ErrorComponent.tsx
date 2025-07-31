@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 export interface ErrorComponentProps {
   errorMessage?: string | null;
@@ -13,6 +14,7 @@ export const ErrorComponent: React.FC<ErrorComponentProps> = ({
   onRetry,
   onSupport,
 }) => {
+  const { t } = useTranslation();
   const handleRetry = () => {
     if (onRetry) {
       onRetry();
@@ -66,7 +68,7 @@ export const ErrorComponent: React.FC<ErrorComponentProps> = ({
           </div>
 
           <h3 className="text-gray-800 text-2xl font-semibold mb-4">
-            Ошибка загрузки данных
+            {t('error_loading_data')}
           </h3>
 
           {errorMessage && (
@@ -76,7 +78,7 @@ export const ErrorComponent: React.FC<ErrorComponentProps> = ({
           )}
 
           <p className="text-gray-600 text-base leading-relaxed max-w-xs mb-8">
-            Попробуйте перезагрузить страницу или обратитесь в поддержку.
+            {t('try_reload_or_support')}
           </p>
 
           <div className="w-full space-y-3">
@@ -85,21 +87,21 @@ export const ErrorComponent: React.FC<ErrorComponentProps> = ({
                 onClick={handleBack}
                 className="w-full bg-gray-800 text-white py-3 px-6 rounded-full font-medium hover:bg-gray-700 transition-colors"
               >
-                Назад
+                {t('back')}
               </button>
             )}
             <button
               onClick={handleRetry}
               className="w-full bg-gray-800 text-white py-3 px-6 rounded-full font-medium hover:bg-gray-700 transition-colors"
             >
-              Перезагрузить
+              {t('reload')}
             </button>
 
             <button
               onClick={handleSupport}
               className="w-full bg-transparent text-gray-600 py-3 px-6 rounded-full font-medium border border-gray-300 hover:bg-gray-50 transition-colors"
             >
-              Связаться с поддержкой
+              {t('contact_support')}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 interface ActionButtonProps {
   onClick: () => void;
@@ -17,6 +18,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   variant = "primary",
   className = "",
 }) => {
+  const { t } = useTranslation();
   const baseClasses =
     "w-full py-3 px-4 rounded-[32px] font-medium text-base transition-all";
 
@@ -39,7 +41,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       className={buttonClasses}
       style={{ fontFamily: "Nunito, sans-serif" }}
     >
-      {isLoading ? "Сохраняем..." : children}
+      {isLoading ? t('saving') : children}
     </button>
   );
 };

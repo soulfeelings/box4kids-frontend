@@ -1,12 +1,15 @@
 import React from "react";
 import { X } from "lucide-react";
 import { BottomNavigation } from "../features/BottomNavigation";
+import { useTranslation } from 'react-i18next';
 
 interface SupportPageProps {
   onClose?: () => void;
 }
 
 export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
+  const { t } = useTranslation();
+  
   const handleWhatsAppClick = () => {
     // Здесь можно добавить логику для открытия WhatsApp
     window.open("https://wa.me/your_whatsapp_number", "_blank");
@@ -36,7 +39,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
       <div className="px-4 py-6 relative flex items-center">
         <div className="flex justify-between items-center" />
         <h1 className="flex-1 text-[20px] font-semibold text-gray-900 text-center">
-          Служба поддержки
+          {t('support_service')}
         </h1>
         <button
           onClick={onClose}
@@ -51,9 +54,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
         {/* Description */}
         <div className="mb-8 text-left">
           <p className="text-base text-gray-600 leading-relaxed">
-            Возникли проблемы с приложением?
-            <br />
-            Напишите нам — мы поможем!
+            {t('support_description')}
           </p>
         </div>
 
@@ -72,7 +73,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
               />
             </div>
             <span className="text-base text-gray-900 font-medium">
-              Написать в WhatsApp
+              {t('write_to_whatsapp')}
             </span>
           </button>
 
@@ -89,7 +90,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
               />
             </div>
             <span className="text-base text-gray-900 font-medium">
-              Написать в Telegram
+              {t('write_to_telegram')}
             </span>
           </button>
         </div>

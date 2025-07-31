@@ -20,8 +20,10 @@ import { useHandleDeleteChilld } from "../features/useHandleDeleteChilld";
 import { NoSubscribtionsView } from "../features/NoSubscribtionsView";
 import { SubscriptionStatus } from "../api-client/model";
 import { ChildInfoWidget } from "../widgets/child-info";
+import { useTranslation } from 'react-i18next';
 
 export const ChildrenPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useStore();
   const navigateToOnboarding = useNavigateToOnboarding();
 
@@ -38,7 +40,7 @@ export const ChildrenPage: React.FC = () => {
         className="p-4 flex items-center justify-center relative"
         style={{ backgroundColor: "#FFE8C8" }}
       >
-        <h1 className="text-lg font-semibold text-gray-800">Дети и наборы</h1>
+        <h1 className="text-lg font-semibold text-gray-800">{t('children_and_sets')}</h1>
       </div>
 
       {/* Content */}
@@ -57,7 +59,7 @@ export const ChildrenPage: React.FC = () => {
             onClickButton={() => {
               navigateToOnboarding({ step: AUTH_STEPS.CHILD });
             }}
-            textButton="Добавить ребенка"
+            textButton={t('add_child')}
           />
         )}
 
@@ -84,6 +86,7 @@ function ChildCard({
   interests: InterestResponse[];
   skills: SkillResponse[];
 }) {
+  const { t } = useTranslation();
   const { setCurrentChildIdToUpdate } = useStore();
   const navigateToEditChild = useNavigateToEditChild();
   const navigateToCancelSubscription = useNavigateToCancelSubscription();
@@ -122,7 +125,7 @@ function ChildCard({
       {subscriptionPlan && (
         <div className="mb-6">
           <h4 className="text-gray-800 font-medium mb-3">
-            Состав набора игрушек
+            {t('toy_set_composition')}
           </h4>
           <div className="space-y-3">
             {subscriptionPlan.toy_configurations?.map((toy) => (
@@ -145,8 +148,7 @@ function ChildCard({
         subscription.status === SubscriptionStatus.paused && (
           <div className="mb-4 p-3 rounded-xl border border-[#DC7E45] bg-[#F0955E] bg-opacity-15">
             <p className="text-sm text-gray-800 leading-5">
-              Подписка остановлена! Возобновите её в любое время — и мы снова
-              начнём собирать коробки для вашего ребёнка
+              {t('subscription_paused_warning')}
             </p>
           </div>
         )}
@@ -163,7 +165,7 @@ function ChildCard({
               }}
               className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
             >
-              Остановить подписку
+              {t('pause_subscription')}
             </button>
           ) : subscription.status === SubscriptionStatus.paused ? (
             <button
@@ -174,7 +176,7 @@ function ChildCard({
               }}
               className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
             >
-              Возобновить подписку
+              {t('resume_subscription')}
             </button>
           ) : null
         ) : (
@@ -185,7 +187,7 @@ function ChildCard({
             }}
             className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
           >
-            Выбрать тариф
+            {t('choose_tariff')}
           </button>
         )}
         <button
@@ -194,7 +196,7 @@ function ChildCard({
           }}
           className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium"
         >
-          Изменить данные ребенка
+          {t('edit_child_data')}
         </button>
         <button
           onClick={() => {
@@ -202,7 +204,7 @@ function ChildCard({
           }}
           className="w-full bg-[#FBC8D5] text-[#E14F75] py-2 rounded-2xl text-sm font-medium"
         >
-          Удалить
+          {t('delete')}
         </button>
       </div>
     </div>

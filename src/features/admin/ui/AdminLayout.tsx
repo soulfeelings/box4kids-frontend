@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { useAdminAuth } from "../hooks/useAdminAuth";
 import { AdminAuthForm } from "./AdminAuthForm";
 import { AdminUsersTable } from "./AdminUsersTable";
@@ -8,6 +9,7 @@ import { AdminMappingsTable } from "./AdminMappingsTable";
 type AdminTab = "users" | "inventory" | "mappings";
 
 export const AdminLayout: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, logout } = useAdminAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>("users");
 
@@ -22,9 +24,9 @@ export const AdminLayout: React.FC = () => {
   }
 
   const tabs = [
-    { id: "users" as AdminTab, name: "Пользователи", icon: "👥" },
-    { id: "inventory" as AdminTab, name: "Склад", icon: "📦" },
-    { id: "mappings" as AdminTab, name: "Маппинг", icon: "🔗" },
+    { id: "users" as AdminTab, name: t('users'), icon: "👥" },
+    { id: "inventory" as AdminTab, name: t('inventory'), icon: "📦" },
+    { id: "mappings" as AdminTab, name: t('mapping'), icon: "🔗" },
   ];
 
   const renderTabContent = () => {
@@ -47,13 +49,13 @@ export const AdminLayout: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Админ панель</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('admin_panel')}</h1>
             </div>
             <button
               onClick={logout}
               className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"
             >
-              Выйти
+              {t('logout')}
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { UserChildData } from "../../../../types";
 import { dateManager } from "../../../../utils/date/DateManager";
 import { Tag } from "../../../Tag";
 import { ChildActionButtons } from "../../../../features/ChildActionButtons";
+import { useTranslation } from 'react-i18next';
 
 // Child overview card component
 export const ChildOverviewCard: React.FC<{
@@ -22,6 +23,7 @@ export const ChildOverviewCard: React.FC<{
   onDelete,
   getSubscriptionPlan,
 }) => {
+  const { t } = useTranslation();
   const currentSubscription = child.subscriptions[0];
   const currentPlan = currentSubscription?.plan_id;
   const plan = getSubscriptionPlan(currentPlan);
@@ -54,7 +56,7 @@ export const ChildOverviewCard: React.FC<{
               className="text-md font-semibold text-[#686564] mb-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Особенности
+              {t('features')}
             </h2>
             <div className="flex flex-wrap gap-2">
               <Tag selected={true}>{child.comment}</Tag>
@@ -68,7 +70,7 @@ export const ChildOverviewCard: React.FC<{
             className="text-md font-semibold text-[#686564] mb-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Интересы
+            {t('interests')}
           </h2>
           <div className="flex flex-wrap gap-2">
             {child.interests.map((interestId, idx) => {
@@ -88,7 +90,7 @@ export const ChildOverviewCard: React.FC<{
             className="text-md font-semibold text-[#686564] mb-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Навыки для развития
+            {t('skills_for_development')}
           </h2>
           <div className="flex flex-wrap gap-2">
             {child.skills.map((skillId, idx) => {
@@ -108,14 +110,14 @@ export const ChildOverviewCard: React.FC<{
             className="text-md font-semibold text-[#686564] mb-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Тариф
+            {t('tariff')}
           </h2>
           {currentSubscription ? (
             <div>
               <div className="mb-8">
                 <Tag selected>
-                  {plan?.name} • {plan?.toy_count} игрушек • $
-                  {plan?.price_monthly}/мес.
+                  {plan?.name} • {plan?.toy_count} {t('toys')} • $
+                  {plan?.price_monthly}{t('per_month')}
                 </Tag>
               </div>
 
@@ -125,7 +127,7 @@ export const ChildOverviewCard: React.FC<{
                   className="text-md font-semibold text-[#686564] mb-3"
                   style={{ fontFamily: "Nunito, sans-serif" }}
                 >
-                  Состав набора игрушек
+                  {t('toy_set_composition')}
                 </h3>
                 <div className="space-y-3">
                   {plan?.toy_configurations?.map((config: any) => (
@@ -134,11 +136,11 @@ export const ChildOverviewCard: React.FC<{
                         className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
                         style={{
                           backgroundColor:
-                            config.name === "Конструктор"
+                            config.name === t('constructor')
                               ? "#F8CAAF"
-                              : config.name === "Творческий набор"
+                              : config.name === t('creative_set')
                               ? "#D4E7C5"
-                              : config.name === "Мягкая игрушка"
+                              : config.name === t('soft_toy')
                               ? "#F9E4B7"
                               : "#F2B7C4",
                         }}
@@ -178,13 +180,14 @@ export const ChildOverviewCard: React.FC<{
 };
 
 function NoSubscription() {
+  const { t } = useTranslation();
   return (
     <div className="bg-gray-50 rounded-xl p-4" style={{ borderRadius: "12px" }}>
       <span
         className="text-gray-900"
         style={{ fontFamily: "Nunito, sans-serif" }}
       >
-        Нет подписки
+        {t('no_subscription')}
       </span>
     </div>
   );

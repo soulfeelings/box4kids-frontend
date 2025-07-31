@@ -1,6 +1,9 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 export const SuccessStep: React.FC = () => {
+  const { t } = useTranslation();
+  
   const handleSuccessComplete = () => {
     window.location.assign("/");
   };
@@ -47,15 +50,14 @@ export const SuccessStep: React.FC = () => {
           className="text-xl font-semibold text-gray-900 mb-4"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Подписка активирована!
+          {t('subscription_activated')}
         </h1>
 
         <p
           className="text-gray-600 leading-relaxed max-w-xs"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Мы уже начали собирать коробку для вашего ребёнка. Вы получите
-          уведомление, когда она будет готова к доставке.
+          {t('subscription_activated_description')}
         </p>
       </div>
 
@@ -69,7 +71,7 @@ export const SuccessStep: React.FC = () => {
             backgroundColor: "#30313D",
           }}
         >
-          Перейти на главную
+          {t('go_to_home')}
         </button>
       </div>
     </div>

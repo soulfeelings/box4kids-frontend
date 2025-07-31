@@ -19,6 +19,7 @@ import {
   ToyBoxResponse,
 } from "../api-client/model";
 import { UserChildData } from "../types";
+import { useTranslation } from 'react-i18next';
 
 export interface BoxesState {
   child: UserChildData;
@@ -33,6 +34,7 @@ export interface SuccessfulBoxesState {
 }
 
 export const AppInterface: React.FC = () => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState<number>(0);
   const [currentBox, setCurrentBox] = useState<
     SuccessfulBoxesState["currentBox"] | null
@@ -110,20 +112,21 @@ export const AppInterface: React.FC = () => {
           const failedCount = res.filter((r) => !r.success).length;
           if (failedCount > 0) {
             notifications.warning(
-              `Не удалось загрузить данные для ${failedCount} ${
-                failedCount === 1 ? "ребенка" : "детей"
-              }. Попробуйте позже.`
+              t('failed_to_load_data_for_children', { 
+                count: failedCount, 
+                child: failedCount === 1 ? t('child') : t('children') 
+              })
             );
           }
         } catch (error) {
           console.error("Failed to fetch boxes data:", error);
-          notifications.error("Не удалось загрузить данные о наборах игрушек");
+          notifications.error(t('failed_to_load_toy_boxes_data'));
         }
       }
     };
 
     fetchData();
-  }, [user]);
+  }, [user, t]);
 
   // Determine current screen state
   const currentScreenState = useMemo((): "not_subscribed" | undefined => {
@@ -155,18 +158,18 @@ export const AppInterface: React.FC = () => {
     const today = new Date();
     const day = today.getDate();
     const months = [
-      "января",
-      "февраля",
-      "марта",
-      "апреля",
-      "мая",
-      "июня",
-      "июля",
-      "августа",
-      "сентября",
-      "октября",
-      "ноября",
-      "декабря",
+      t('january'),
+      t('february'),
+      t('march'),
+      t('april'),
+      t('may'),
+      t('june'),
+      t('july'),
+      t('august'),
+      t('september'),
+      t('october'),
+      t('november'),
+      t('december'),
     ];
     const month = months[today.getMonth()];
     return `${day} ${month}`;
@@ -181,28 +184,28 @@ export const AppInterface: React.FC = () => {
     const date = new Date(currentYear, parseInt(month) - 1, parseInt(day));
 
     const months = [
-      "января",
-      "февраля",
-      "марта",
-      "апреля",
-      "мая",
-      "июня",
-      "июля",
-      "августа",
-      "сентября",
-      "октября",
-      "ноября",
-      "декабря",
+      t('january'),
+      t('february'),
+      t('march'),
+      t('april'),
+      t('may'),
+      t('june'),
+      t('july'),
+      t('august'),
+      t('september'),
+      t('october'),
+      t('november'),
+      t('december'),
     ];
 
     const daysOfWeek = [
-      "воскресенье",
-      "понедельник",
-      "вторник",
-      "среда",
-      "четверг",
-      "пятница",
-      "суббота",
+      t('sunday'),
+      t('monday'),
+      t('tuesday'),
+      t('wednesday'),
+      t('thursday'),
+      t('friday'),
+      t('saturday'),
     ];
 
     const monthName = months[date.getMonth()];

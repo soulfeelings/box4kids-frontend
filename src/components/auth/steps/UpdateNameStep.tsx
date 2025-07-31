@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useStore } from "../../../store/store";
 import { useUpdateUserProfileUsersProfilePut } from "../../../api-client";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { useTranslation } from 'react-i18next';
 
 export const UpdateNameStep: React.FC<{
   onBack: () => void;
@@ -9,6 +10,7 @@ export const UpdateNameStep: React.FC<{
   onClose: () => void;
   userName?: string;
 }> = ({ onBack, onNext, onClose, userName }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState(userName ?? "");
   const { setUserName } = useStore();
 
@@ -86,7 +88,7 @@ export const UpdateNameStep: React.FC<{
             className="text-xl font-medium text-gray-900 mb-0"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Давайте познакомимся!
+            {t('lets_get_acquainted')}
           </h1>
         </div>
 
@@ -96,7 +98,7 @@ export const UpdateNameStep: React.FC<{
             className="text-sm font-medium text-gray-600 px-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Как к вам обращаться?
+            {t('how_should_we_address_you')}
           </label>
           <div
             className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -135,7 +137,7 @@ export const UpdateNameStep: React.FC<{
             backgroundColor: name.trim() && !isLoading ? "#30313D" : undefined,
           }}
         >
-          {isLoading ? "Сохраняем..." : "Продолжить"}
+          {isLoading ? t('saving') : t('continue')}
         </button>
       </div>
     </div>

@@ -5,12 +5,14 @@ import { SuccessfulBoxesState } from "../../pages/AppInterface";
 import { SubscriptionStatus } from "../../api-client/model";
 import { useSubscriptionPlan } from "../../store/hooks/useSubscription";
 import { useNavigateToEditChild } from "../../hooks/useNavigateHooks";
+import { useTranslation } from 'react-i18next';
 
 interface NextToyBoxCardProps {
   box: SuccessfulBoxesState;
 }
 
 export const NextToyBoxCard: React.FC<NextToyBoxCardProps> = ({ box }) => {
+  const { t } = useTranslation();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
   const navigateToEditChild = useNavigateToEditChild();
 
@@ -35,7 +37,7 @@ export const NextToyBoxCard: React.FC<NextToyBoxCardProps> = ({ box }) => {
     >
       <div className="mb-4">
         <h3 className="text-gray-800 font-medium">
-          Следующий набор для {box.child.name}
+          {t('next_set_for_child', { name: box.child.name })}
         </h3>
         {subscriptionPlan && (
           <p className="text-gray-600 text-sm">{subscriptionPlan.name}</p>
@@ -66,7 +68,7 @@ export const NextToyBoxCard: React.FC<NextToyBoxCardProps> = ({ box }) => {
         style={{ backgroundColor: "#F2F2F2", borderRadius: "16px" }}
       >
         <div>
-          <p className="text-gray-600 text-sm mb-1">Доставка</p>
+          <p className="text-gray-600 text-sm mb-1">{t('delivery')}</p>
           <p className="text-gray-800 font-medium">
             {dateManager.formatFullDeliveryDateTime(
               box.nextBox.delivery_date ?? "",
@@ -82,7 +84,7 @@ export const NextToyBoxCard: React.FC<NextToyBoxCardProps> = ({ box }) => {
         className="w-full text-gray-600 py-3 text-sm font-medium mb-8"
         style={{ backgroundColor: "#E3E3E3", borderRadius: "32px" }}
       >
-        Изменить интересы ребенка
+        {t('change_child_interests')}
       </button>
     </div>
   );

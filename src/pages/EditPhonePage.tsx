@@ -11,6 +11,7 @@ import {
 import { SECONDS_TO_RESEND_CODE, PHONE_MIN_LENGTH } from "../constants/phone";
 import { notifications } from "../utils/notifications";
 import { useStore } from "../store/store";
+import { useTranslation } from 'react-i18next';
 
 interface EditPhonePageProps {
   currentPhone: string;
@@ -30,6 +31,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const { setUserPhone } = useStore();
   const [step, setStep] = useState<Step>(Step.CurrentPhoneConfirm);
   const [currentCode, setCurrentCode] = useState("");
@@ -88,7 +90,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
 
       setStep(Step.CurrentPhoneCode);
       setResendTimer(SECONDS_TO_RESEND_CODE);
-      notifications.success("Код отправлен на текущий номер");
+      notifications.success(t('code_sent_to_current_number'));
 
       // DEV MODE: Автоматически получаем код
       setIsAutoFillingCurrent(true);
@@ -105,15 +107,15 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
         }
       }, 2000);
     } catch (error) {
-      setError("Не удалось отправить код на текущий номер");
-      notifications.error("Не удалось отправить код");
+      setError(t('failed_to_send_code_to_current_number'));
+      notifications.error(t('failed_to_send_code'));
     }
-  }, [sendOtpMutation, currentPhone, setStep, setResendTimer, getDevCode]);
+  }, [sendOtpMutation, currentPhone, setStep, setResendTimer, getDevCode, t]);
 
   // Handle verifying current phone code
   const handleVerifyCurrentCode = useCallback(async () => {
     if (currentCode.length !== 4) {
-      setError("Введите 4-значный код");
+      setError(t('enter_4_digit_code'));
       return;
     }
 
@@ -129,7 +131,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       });
 
       console.log("✅ Подтверждение текущего номера успешно");
-      notifications.success("Код отправлен на новый номер.");
+      notifications.success(t('code_sent_to_new_number'));
       setStep(Step.NewPhoneCode);
       setResendTimer(SECONDS_TO_RESEND_CODE);
 
@@ -148,8 +150,8 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
         }
       }, 2000);
     } catch (error) {
-      setError("Неверный код подтверждения");
-      notifications.error("Неверный код подтверждения");
+      setError(t('invalid_confirmation_code'));
+      notifications.error(t('invalid_confirmation_code'));
     }
   }, [
     initiatePhoneChangeMutation,
@@ -158,12 +160,13 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
     setStep,
     setResendTimer,
     getDevCode,
+    t,
   ]);
 
   // Handle verifying new phone code
   const handleVerifyNewCode = useCallback(async () => {
     if (newCode.length !== 4) {
-      setError("Введите 4-значный код");
+      setError(t('enter_4_digit_code'));
       return;
     }
 
@@ -184,7 +187,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       }
 
       console.log("✅ Смена номера телефона успешна:", response.user);
-      notifications.success("Номер телефона успешно изменен!");
+      notifications.success(t('phone_number_changed_successfully'));
 
       // Обновляем номер телефона в store
       setUserPhone(newPhone);
@@ -192,8 +195,8 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       onSave(newPhone);
       onClose();
     } catch (error) {
-      setError("Неверный код подтверждения");
-      notifications.error("Неверный код подтверждения");
+      setError(t('invalid_confirmation_code'));
+      notifications.error(t('invalid_confirmation_code'));
     }
   }, [
     confirmPhoneChangeMutation,
@@ -202,6 +205,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
     setUserPhone,
     onSave,
     onClose,
+    t,
   ]);
 
   // Handle resending code
@@ -217,7 +221,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
 
         setResendTimer(SECONDS_TO_RESEND_CODE);
         setError(null);
-        notifications.success("Код отправлен повторно");
+        notifications.success(t('code_sent_again'));
 
         // DEV MODE: Автоматически получаем код
         setIsAutoFillingCurrent(true);
@@ -234,8 +238,8 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
           }
         }, 2000);
       } catch (error) {
-        setError("Не удалось отправить код повторно");
-        notifications.error("Не удалось отправить код повторно");
+        setError(t('failed_to_send_code_again'));
+        notifications.error(t('failed_to_send_code_again'));
       }
     } else if (step === Step.NewPhoneCode) {
       // Повторная отправка кода на новый номер
@@ -249,7 +253,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
 
         setResendTimer(SECONDS_TO_RESEND_CODE);
         setError(null);
-        notifications.success("Код отправлен повторно");
+        notifications.success(t('code_sent_again'));
 
         // DEV MODE: Автоматически получаем код
         setIsAutoFillingNew(true);
@@ -266,8 +270,8 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
           }
         }, 2000);
       } catch (error) {
-        setError("Не удалось отправить код повторно");
-        notifications.error("Не удалось отправить код повторно");
+        setError(t('failed_to_send_code_again'));
+        notifications.error(t('failed_to_send_code_again'));
       }
     }
   }, [
@@ -280,6 +284,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
     sendOtpMutation,
     currentCode,
     setError,
+    t,
   ]);
 
   // Handle back navigation
@@ -310,16 +315,14 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
               {/* Warning Notice */}
               <div className="bg-orange-100 rounded-lg p-4 border border-orange-200">
                 <p className="text-sm font-medium text-orange-800 text-center">
-                  После изменения номера телефона изменится номер для входа в
-                  сервис.
+                  {t('phone_change_warning')}
                 </p>
               </div>
 
               {/* Instructions */}
               <div className="text-center">
                 <p className="text-base font-medium text-gray-700">
-                  Мы отправим код подтверждения на ваш текущий номер{" "}
-                  {currentPhone}
+                  {t('we_will_send_code_to_current_number', { number: currentPhone })}
                 </p>
               </div>
             </div>
@@ -341,7 +344,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
                     : "#30313D",
                 }}
               >
-                {sendOtpMutation.isPending ? "Отправляем..." : "Получить код"}
+                {sendOtpMutation.isPending ? t('sending') : t('get_code')}
               </button>
             </div>
           </div>
@@ -358,22 +361,21 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
               {/* Warning Notice */}
               <div className="bg-orange-100 rounded-lg p-4 border border-orange-200 mb-6">
                 <p className="text-sm font-medium text-orange-800 text-center">
-                  После изменения номера телефона изменится номер для входа в
-                  сервис.
+                  {t('phone_change_warning')}
                 </p>
               </div>
 
               {/* Instructions */}
               <div className="text-center mb-6">
                 <p className="text-base font-medium text-gray-700">
-                  Введите код подтверждения для текущего номера {currentPhone}
+                  {t('enter_confirmation_code_for_current_number', { number: currentPhone })}
                 </p>
               </div>
 
               {/* New Phone Input */}
               <div className="flex flex-col gap-1 mb-6">
                 <label className="text-sm font-medium text-gray-700 px-3">
-                  Новый номер телефона
+                  {t('new_phone_number')}
                 </label>
                 <div
                   className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -404,7 +406,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
               {/* Code Input */}
               <div className="flex flex-col gap-1 mb-6">
                 <label className="text-sm font-medium text-gray-700 px-3">
-                  Код подтверждения
+                  {t('confirmation_code')}
                 </label>
                 <div
                   className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -446,8 +448,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
               <div className="text-center">
                 {resendTimer > 0 ? (
                   <p className="text-sm text-gray-500">
-                    Получить новый код через {resendTimer} секунд
-                    {resendTimer === 1 ? "у" : resendTimer < 5 ? "ы" : ""}
+                    {t('get_new_code_in_seconds', { seconds: resendTimer })}
                   </p>
                 ) : (
                   <button
@@ -455,7 +456,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
                     className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
                     style={{ fontFamily: "Nunito, sans-serif" }}
                   >
-                    Получить новый код
+                    {t('get_new_code')}
                   </button>
                 )}
               </div>
@@ -491,10 +492,10 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
                 }}
               >
                 {initiatePhoneChangeMutation.isPending
-                  ? "Проверяем..."
+                  ? t('checking')
                   : isAutoFillingCurrent
-                  ? "Получаем код..."
-                  : "Подтвердить"}
+                  ? t('getting_code')
+                  : t('confirm')}
               </button>
             </div>
           </div>
@@ -511,14 +512,14 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
               {/* Instructions */}
               <div className="text-center mb-6">
                 <p className="text-base font-medium text-gray-700">
-                  Мы отправили код подтверждения на номер {newPhone}
+                  {t('we_sent_code_to_number', { number: newPhone })}
                 </p>
                 <button
                   onClick={handleBack}
                   className="text-base font-medium text-indigo-600 hover:text-indigo-700 transition-colors mt-2"
                   style={{ fontFamily: "Nunito, sans-serif" }}
                 >
-                  Изменить номер
+                  {t('change_number')}
                 </button>
               </div>
 
@@ -565,8 +566,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
               <div className="text-center mb-6">
                 {resendTimer > 0 ? (
                   <p className="text-sm text-gray-500">
-                    Получить новый код через {resendTimer} секунд
-                    {resendTimer === 1 ? "у" : resendTimer < 5 ? "ы" : ""}
+                    {t('get_new_code_in_seconds', { seconds: resendTimer })}
                   </p>
                 ) : (
                   <button
@@ -574,7 +574,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
                     className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
                     style={{ fontFamily: "Nunito, sans-serif" }}
                   >
-                    Получить новый код
+                    {t('get_new_code')}
                   </button>
                 )}
               </div>
@@ -606,10 +606,10 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
                 }}
               >
                 {confirmPhoneChangeMutation.isPending
-                  ? "Проверяем..."
+                  ? t('checking')
                   : isAutoFillingNew
-                  ? "Получаем код..."
-                  : "Подтвердить"}
+                  ? t('getting_code')
+                  : t('confirm')}
               </button>
             </div>
           </div>
@@ -629,7 +629,7 @@ export const EditPhonePage: React.FC<EditPhonePageProps> = ({
       <div className="px-4 py-6">
         <div className="flex items-center justify-center relative">
           <h1 className="text-[20px] font-semibold text-gray-900 text-center">
-            Изменить номер
+            {t('change_number')}
           </h1>
           <button
             onClick={onClose}

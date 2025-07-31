@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { scenarioConfigs } from '../hooks/useScenarioNavigation';
+import { useTranslation } from 'react-i18next';
 
 interface BreadcrumbsProps {
   className?: string;
 }
 
 export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ className = '' }) => {
+  const { t } = useTranslation();
   const location = useLocation();
   const pathSegments = location.pathname.split('/').filter(Boolean);
 
@@ -14,9 +16,9 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ className = '' }) => {
     if (index === 0) {
       switch (segment) {
         case 'demo':
-          return 'Демо';
+          return t('demo');
         case 'login':
-          return 'Логин';
+          return t('login');
         default:
           return segment;
       }
@@ -37,7 +39,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ className = '' }) => {
   if (pathSegments.length === 0) {
     return (
       <div className={`flex items-center text-sm text-gray-600 ${className}`}>
-        <span>🏠 Главная</span>
+        <span>🏠 {t('home')}</span>
       </div>
     );
   }
@@ -48,7 +50,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ className = '' }) => {
         to="/" 
         className="hover:text-gray-900 transition-colors"
       >
-        🏠 Главная
+        🏠 {t('home')}
       </Link>
       
       {pathSegments.map((segment, index) => (

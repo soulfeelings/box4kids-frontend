@@ -6,6 +6,7 @@ import { ToyBoxStatus } from "../api-client/model/toyBoxStatus";
 import { DateManager } from "../utils/date/DateManager";
 import { LoadingComponent } from "../components/common/LoadingComponent";
 import { ErrorComponent } from "../components/common/ErrorComponent";
+import { useTranslation } from 'react-i18next';
 
 const dateManager = new DateManager();
 
@@ -16,6 +17,7 @@ interface DeliveryHistoryPageProps {
 export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
   onClose,
 }) => {
+  const { t } = useTranslation();
   // Получаем историю наборов, фильтруем только доставленные и возвращенные
   const {
     data: historyData,
@@ -33,7 +35,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
   }
 
   if (error) {
-    return <ErrorComponent errorMessage={"Ошибка загрузки истории"} />;
+    return <ErrorComponent errorMessage={t('error_loading_history')} />;
   }
 
   return (
@@ -45,7 +47,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
       <div className="px-4 py-6 relative flex items-center">
         <div className="flex justify-between items-center" />
         <h1 className="flex-1 text-[20px] font-semibold text-gray-900 text-center">
-          История доставок
+          {t('delivery_history')}
         </h1>
         <button
           onClick={onClose}
@@ -58,9 +60,9 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
       {/* Table Header */}
       <div className="mx-4 px-4 py-3 mb-2">
         <div className="flex justify-between items-center">
-          <div className="text-base font-medium text-black flex-1">Набор</div>
+          <div className="text-base font-medium text-black flex-1">{t('set')}</div>
           <div className="text-base font-medium text-black flex-1 text-right">
-            Дата доставки
+            {t('delivery_date')}
           </div>
         </div>
       </div>
@@ -69,7 +71,7 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
       <div className="mx-4 space-y-2">
         {deliveries.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            История доставок пуста
+            {t('delivery_history_empty')}
           </div>
         ) : (
           deliveries.map((delivery) => (
@@ -79,17 +81,17 @@ export const DeliveryHistoryPage: React.FC<DeliveryHistoryPageProps> = ({
             >
               <div className="flex justify-between items-center">
                 <div className="text-base text-gray-900 flex-1">
-                  Набор №{delivery.id}
+                  {t('set_number', { id: delivery.id })}
                   {delivery.status === "returned" && (
                     <span className="ml-2 text-sm text-gray-500">
-                      (Возвращен)
+                      ({t('returned')})
                     </span>
                   )}
                 </div>
                 <div className="text-base text-gray-900 flex-1 text-right">
                   {delivery.delivery_date
                     ? dateManager.formatDeliveryDate(delivery.delivery_date)
-                    : "Дата не указана"}
+                    : t('date_not_specified')}
                 </div>
               </div>
             </div>

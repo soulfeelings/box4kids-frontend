@@ -1,6 +1,7 @@
 import { clearPersistedStore } from "../store/store";
 import { refreshTokenClient } from "./refreshClient";
 import { notifications } from "../utils/notifications";
+import i18n from "../i18n";
 
 export interface CustomFetchParams {
   url: string;
@@ -107,6 +108,7 @@ export const customFetch = async <T>({
         "Content-Type": "application/json",
         ...(headers || {}),
         ...(authToken && { Authorization: `Bearer ${authToken}` }),
+        "Accept-Language": i18n.language.split("-")[0],
       },
       body: data !== undefined ? JSON.stringify(data) : undefined,
       signal,

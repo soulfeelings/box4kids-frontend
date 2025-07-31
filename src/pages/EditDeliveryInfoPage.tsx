@@ -8,6 +8,7 @@ import { useStore } from "../store/store";
 import { useUpdateDeliveryAddressDeliveryAddressesAddressIdPut } from "../api-client/";
 import { dateManager } from "../utils/date/DateManager";
 import { notifications } from "../utils/notifications";
+import { useTranslation } from 'react-i18next';
 
 interface DeliveryData {
   name: string;
@@ -18,6 +19,7 @@ interface DeliveryData {
 }
 
 export const EditDeliveryInfoPage: React.FC = () => {
+  const { t } = useTranslation();
   const { addressId } = useParams<{ addressId: string }>();
   const navigate = useNavigate();
   const updateDeliveryAddress = useStore(
@@ -104,8 +106,8 @@ export const EditDeliveryInfoPage: React.FC = () => {
       navigate(-1);
     } catch (error) {
       console.error("Failed to update delivery address:", error);
-      setError("Не удалось обновить адрес доставки");
-      notifications.error("Не удалось сохранить данные адреса");
+      setError(t('failed_to_update_delivery_address'));
+      notifications.error(t('failed_to_save_address_data'));
     }
   }, [
     currentAddress,
@@ -116,6 +118,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
     setError,
     isFormValid,
     navigate,
+    t,
   ]);
 
   // Если адрес не найден
@@ -123,12 +126,12 @@ export const EditDeliveryInfoPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Адрес доставки не найден</p>
+          <p className="text-gray-600">{t('delivery_address_not_found')}</p>
           <button
             onClick={handleClose}
             className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg"
           >
-            Назад
+            {t('back')}
           </button>
         </div>
       </div>
@@ -141,7 +144,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
       <div className="px-4 py-6">
         <div className="flex items-center justify-center relative">
           <h1 className="text-[20px] text-gray-900 text-center">
-            Изменить доставку
+            {t('edit_delivery')}
           </h1>
           <button
             onClick={handleClose}
@@ -172,7 +175,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
           isLoading={updateDeliveryAddressMutation.isPending}
           variant="primary"
         >
-          Сохранить
+          {t('save')}
         </ActionButton>
       </div>
 

@@ -2,12 +2,14 @@ import React, { useCallback, useEffect } from "react";
 import { useStore } from "../../../store/store";
 import { useSendOtpAuthSendOtpPost } from "../../../api-client";
 import { PHONE_MIN_LENGTH } from "../../../constants/phone";
+import { useTranslation } from 'react-i18next';
 
 interface PhoneStepProps {
   onSuccess: () => void;
 }
 
 export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
+  const { t } = useTranslation();
   const { phoneData, setPhoneData, setError } = useStore();
 
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
@@ -16,7 +18,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
     setError(null);
 
     if (phoneData.phone.length < PHONE_MIN_LENGTH) {
-      setError("Введите корректный номер телефона");
+      setError(t('enter_valid_phone_number'));
       return;
     }
 
@@ -28,10 +30,10 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
       onSuccess();
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : "Не удалось отправить код"
+        error instanceof Error ? error.message : t('failed_to_send_code')
       );
     }
-  }, [phoneData.phone, sendOtpMutation, setError, onSuccess]);
+  }, [phoneData.phone, sendOtpMutation, setError, onSuccess, t]);
 
   useEffect(() => {
     return () => {
@@ -50,10 +52,10 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
       {/* Title and Description */}
       <div className="flex flex-col gap-2 text-center">
         <h1 className="text-xl font-medium text-gray-900">
-          Войдите или зарегистрируйтесь
+          {t('login_or_register')}
         </h1>
         <p className="text-base font-medium text-gray-600">
-          Введите номер телефона и мы отправим код подтверждения
+          {t('enter_phone_number_and_we_will_send_code')}
         </p>
       </div>
 
@@ -88,7 +90,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
             className="text-red-500 text-sm font-medium px-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            {sendOtpMutation.error.detail?.[0]?.msg || "Ошибка отправки кода"}
+            {sendOtpMutation.error.detail?.[0]?.msg || t('code_sending_error')}
           </p>
         )}
       </div>
@@ -107,7 +109,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
           backgroundColor: isPhoneValid && !isLoading ? "#747EEC" : undefined,
         }}
       >
-        {isLoading ? "Отправляем..." : "Получить код"}
+        {isLoading ? t('sending') : t('get_code')}
       </button>
 
       {/* Spacer */}
@@ -115,8 +117,7 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
 
       {/* Legal Text */}
       <p className="text-sm font-medium text-gray-500 text-center leading-relaxed">
-        Нажимая кнопку «Получить код», вы принимаете условия Политики
-        конфиденциальности и Пользовательского соглашения.
+        {t('legal_agreement_text')}
       </p>
     </div>
   );
