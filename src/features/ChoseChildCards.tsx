@@ -1,5 +1,6 @@
 import { UserData } from "../types";
 import { dateManager } from "../utils/date/DateManager";
+import { useTranslation } from 'react-i18next';
 
 export const ChoseChildCards = ({
   user,
@@ -14,6 +15,7 @@ export const ChoseChildCards = ({
   handleAddNewChild: () => void;
   isCreatingNew: boolean;
 }) => {
+  const { t } = useTranslation();
   return (
     <>
       {user?.children && user.children.length > 0 && (
@@ -50,7 +52,7 @@ export const ChoseChildCards = ({
                       style={{ fontFamily: "Nunito, sans-serif" }}
                     >
                       {dateManager.getAgeWithDeclension(child.date_of_birth)} •{" "}
-                      {child.gender === "male" ? "Мальчик" : "Девочка"}
+                      {child.gender === "male" ? t('boy') : t('girl')}
                     </p>
                   </div>
                 </div>
@@ -98,7 +100,7 @@ export const ChoseChildCards = ({
                 className="font-medium text-gray-700"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Добавить ребенка
+                {t('add_child')}
               </p>
             </div>
           </button>

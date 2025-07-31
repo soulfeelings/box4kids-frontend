@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface DeliveryAddress {
   id: number;
@@ -29,30 +30,31 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
   deliveryAddresses = [],
   onEditDelivery,
 }) => {
+  const { t } = useTranslation();
   const formatDeliveryDate = useCallback((date: string) => {
     if (!date) return "";
     if (date.includes(".")) {
       const [day, month] = date.split(".");
       const monthNames = [
-        "янв",
-        "фев",
-        "мар",
-        "апр",
-        "мая",
-        "июн",
-        "июл",
-        "авг",
-        "сен",
-        "окт",
-        "ноя",
-        "дек",
+        t('jan_short'),
+        t('feb_short'),
+        t('mar_short'),
+        t('apr_short'),
+        t('may_short'),
+        t('jun_short'),
+        t('jul_short'),
+        t('aug_short'),
+        t('sep_short'),
+        t('oct_short'),
+        t('nov_short'),
+        t('dec_short'),
       ];
       const monthIndex = parseInt(month) - 1;
       const monthName = monthNames[monthIndex] || month;
       return `${day} ${monthName}`;
     }
     return date;
-  }, []);
+  }, [t]);
 
   const formatDeliveryTime = useCallback((time: string) => {
     if (!time) return "";
@@ -72,7 +74,7 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
     <div className="bg-[#F2F2F2] rounded-[24px] px-4 py-3 mb-2">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <div className="text-sm text-gray-600 mb-1">Доставка</div>
+          <div className="text-sm text-gray-600 mb-1">{t('delivery')}</div>
           <div className="mt-2">
             <div className="flex items-center text-base text-black mb-1">
               <div className="bg-[#F9F9F9] rounded-full w-6 h-6 flex items-center justify-center mr-2">
@@ -95,11 +97,11 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
                   <div className="bg-blue-100 rounded-full w-4 h-4 flex items-center justify-center mr-2">
                     <span className="text-xs">📦</span>
                   </div>
-                  Подписка: {primaryAddress.subscriptionInfo.childName} •{" "}
+                  {t('subscription')}: {primaryAddress.subscriptionInfo.childName} •{" "}
                   {primaryAddress.subscriptionInfo.planName}
                 </div>
                 <div className="text-xs text-blue-600">
-                  Статус: {primaryAddress.subscriptionInfo.status}
+                  {t('status')}: {primaryAddress.subscriptionInfo.status}
                 </div>
               </div>
             )}
@@ -111,11 +113,11 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
                   <div className="bg-green-100 rounded-full w-4 h-4 flex items-center justify-center mr-2">
                     <span className="text-xs">🎁</span>
                   </div>
-                  Бокс: {primaryAddress.boxInfo.childName} •{" "}
+                  {t('box')}: {primaryAddress.boxInfo.childName} •{" "}
                   {primaryAddress.boxInfo.status}
                 </div>
                 <div className="text-xs text-green-600">
-                  Доставка:{" "}
+                  {t('delivery_date')}:{" "}
                   {formatDeliveryDate(primaryAddress.boxInfo.deliveryDate)}
                 </div>
               </div>
@@ -126,7 +128,7 @@ export const DeliveryProfileSection: React.FC<DeliveryProfileSectionProps> = ({
                 onClick={onEditDelivery}
                 className="w-full bg-[#E3E3E3] text-sm text-black py-2 px-4 rounded-[32px] text-center hover:bg-gray-300 transition-colors"
               >
-                Изменить адрес или дату доставки
+                {t('change_address_or_delivery_date')}
               </button>
             </div>
           </div>

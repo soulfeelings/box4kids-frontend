@@ -1,4 +1,5 @@
 import { UserData } from "../types";
+import { useTranslation } from 'react-i18next';
 
 export const DeliveryAddressCards = ({
   user,
@@ -15,6 +16,8 @@ export const DeliveryAddressCards = ({
   onEditAddress?: (id: number) => void;
   isCreatingNew: boolean;
 }) => {
+  const { t } = useTranslation();
+
   const formatTimeRange = (time: string) => {
     if (!time) return "";
 
@@ -28,24 +31,22 @@ export const DeliveryAddressCards = ({
   };
 
   const formatDate = (date: string) => {
-    if (!date) return "";
-
     // Если дата в формате "DD.MM", добавляем название месяца
     if (date.includes(".")) {
       const [day, month] = date.split(".");
       const monthNames = [
-        "янв",
-        "фев",
-        "мар",
-        "апр",
-        "мая",
-        "июн",
-        "июл",
-        "авг",
-        "сен",
-        "окт",
-        "ноя",
-        "дек",
+        t('jan_short'),
+        t('feb_short'),
+        t('mar_short'),
+        t('apr_short'),
+        t('may_short'),
+        t('jun_short'),
+        t('jul_short'),
+        t('aug_short'),
+        t('sep_short'),
+        t('oct_short'),
+        t('nov_short'),
+        t('dec_short'),
       ];
 
       const monthIndex = parseInt(month) - 1;
@@ -66,7 +67,7 @@ export const DeliveryAddressCards = ({
               className="text-lg font-medium text-gray-900 mb-4 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Сохраненные места доставки
+              {t('saved_delivery_addresses')}
             </h3>
 
             {user.deliveryAddresses.map((address, index) => (
@@ -202,7 +203,7 @@ export const DeliveryAddressCards = ({
                 className="font-medium text-gray-700"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Добавить новый адрес
+                {t('add_new_address')}
               </p>
             </div>
           </button>

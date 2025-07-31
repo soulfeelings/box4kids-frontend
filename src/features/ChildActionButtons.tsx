@@ -1,5 +1,6 @@
 import React from "react";
 import { ActionButton } from "./ActionButton";
+import { useTranslation } from 'react-i18next';
 
 interface ChildActionButtonsProps {
   onEditData: (childId: number) => void;
@@ -16,6 +17,7 @@ export const ChildActionButtons: React.FC<ChildActionButtonsProps> = ({
   childId,
   isDisabled = false,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3 pt-4">
       <ActionButton
@@ -23,23 +25,21 @@ export const ChildActionButtons: React.FC<ChildActionButtonsProps> = ({
         disabled={isDisabled}
         variant="secondary"
       >
-        Изменить данные ребёнка
+        {t('edit_child_data')}
       </ActionButton>
-
       <ActionButton
         onClick={() => onEditSubscription(childId)}
         disabled={isDisabled}
         variant="secondary"
       >
-        Изменить тариф
+        {t('edit_tariff')}
       </ActionButton>
-
       <ActionButton
         onClick={() => onDelete(childId)}
         disabled={isDisabled}
         variant="danger"
       >
-        Удалить
+        {t('delete')}
       </ActionButton>
     </div>
   );

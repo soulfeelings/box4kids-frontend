@@ -8,12 +8,14 @@ import { ToyCategoryConfigResponse } from "../../../api-client/model/toyCategory
 import { PaymentStatusEnum } from "../../../api-client/model/paymentStatusEnum";
 import { notifications } from "../../../utils/notifications";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { useTranslation } from 'react-i18next';
 
 export const PaymentStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
+  const { t } = useTranslation();
   const isLoading = useStore((state) => state.isLoading);
   const setError = useStore((state) => state.setError);
   const subscriptionPlans = useStore((state) => state.subscriptionPlans);
@@ -46,7 +48,7 @@ export const PaymentStep: React.FC<{
 
   const handlePaymentSubmit = useCallback(async () => {
     if (!subscriptionsIds?.length) {
-      setError("Нет доступных подписок");
+      setError(t('no_available_subscriptions'));
       return;
     }
 
@@ -65,16 +67,16 @@ export const PaymentStep: React.FC<{
         onNext(); // Переходим к успешному завершению
       } else {
         notifications.paymentError();
-        setError("Платеж не прошел. Попробуйте еще раз.");
+        setError(t('payment_failed_try_again'));
       }
     } catch (error) {
       console.error("Payment error:", error);
       notifications.paymentError();
-      setError("Ошибка при обработке платежа. Попробуйте еще раз.");
+      setError(t('payment_processing_error'));
     } finally {
       setPaymentProcessing(false);
     }
-  }, [subscriptionsIds, processSubscriptionsMutation, onNext, setError]);
+  }, [subscriptionsIds, processSubscriptionsMutation, onNext, setError, t]);
 
   // Получение плана по ID
   const getPlanById = useCallback(
@@ -176,7 +178,7 @@ export const PaymentStep: React.FC<{
             className="text-xl font-semibold text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Подтвердите и оплатите подписку
+            {t('confirm_and_pay_subscription')}
           </h1>
         </div>
 
@@ -208,7 +210,7 @@ export const PaymentStep: React.FC<{
                   className="text-lg font-semibold text-gray-900 mb-3"
                   style={{ fontFamily: "Nunito, sans-serif" }}
                 >
-                  Набор для {child.name}
+                  {t('set_for_child', { name: child.name })}
                 </h2>
 
                 <div className="space-y-2">
@@ -217,7 +219,7 @@ export const PaymentStep: React.FC<{
                       className="text-gray-700"
                       style={{ fontFamily: "Nunito, sans-serif" }}
                     >
-                      Игрушек в наборе
+                      {t('toys_in_set')}
                     </span>
                     <span
                       className="text-gray-900 font-medium"
@@ -227,7 +229,7 @@ export const PaymentStep: React.FC<{
                         (sum: number, item: any) => sum + item.count,
                         0
                       )}{" "}
-                      шт
+                      {t('pcs')}
                     </span>
                   </div>
                   {/* Скидка (если есть) */}
@@ -257,7 +259,7 @@ export const PaymentStep: React.FC<{
                           className="text-gray-700"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          Скидка
+                          {t('discount')}
                         </span>
                         <span
                           className="text-green-600 font-medium"
@@ -273,13 +275,13 @@ export const PaymentStep: React.FC<{
                           className="text-gray-700"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          Базовая стоимость
+                          {t('base_cost')}
                         </span>
                         <span
                           className="text-gray-900 font-medium"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          ${plan.price_monthly} / мес.
+                          ${plan.price_monthly} {t('per_month')}
                         </span>
                       </div>
                       
@@ -289,13 +291,13 @@ export const PaymentStep: React.FC<{
                           className="text-gray-900 font-semibold"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          Итого
+                          {t('total')}
                         </span>
                         <span
                           className="text-gray-900 font-bold text-lg"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          ${Math.round((subscription[0] as any).final_price || plan.price_monthly * (1 - (subscription[0]?.discount_percent || 0) / 100))} / мес.
+                          ${Math.round((subscription[0] as any).final_price || plan.price_monthly * (1 - (subscription[0]?.discount_percent || 0) / 100))} {t('per_month')}
                         </span>
                       </div>
                     </>
@@ -306,13 +308,13 @@ export const PaymentStep: React.FC<{
                         className="text-gray-700"
                         style={{ fontFamily: "Nunito, sans-serif" }}
                       >
-                        Стоимость
+                        {t('cost')}
                       </span>
                       <span
                         className="text-gray-900 font-medium"
                         style={{ fontFamily: "Nunito, sans-serif" }}
                       >
-                        ${plan.price_monthly} / мес.
+                        ${plan.price_monthly} {t('per_month')}
                       </span>
                     </div>
                   )}
@@ -364,7 +366,7 @@ export const PaymentStep: React.FC<{
                             className="text-gray-700"
                             style={{ fontFamily: "Nunito, sans-serif" }}
                           >
-                            Скидка
+                            {t('discount')}
                           </span>
                           <span
                             className="text-green-600 font-medium"
@@ -378,13 +380,13 @@ export const PaymentStep: React.FC<{
                             className="text-xl font-semibold text-gray-900"
                             style={{ fontFamily: "Nunito, sans-serif" }}
                           >
-                            Общая сумма
+                            {t('total_amount')}
                           </span>
                           <span
                             className="text-xl font-bold text-gray-900"
                             style={{ fontFamily: "Nunito, sans-serif" }}
                           >
-                            ${totalPrice} / мес.
+                            ${totalPrice} {t('per_month')}
                           </span>
                         </div>
                       </>
@@ -394,13 +396,13 @@ export const PaymentStep: React.FC<{
                           className="text-xl font-semibold text-gray-900"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          Общая сумма
+                          {t('total_amount')}
                         </span>
                         <span
                           className="text-xl font-bold text-gray-900"
                           style={{ fontFamily: "Nunito, sans-serif" }}
                         >
-                          ${totalPrice} / мес.
+                          ${totalPrice} {t('per_month')}
                         </span>
                       </div>
                     )}
@@ -416,8 +418,7 @@ export const PaymentStep: React.FC<{
               className="text-gray-500 text-sm text-center leading-relaxed"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Можно отменить или поставить подписку на паузу в любое время через
-              приложение
+              {t('subscription_cancellation_info')}
             </p>
           </div>
         </div>
@@ -438,12 +439,12 @@ export const PaymentStep: React.FC<{
           }}
         >
           {isLoading
-            ? "Подготавливаем платеж..."
+            ? t('preparing_payment')
             : paymentProcessing
-            ? "Обрабатываем платеж..."
+            ? t('processing_payment')
             : !totalPrice
-            ? "Загружаем данные..."
-            : "Оплатить и активировать"}
+            ? t('loading_data')
+            : t('pay_and_activate')}
         </button>
 
         {/* Payment processing indicator */}
@@ -455,7 +456,7 @@ export const PaymentStep: React.FC<{
                 className="text-sm text-gray-600"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Обработка может занять до 15 секунд...
+                {t('processing_may_take_up_to_15_seconds')}
               </span>
             </div>
           </div>
@@ -465,7 +466,7 @@ export const PaymentStep: React.FC<{
           className="text-center text-gray-500 text-xs leading-relaxed"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Вы будете перенаправлены в платёжный сервис для безопасной оплаты
+          {t('you_will_be_redirected_to_payment_service')}
         </p>
       </div>
     </div>

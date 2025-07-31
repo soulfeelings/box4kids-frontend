@@ -15,6 +15,7 @@ import { ChoseChildCards } from "../../../features/ChoseChildCards";
 import { notifications } from "../../../utils/notifications";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { useTranslation } from 'react-i18next';
 
 interface ChildData {
   name: string;
@@ -30,6 +31,7 @@ export const ChildStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
+  const { t } = useTranslation();
   const { setCurrentChildIdToUpdate, addChild, updateChild, setError, fetchInitData } =
     useStore();
   const createChildMutation = useCreateChildChildrenPost();
@@ -189,8 +191,8 @@ export const ChildStep: React.FC<{
       onNext();
     } catch (error) {
       console.error("Failed to update child:", error);
-      setError("Не удалось обновить ребёнка");
-      notifications.error("Не удалось сохранить данные ребенка");
+      setError(t('failed_to_update_child'));
+      notifications.error(t('failed_to_save_child_data'));
     }
   }, [
     isFormValid,
@@ -206,6 +208,7 @@ export const ChildStep: React.FC<{
     notifications,
     fetchInitData,
     onNext,
+    t,
   ]);
 
   return (
@@ -255,13 +258,13 @@ export const ChildStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Кому собираем набор?
+            {t('who_are_we_collecting_set_for')}
           </h1>
           <p
             className="text-sm text-gray-600 mt-2"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Показаны только дети без активной подписки
+            {t('only_children_without_active_subscription')}
           </p>
         </div>
 
@@ -284,7 +287,7 @@ export const ChildStep: React.FC<{
               className="text-sm font-medium text-gray-600 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Имя ребенка
+              {t('child_name')}
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -315,7 +318,7 @@ export const ChildStep: React.FC<{
               className="text-sm font-medium text-gray-600 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Дата рождения
+              {t('birth_date')}
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -361,7 +364,7 @@ export const ChildStep: React.FC<{
               className="text-lg font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Пол ребенка
+              {t('child_gender')}
             </h3>
             <div className="flex gap-3">
               <button
@@ -376,7 +379,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Мужской
+                {t('male')}
               </button>
               <button
                 onClick={useCallback(
@@ -390,7 +393,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Женский
+                {t('female')}
               </button>
             </div>
           </div>
@@ -401,7 +404,7 @@ export const ChildStep: React.FC<{
               className="text-lg font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Особенности
+              {t('features')}
             </h3>
             <div className="flex gap-3">
               <button
@@ -417,7 +420,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Нет
+                {t('no')}
               </button>
               <button
                 onClick={useCallback(
@@ -432,7 +435,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Есть ограничения
+                {t('has_limitations')}
               </button>
             </div>
           </div>
@@ -443,7 +446,7 @@ export const ChildStep: React.FC<{
               className="text-sm font-medium text-gray-600 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Комментарий
+              {t('comment')}
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -458,8 +461,8 @@ export const ChildStep: React.FC<{
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
                 placeholder={
                   childData.limitations
-                    ? "Опишите ограничения ребенка..."
-                    : "Дополнительная информация о ребенке..."
+                    ? t('describe_child_limitations')
+                    : t('additional_child_info')
                 }
                 value={childData.comment || ""}
                 onChange={useCallback(
@@ -480,7 +483,7 @@ export const ChildStep: React.FC<{
                 className="text-sm text-red-400 px-3"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                Напишите ограничения ребенка
+                {t('write_child_limitations')}
               </p>
             )}
           </div>
@@ -505,7 +508,7 @@ export const ChildStep: React.FC<{
                 : undefined,
           }}
         >
-          {createChildMutation.isPending ? "Сохраняем..." : "Продолжить"}
+          {createChildMutation.isPending ? t('saving') : t('continue')}
         </button>
       </div>
     </div>

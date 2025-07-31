@@ -16,6 +16,7 @@ import {
 import { Gender } from "../api-client/model/gender";
 import { dateManager } from "../utils/date/DateManager";
 import { notifications } from "../utils/notifications";
+import { useTranslation } from 'react-i18next';
 
 interface ChildData {
   name: string;
@@ -26,6 +27,7 @@ interface ChildData {
 }
 
 export const EditChildPage: React.FC = () => {
+  const { t } = useTranslation();
   const { childId } = useEditChildParams();
   const navigate = useNavigate();
   const updateChild = useStore((state) => state.updateChild);
@@ -158,8 +160,8 @@ export const EditChildPage: React.FC = () => {
       notifications.childUpdated();
     } catch (error) {
       console.error("Failed to update child:", error);
-      setError("Не удалось обновить ребёнка");
-      notifications.error("Не удалось сохранить данные ребенка");
+      setError(t('failed_to_update_child'));
+      notifications.error(t('failed_to_save_child_data'));
     }
   }, [
     currentChild,
@@ -172,6 +174,7 @@ export const EditChildPage: React.FC = () => {
     updateChild,
     setError,
     isFormValid,
+    t,
   ]);
 
   // Если ребенок не найден
@@ -179,12 +182,12 @@ export const EditChildPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Ребенок не найден</p>
+          <p className="text-gray-600">{t('child_not_found')}</p>
           <button
             onClick={handleClose}
             className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg"
           >
-            Назад
+            {t('back')}
           </button>
         </div>
       </div>
@@ -197,7 +200,7 @@ export const EditChildPage: React.FC = () => {
       <div className="px-4 py-6">
         <div className="flex items-center justify-center relative">
           <h1 className="text-[20px] font-semibold text-gray-900 text-center">
-            Изменить данные ребёнка
+            {t('edit_child_data')}
           </h1>
           <button
             onClick={handleClose}
@@ -238,7 +241,7 @@ export const EditChildPage: React.FC = () => {
           isLoading={updateChildMutation.isPending}
           variant="primary"
         >
-          Сохранить
+          {t('save')}
         </ActionButton>
       </div>
 

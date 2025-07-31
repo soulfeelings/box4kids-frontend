@@ -3,6 +3,7 @@ import { Tag } from "../../components/Tag";
 import { dateManager } from "../../utils/date/DateManager";
 import { UserChildData } from "../../types";
 import { InterestResponse, SkillResponse } from "../../api-client/model";
+import { useTranslation } from 'react-i18next';
 
 interface ChildInfoWidgetProps {
   child: UserChildData;
@@ -21,6 +22,8 @@ export const ChildInfoWidget: React.FC<ChildInfoWidgetProps> = ({
   skills,
   subscriptionPlan,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="mb-6">
       <div className="flex items-center mb-3">
@@ -35,7 +38,7 @@ export const ChildInfoWidget: React.FC<ChildInfoWidgetProps> = ({
       {/* Special Needs */}
       {child?.limitations && (
         <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-2">Особенности</p>
+          <p className="text-sm text-gray-600 mb-2">{t('features')}</p>
           <div className="flex flex-wrap gap-2">
             <Tag>{child.comment}</Tag>
           </div>
@@ -44,7 +47,7 @@ export const ChildInfoWidget: React.FC<ChildInfoWidgetProps> = ({
 
       {/* Interests */}
       <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">Интересы</p>
+        <p className="text-sm text-gray-600 mb-2">{t('interests')}</p>
         <div className="flex flex-wrap gap-2">
           {interests.filter(Boolean).map((interest, index) => (
             <Tag key={index}>{interest.name}</Tag>
@@ -54,7 +57,7 @@ export const ChildInfoWidget: React.FC<ChildInfoWidgetProps> = ({
 
       {/* Skills */}
       <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">Навыки для развития</p>
+        <p className="text-sm text-gray-600 mb-2">{t('skills_for_development')}</p>
         <div className="flex flex-wrap gap-2">
           {skills.filter(Boolean).map((skill, index) => (
             <Tag key={index}>{skill.name}</Tag>
@@ -65,10 +68,10 @@ export const ChildInfoWidget: React.FC<ChildInfoWidgetProps> = ({
       {/* Subscription */}
       {subscriptionPlan && (
         <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-2">Тариф</p>
+          <p className="text-sm text-gray-600 mb-2">{t('tariff')}</p>
           <Tag>
-            {subscriptionPlan?.name} • {subscriptionPlan?.toy_count} игрушек • $
-            {subscriptionPlan?.price_monthly} /мес
+            {subscriptionPlan?.name} • {subscriptionPlan?.toy_count} {t('toys')} • $
+            {subscriptionPlan?.price_monthly} {t('per_month')}
           </Tag>
         </div>
       )}

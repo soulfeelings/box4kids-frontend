@@ -12,8 +12,10 @@ import {
 import { SubscriptionStatus } from "../api-client/model";
 import { notifications } from "../utils/notifications";
 import { ErrorComponent } from "../components/common/ErrorComponent";
+import { useTranslation } from 'react-i18next';
 
 export const CancelSubscriptionPage: React.FC = () => {
+  const { t } = useTranslation();
   const { subscriptionId } = useCancelSubscriptionParams();
   const { updateChildSubscription } = useStore();
   const navigate = useNavigate();
@@ -61,7 +63,7 @@ export const CancelSubscriptionPage: React.FC = () => {
       refetch();
     } catch (error) {
       console.error("Ошибка при приостановке подписки:", error);
-      notifications.error("Не удалось приостановить подписку");
+      notifications.error(t('failed_to_pause_subscription'));
     }
   }, [
     pauseSubscriptionMutation,
@@ -69,6 +71,7 @@ export const CancelSubscriptionPage: React.FC = () => {
     subscriptionId,
     updateChildSubscription,
     refetch,
+    t,
   ]);
 
   const onResume = useCallback(async () => {
@@ -97,7 +100,7 @@ export const CancelSubscriptionPage: React.FC = () => {
       refetch();
     } catch (error) {
       console.error("Ошибка при возобновлении подписки:", error);
-      notifications.error("Не удалось возобновить подписку");
+      notifications.error(t('failed_to_resume_subscription'));
     }
   }, [
     resumeSubscriptionMutation,
@@ -105,12 +108,13 @@ export const CancelSubscriptionPage: React.FC = () => {
     subscriptionId,
     updateChildSubscription,
     refetch,
+    t,
   ]);
 
   if (!subscriptionId) {
     return (
       <ErrorComponent
-        errorMessage="ID подписки не найден"
+        errorMessage={t('subscription_id_not_found')}
         onBack={() => navigate(-1)}
       />
     );
@@ -123,7 +127,7 @@ export const CancelSubscriptionPage: React.FC = () => {
   if (!subscription) {
     return (
       <ErrorComponent
-        errorMessage="Подписка не найдена"
+        errorMessage={t('subscription_not_found')}
         onBack={() => navigate(-1)}
       />
     );
@@ -137,7 +141,7 @@ export const CancelSubscriptionPage: React.FC = () => {
       <div className="flex-1 flex flex-col items-center p-4">
         <ModalHeader
           className="mb-8"
-          title={isPaused ? "Возобновить подписку?" : "Остановить подписку?"}
+          title={isPaused ? t('resume_subscription_question') : t('pause_subscription_question')}
           onClose={onCancel}
         />
 
@@ -145,8 +149,8 @@ export const CancelSubscriptionPage: React.FC = () => {
         <div className="mb-8">
           <p className="text-gray-600 text-center leading-relaxed">
             {isPaused
-              ? "Мы возобновим доставку коробок и подбор игрушек для вашего ребенка."
-              : "Мы приостановим доставку коробок и подбор игрушек. Вы сможете возобновить подписку в любой момент."}
+              ? t('resume_subscription_description')
+              : t('pause_subscription_description')}
           </p>
         </div>
 
@@ -159,8 +163,8 @@ export const CancelSubscriptionPage: React.FC = () => {
               className="w-full h-14 bg-[#4CAF50] hover:bg-[#45a049] text-white py-4 px-4 rounded-[32px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {resumeSubscriptionMutation.isPending
-                ? "Возобновляем..."
-                : "Возобновить подписку"}
+                ? t('resuming')
+                : t('resume_subscription')}
             </button>
           ) : (
             <button
@@ -169,8 +173,8 @@ export const CancelSubscriptionPage: React.FC = () => {
               className="w-full h-14 bg-[#FBC8D5] hover:bg-[#F9B8C8] text-[#E14F75] py-4 px-4 rounded-[32px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {pauseSubscriptionMutation.isPending
-                ? "Останавливаем..."
-                : "Остановить подписку"}
+                ? t('pausing')
+                : t('pause_subscription')}
             </button>
           )}
 
@@ -182,7 +186,7 @@ export const CancelSubscriptionPage: React.FC = () => {
             }
             className="w-full h-14 bg-[#E3E3E3] hover:bg-[#D3D3D3] text-gray-800 py-4 px-4 rounded-[32px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Отмена
+            {t('cancel')}
           </button>
         </div>
       </div>

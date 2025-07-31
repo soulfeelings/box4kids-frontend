@@ -2,6 +2,7 @@ import React from "react";
 import { Star } from "lucide-react";
 import { useGetBoxReviewsToyBoxesBoxIdReviewsGet } from "../api-client";
 import { UserData } from "../types";
+import { useTranslation } from 'react-i18next';
 
 interface BoxesState {
   child: UserData["children"][0];
@@ -24,6 +25,7 @@ export const RatingSection: React.FC<RatingSectionProps> = ({
   handleStarClick,
   userId,
 }) => {
+  const { t } = useTranslation();
   const { data: reviewsData } = useGetBoxReviewsToyBoxesBoxIdReviewsGet(
     box.currentBox.id
   );
@@ -41,7 +43,7 @@ export const RatingSection: React.FC<RatingSectionProps> = ({
         style={{ backgroundColor: "#747EEC", borderRadius: "24px" }}
       >
         <h3 className="text-white text-center md:text-left font-medium mb-3">
-          Ваш отзыв о наборе для {box.child.name}
+          {t('your_review_about_the_box')}
         </h3>
         <div className="flex justify-center md:justify-start space-x-2 mb-3">
           {[1, 2, 3, 4, 5].map((starRating) => (
@@ -72,7 +74,7 @@ export const RatingSection: React.FC<RatingSectionProps> = ({
       style={{ backgroundColor: "#747EEC", borderRadius: "24px" }}
     >
       <h3 className="text-white font-medium mb-3">
-        Как вам текущий набор для {box.child.name}?
+        {t('how_do_you_like_the_current_box')}
       </h3>
       <div className="flex justify-center space-x-2">
         {[0, 1, 2, 3, 4].map((index) => (

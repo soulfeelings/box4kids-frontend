@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const LandingPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const currentLanguage = i18n.language;
+
+  const handleLanguageChange = (language: string) => {
+    i18n.changeLanguage(language);
+  };
   const [openFaq, setOpenFaq] = useState<number | null>(null); // All items closed by default
-  const [selectedAge, setSelectedAge] = useState<string>('0 - 3 месяцев');
+  const [selectedAge, setSelectedAge] = useState<string>(t('age_0_3_months'));
   const [isAgeMenuOpen, setIsAgeMenuOpen] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
@@ -49,14 +56,48 @@ export const LandingPage: React.FC = () => {
     <div className="min-h-screen" style={{ backgroundColor: '#FFE8C8' }}>
       {/* Header */}
       <header className="flex justify-between items-center px-4 md:px-8 lg:px-12 py-4 bg-white">
+        {/* Language Switcher */}
+        <div className="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <button
+            onClick={() => handleLanguageChange('ru')}
+            className={`px-3 py-1 text-sm font-medium transition-all duration-200 ${
+              currentLanguage === 'ru'
+                ? 'text-white'
+                : 'bg-white text-gray-700 hover:bg-gray-50'
+            }`}
+            style={{ 
+              fontFamily: 'Nunito, sans-serif',
+              backgroundColor: currentLanguage === 'ru' ? '#747EEC' : undefined
+            }}
+          >
+            RU
+          </button>
+          <div className="w-px bg-gray-200"></div>
+          <button
+            onClick={() => handleLanguageChange('uz')}
+            className={`px-3 py-1 text-sm font-medium transition-all duration-200 ${
+              currentLanguage === 'uz'
+                ? 'text-white'
+                : 'bg-white text-gray-700 hover:bg-gray-50'
+            }`}
+            style={{ 
+              fontFamily: 'Nunito, sans-serif',
+              backgroundColor: currentLanguage === 'uz' ? '#747EEC' : undefined
+            }}
+          >
+            UZ
+          </button>
+        </div>
+
         <div className="text-xl md:text-2xl font-bold text-gray-800">
           BOX4BABY
         </div>
+
         <button
           onClick={handleLoginClick}
           className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
         >
-          Войти
+          {t('login')}
         </button>
       </header>
 
@@ -66,7 +107,7 @@ export const LandingPage: React.FC = () => {
         <div className="w-full">
           <img 
             src="/illustrations/family.svg" 
-            alt="Семья с детьми"
+            alt={t('family_with_children')}
             className="w-full h-64 md:h-80 lg:h-[534px] object-cover"
           />
         </div>
@@ -74,17 +115,17 @@ export const LandingPage: React.FC = () => {
         {/* Main content */}
         <div className="bg-white p-8 md:p-12 mx-4 md:mx-8 text-center -mt-8 md:-mt-12 max-w-7xl mx-auto" style={{ borderRadius: '24px' }}>
           <h1 className="font-bold mb-4 leading-tight text-[26px] md:text-[32px] lg:text-[36px] text-gray-800">
-            Игрушки, которые радуют и развивают
+            {t('toys_that_bring_joy_and_development')}
           </h1>
           <p className="mb-8 leading-relaxed text-[16px] md:text-[18px] text-[#686564] max-w-2xl mx-auto">
-            Подберите персональную коробку для ребенка и получай новый набор каждые 2 недели
+            {t('personal_box_subtitle')}
           </p>
           <button
             onClick={handleCreateBoxClick}
             className="w-full max-w-md py-4 text-white font-semibold rounded-3xl text-lg transition-all duration-200"
             style={{ backgroundColor: '#747EEC' }}
           >
-            Собрать коробку
+            {t('create_box')}
           </button>
         </div>
       </div>
@@ -93,10 +134,10 @@ export const LandingPage: React.FC = () => {
       <div className="px-4 py-12 ">
         <div className="max-w-sm mx-auto text-center">
           <h2 className="font-bold leading-tight text-[26px] text-gray-800 mb-4">
-            Освобождайте пространство, развивайте ребёнка и экономьте ресурсы
+            {t('free_space_develop_save')}
           </h2>
           <p className="mb-0 text-[16px] text-[#686564]">
-            90% детей теряют интерес к игрушке меньше чем за 16 дней. Им хочется чего-то нового — и это нормально!
+            {t('90_percent_kids_lose_interest')}
           </p>
         </div>
       </div>
@@ -108,15 +149,15 @@ export const LandingPage: React.FC = () => {
           <div className="min-w-[246px] max-w-[246px] bg-white rounded-3xl shadow-md flex flex-col overflow-hidden" style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.06)' }}>
             {/* Иллюстрация */}
             <div className="bg-[#E6E6FA] w-full overflow-hidden" style={{ height: 160 }}>
-              <img src="/illustrations/bear.png" alt="Меньше хаоса" className="w-full h-full object-contain" />
+              <img src="/illustrations/bear.png" alt={t('less_chaos')} className="w-full h-full object-contain" />
             </div>
             {/* Контент */}
             <div className="p-5">
               <div className="font-bold text-[18px] mb-2 flex items-center">
-                <span className="mr-2">🧸</span> Меньше хаоса
+                <span className="mr-2">🧸</span> {t('less_chaos')}
               </div>
               <div className="text-[18px] text-[#222] leading-snug">
-                Устали от гор игрушек, которыми никто не играет? Подписка избавляет от беспорядка и делает игру осмысленной и удобной.
+                {t('tired_of_toys_that_nobody_plays')}
               </div>
             </div>
           </div>
@@ -129,10 +170,10 @@ export const LandingPage: React.FC = () => {
             {/* Контент */}
             <div className="p-5">
               <div className="font-bold text-[18px] mb-2 flex items-center">
-                <span className="mr-2">🧠</span>Только акутальное
+                <span className="mr-2">🧠</span> {t('only_current')}
               </div>
               <div className="text-[18px] text-[#222] leading-snug">
-                Игрушки легко менять по мере роста и интересов ребенка. Никакого перегруза — только то, что нужно именно сейчас.
+                {t('toys_can_be_easily_changed_as_the_child_grows')}
               </div>
             </div>
           </div>
@@ -144,10 +185,10 @@ export const LandingPage: React.FC = () => {
             {/* Контент */}
             <div className="p-5">
               <div className="font-bold text-[18px] mb-2 flex items-center">
-                <span className="mr-2">🎓 </span>Развитие без усилий
+                <span className="mr-2">🎓 </span> {t('development_without_effort')}
               </div>
               <div className="text-[18px] text-[#222] leading-snug">
-              Каждая игрушка — не случайна. Мы подбираем наборы с учётом возраста, навыков и целей развития.
+              {t('each_toy_is_not_random')}
               </div>
             </div>
           </div>
@@ -159,10 +200,10 @@ export const LandingPage: React.FC = () => {
             {/* Контент */}
             <div className="p-5">
               <div className="font-bold text-[18px] mb-2 flex items-center">
-                <span className="mr-2">🕰️</span>Экономия времени
+                <span className="mr-2">🕰️</span> {t('time_saving')}
               </div>
               <div className="text-[18px] text-[#222] leading-snug">
-              Больше не нужно тратить часы на маркетплейсах. Игрушки приходят автоматически — в нужное время, в одной коробке.
+              {t('no_more_spending_hours_on_marketplaces')}
               </div>
             </div>
           </div>
@@ -179,28 +220,28 @@ export const LandingPage: React.FC = () => {
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
                 <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">1</span>
               </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">Вы выбираете возраст, интересы и цели развития</div>
+              <div className="pt-1 text-[18px] md:text-[20px]">{t('choose_age_interests_development_goals')}</div>
             </div>
             {/* Шаг 2 */}
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
                 <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">2</span>
               </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">Мы собираем персональный набор игрушек</div>
+              <div className="pt-1 text-[18px] md:text-[20px]">{t('we_collect_personal_toy_set')}</div>
             </div>
             {/* Шаг 3 */}
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
                 <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">3</span>
               </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">Курьер доставляет коробку прямо к вам домой</div>
+              <div className="pt-1 text-[18px] md:text-[20px]">{t('courier_delivers_the_box_to_your_home')}</div>
             </div>
             {/* Шаг 4 */}
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
                 <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">4</span>
               </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">Через 2 недели — новый набор</div>
+              <div className="pt-1 text-[18px] md:text-[20px]">{t('new_set_after_2_weeks')}</div>
             </div>
           </div>
         </div>
@@ -235,12 +276,12 @@ export const LandingPage: React.FC = () => {
                 <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg z-10 min-w-[200px]">
                   <div className="py-2">
                     {[
-                      '0 - 3 месяцев',
-                      '3 - 6 месяцев', 
-                      '6 - 12 месяцев',
-                      '1 - 3 года',
-                      '3 - 5 лет',
-                      '5 - 8 лет'
+                      t('age_0_3_months'),
+                      t('age_3_6_months'), 
+                      t('age_6_12_months'),
+                      t('age_1_3_years'),
+                      t('age_3_5_years'),
+                      t('age_5_8_years')
                     ].map((age) => (
                       <div
                         key={age}
@@ -269,12 +310,12 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/box1.svg" 
-                  alt="Коробка 1"
+                  alt={t('box_1')}
                   className="w-full object-contain"
                 />
               </div>
-              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">Коробка 1</h3>
-              <p className="text-sm text-gray-500">Подробнее</p>
+              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">{t('box_1')}</h3>
+              <p className="text-sm text-gray-500">{t('learn_more')}</p>
             </div>
             
             {/* Set 2 */}
@@ -286,12 +327,12 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/box2.svg" 
-                  alt="Коробка 2"
+                  alt={t('box_2')}
                   className="w-full object-contain"
                 />
               </div>
-              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">Коробка 2</h3>
-              <p className="text-sm text-gray-500">Подробнее</p>
+              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">{t('box_2')}</h3>
+              <p className="text-sm text-gray-500">{t('learn_more')}</p>
             </div>
             
             {/* Set 3 */}
@@ -303,12 +344,12 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/box3.svg" 
-                  alt="Коробка 3"
+                  alt={t('box_3')}
                   className="w-full object-contain"
                 />
               </div>
-              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">Коробка 3</h3>
-              <p className="text-sm text-gray-500">Подробнее</p>
+              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">{t('box_3')}</h3>
+              <p className="text-sm text-gray-500">{t('learn_more')}</p>
             </div>
             
             {/* Set 4 */}
@@ -320,12 +361,12 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/box4.svg" 
-                  alt="Коробка 4"
+                  alt={t('box_4')}
                   className="w-full object-contain"
                 />
               </div>
-              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">Коробка 4</h3>
-              <p className="text-sm text-gray-500">Подробнее</p>
+              <h3 className="font-medium text-gray-800 mb-1 md:text-lg">{t('box_4')}</h3>
+              <p className="text-sm text-gray-500">{t('learn_more')}</p>
             </div>
           </div>
           
@@ -336,16 +377,16 @@ export const LandingPage: React.FC = () => {
               className="w-full max-w-md py-4 text-white font-semibold rounded-3xl text-lg transition-all duration-200"
               style={{ background: 'linear-gradient(135deg, #747EEC 0%, #8B80F0 100%)' }}
             >
-              Собрать набор для ребенка
+              {t('create_set_for_child')}
             </button>
           </div>
           
           {/* Service Info */}
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 text-sm md:text-base text-gray-600">
-              <span>Бесплатная доставка</span>
+              <span>{t('free_delivery')}</span>
               <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-              <span>Обновление набора каждые 14 дней</span>
+              <span>{t('set_update_every_14_days')}</span>
             </div>
           </div>
         </div>
@@ -355,7 +396,7 @@ export const LandingPage: React.FC = () => {
       <div className="px-4 py-12">
         <div className="max-w-sm mx-auto text-center mb-8">
           <h2 className="font-bold leading-tight text-[26px] text-gray-800 mb-4">
-            Что говорят наши клиенты
+            {t('what_clients_say')}
           </h2>
         </div>
         
@@ -371,7 +412,7 @@ export const LandingPage: React.FC = () => {
               >
                 <img 
                   src="/illustrations/Video.svg" 
-                  alt="Видео отзыв Алины"
+                  alt={t('video_review_alina')}
                   className="w-full h-full object-cover"
                 />
                 {/* Play Button Overlay */}
@@ -392,7 +433,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Алина</h3>
-                  <p className="text-sm text-gray-600">мама 2х летней девочки</p>
+                  <p className="text-sm text-gray-600">{t('alina_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -410,7 +451,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Крутая идея — подписка с игрушками. Ребёнок играет с интересом, экранное время уменьшилось. А я больше не гуглю, что ему купить.
+                  {t('kryta_idea_subscription_toys')}
                 </p>
               </div>
             </div>
@@ -427,7 +468,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Мария</h3>
-                  <p className="text-sm text-gray-600">мама 3х летнего мальчика</p>
+                  <p className="text-sm text-gray-600">{t('maria_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -445,7 +486,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Ребёнок в восторге от каждой коробки! Игрушки качественные, развивающие. Теперь не нужно ломать голову над выбором.
+                  {t('child_in_awe_of_each_box')}
                 </p>
               </div>
 
@@ -459,7 +500,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Елена</h3>
-                  <p className="text-sm text-gray-600">мама 1.5 летней девочки</p>
+                  <p className="text-sm text-gray-600">{t('elena_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -477,7 +518,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Отличный сервис! Дочка с нетерпением ждёт каждую коробку. Игрушки подобраны идеально по возрасту и интересам.
+                  {t('excellent_service')}
                 </p>
               </div>
 
@@ -491,7 +532,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Анна</h3>
-                  <p className="text-sm text-gray-600">мама 4х летнего мальчика</p>
+                  <p className="text-sm text-gray-600">{t('anna_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -509,7 +550,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Экономия времени и нервов! Больше не нужно бегать по магазинам. Сын в восторге от разнообразия игрушек.
+                  {t('time_and_nerves_saving')}
                 </p>
               </div>
             </div>
@@ -526,7 +567,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Евгения</h3>
-                  <p className="text-sm text-gray-600">бабушка девочки 3 лет</p>
+                  <p className="text-sm text-gray-600">{t('evgenia_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -544,7 +585,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Подарила подписку внучке — и не прогадала! Каждый месяц — как праздник. Это не просто игрушки, а настоящее внимание к ребёнку.
+                  {t('gave_subscription_to_granddaughter')}
                 </p>
               </div>
 
@@ -555,7 +596,7 @@ export const LandingPage: React.FC = () => {
               >
                 <img 
                   src="/illustrations/Video1.svg" 
-                  alt="Видео отзыв Евгении"
+                  alt={t('video_review_evgenia')}
                   className="w-full h-full object-cover"
                 />
                 {/* Play Button Overlay */}
@@ -579,7 +620,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Мария</h3>
-                  <p className="text-sm text-gray-600">мама двойняшек 2 лет</p>
+                  <p className="text-sm text-gray-600">{t('maria_review_age_twins')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -597,7 +638,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Ребёнок в восторге от каждого набора! Особенно радует, что всё чистое и готовое к использованию. Чувствуется забота о деталях.
+                  {t('child_in_awe_of_each_set')}
                 </p>
               </div>
 
@@ -611,7 +652,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Тимур</h3>
-                  <p className="text-sm text-gray-600">папа мальчика 3 лет</p>
+                  <p className="text-sm text-gray-600">{t('timur_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -629,7 +670,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Крутая идея — подписка с игрушками. Ребёнок играет с интересом, экранное время уменьшилось. А я больше не гуглю, что ему купить.
+                  {t('kryta_idea_subscription_toys')}
                 </p>
               </div>
 
@@ -643,7 +684,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="mb-3">
                   <h3 className="font-bold text-lg text-gray-800 mb-1">Сабина</h3>
-                  <p className="text-sm text-gray-600">мама мальчика 2,5 года</p>
+                  <p className="text-sm text-gray-600">{t('sabina_review_age')}</p>
                 </div>
                 
                 {/* Star Rating */}
@@ -661,7 +702,7 @@ export const LandingPage: React.FC = () => {
                 </div>
                 
                 <p className="text-gray-700 leading-relaxed">
-                  Ребёнок в восторге от каждого набора! Особенно радует, что всё чистое и готовое к использованию. Чувствуется забота о деталях.
+                  {t('child_in_awe_of_each_set')}
                 </p>
               </div>
             </div>
@@ -673,10 +714,10 @@ export const LandingPage: React.FC = () => {
       <div className="px-4 md:px-8 lg:px-12 py-12" style={{ backgroundColor: '#FFFFFF' }}>
         <div className="max-w-2xl mx-auto text-center mb-8 md:mb-12">
           <h2 className="font-bold leading-tight text-[26px] md:text-[32px] lg:text-[36px] text-gray-800 mb-4">
-            Игрушки по подписке
+            {t('toys_by_subscription')}
           </h2>
           <p className="text-[16px] md:text-[18px] text-[#686564]">
-            Выберите тариф, который подойдёт вашему ребёнку
+            {t('choose_tariff_for_your_child')}
           </p>
         </div>
         
@@ -689,7 +730,7 @@ export const LandingPage: React.FC = () => {
               <div className="absolute -top-16 left-6 right-6 overflow-visible">
                 <img 
                   src="/illustrations/set.svg" 
-                  alt="Базовый набор игрушек"
+                  alt={t('basic_toy_set')}
                   className="w-full h-32 object-contain"
                 />
               </div>
@@ -699,7 +740,7 @@ export const LandingPage: React.FC = () => {
               
               {/* Plan Description */}
               <p className="text-[16px] text-[#686564] mb-6 leading-relaxed">
-                6 игрушек для регулярной игры и знакомства с сервисом
+                {t('6_toys_for_regular_play_and_service_familiarization')}
               </p>
               
               {/* Price */}
@@ -713,7 +754,7 @@ export const LandingPage: React.FC = () => {
                 onClick={handleCreateBoxClick}
                 className="w-full py-3 bg-gray-200 text-gray-800 font-semibold rounded-2xl transition-all duration-200 hover:bg-gray-300"
               >
-                Подписаться
+                {t('subscribe')}
               </button>
             </div>
 
@@ -723,7 +764,7 @@ export const LandingPage: React.FC = () => {
               <div className="absolute -top-16 left-6 right-6 overflow-visible">
                 <img 
                   src="/illustrations/set1.svg" 
-                  alt="Премиум набор игрушек"
+                  alt={t('premium_toy_set')}
                   className="w-full h-32 object-contain"
                 />
               </div>
@@ -733,7 +774,7 @@ export const LandingPage: React.FC = () => {
               
               {/* Plan Description */}
               <p className="text-[16px] text-white mb-6 leading-relaxed opacity-90">
-                9 игрушек, редкие и премиальные. Больше «вау» эффекта в коробке
+                {t('9_toys_rare_and_premium_more_wow_effect_in_the_box')}
               </p>
               
               {/* Price */}
@@ -747,7 +788,7 @@ export const LandingPage: React.FC = () => {
                 onClick={handleCreateBoxClick}
                 className="w-full py-3 bg-white text-[#747EEC] font-semibold rounded-2xl transition-all duration-200 hover:bg-gray-100"
               >
-                Подписаться
+                {t('subscribe')}
               </button>
             </div>
           </div>
@@ -766,7 +807,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
                   <span className="text-orange-600 text-lg">🚚</span>
                 </div>
-                <span className="text-gray-700">Бесплатная доставка</span>
+                <span className="text-gray-700">{t('free_delivery')}</span>
               </div>
               
               {/* Feature 2 */}
@@ -774,7 +815,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="text-blue-600 text-lg">🔄</span>
                 </div>
-                <span className="text-gray-700">Обновление набора каждые 14 дней</span>
+                <span className="text-gray-700">{t('set_update_every_14_days')}</span>
               </div>
               
               {/* Feature 3 */}
@@ -782,7 +823,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
                   <span className="text-red-600 text-lg">🎯</span>
                 </div>
-                <span className="text-gray-700">Подбор по возрасту и интересам</span>
+                <span className="text-gray-700">{t('age_and_interest_based_selection')}</span>
               </div>
               
               {/* Feature 4 */}
@@ -790,7 +831,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                   <span className="text-green-600 text-lg">🧼</span>
                 </div>
-                <span className="text-gray-700">Только чистые и проверенные игрушки</span>
+                <span className="text-gray-700">{t('only_clean_and_verified_toys')}</span>
               </div>
               
               {/* Feature 5 */}
@@ -798,7 +839,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
                   <span className="text-yellow-600 text-lg">🧸</span>
                 </div>
-                <span className="text-gray-700">Возможность выкупить любимую игрушку</span>
+                <span className="text-gray-700">{t('opportunity_to_buy_favorite_toy')}</span>
               </div>
               
               {/* Feature 6 */}
@@ -806,7 +847,7 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                   <span className="text-purple-600 text-lg">💬</span>
                 </div>
-                <span className="text-gray-700">Поддержка по любым вопросам</span>
+                <span className="text-gray-700">{t('support_for_any_questions')}</span>
               </div>
             </div>
           </div>
@@ -815,9 +856,9 @@ export const LandingPage: React.FC = () => {
           <div className="rounded-3xl p-6 md:p-8 lg:p-12" style={{ backgroundColor: '#E4E6FC' }}>
             <div className="flex items-start">
               <div className="flex-1">
-                <p className="text-purple-700 font-medium text-lg md:text-xl lg:text-2xl mb-1">Каждому ребёнку — свой набор</p>
-                <p className="text-gray-700 mb-2 md:text-lg">Для второго и следующих — скидка</p>
-                <p className="text-purple-700 font-bold text-2xl md:text-3xl lg:text-4xl">20% на каждый набор</p>
+                <p className="text-purple-700 font-medium text-lg md:text-xl lg:text-2xl mb-1">{t('each_child_own_set')}</p>
+                <p className="text-gray-700 mb-2 md:text-lg">{t('discount_for_second_and_following')}</p>
+                <p className="text-purple-700 font-bold text-2xl md:text-3xl lg:text-4xl">{t('20_discount_on_each_set')}</p>
               </div>
             </div>
           </div>
@@ -839,11 +880,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/frog.svg" 
-                  alt="Весёлая лягушка-мемори"
+                  alt={t('funny_frog_memory')}
                   className="w-full object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Весёлая лягушка-мемори</p>
+              <p className="text-sm text-gray-700 text-center">{t('funny_frog_memory')}</p>
             </div>
             
             {/* Toy Card 2 */}
@@ -851,11 +892,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/football.svg" 
-                  alt="Мини-футбол на пальцах"
+                  alt={t('mini_football_on_fingers')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Мини-футбол на пальцах</p>
+              <p className="text-sm text-gray-700 text-center">{t('mini_football_on_fingers')}</p>
             </div>
             
             {/* Toy Card 3 */}
@@ -863,11 +904,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/sort.svg" 
-                  alt="Сортировщик Цвета и форм"
+                  alt={t('color_and_shape_sorter')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Сортировщик «Цвета и форм»</p>
+              <p className="text-sm text-gray-700 text-center">{t('color_and_shape_sorter')}</p>
             </div>
             
             {/* Toy Card 4 */}
@@ -875,11 +916,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/car.svg" 
-                  alt="Городской гараж с машинками"
+                  alt={t('city_garage_with_cars')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Городской гараж с машинками</p>
+              <p className="text-sm text-gray-700 text-center">{t('city_garage_with_cars')}</p>
             </div>
             
             {/* Toy Card 5 - Hidden on mobile by default */}
@@ -887,11 +928,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/brick.svg" 
-                  alt="Мозаика для малышей"
+                  alt={t('baby_jigsaw')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Мозаика для малышей</p>
+              <p className="text-sm text-gray-700 text-center">{t('baby_jigsaw')}</p>
             </div>
             
             {/* Toy Card 6 - Hidden on mobile by default */}
@@ -899,11 +940,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/dino.svg" 
-                  alt="Деревянные кубики"
+                  alt={t('wooden_blocks')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Деревянные кубики</p>
+              <p className="text-sm text-gray-700 text-center">{t('wooden_blocks')}</p>
             </div>
             
             {/* Toy Card 7 - Hidden on mobile by default */}
@@ -911,11 +952,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/sorter.svg" 
-                  alt="Музыкальный ксилофон"
+                  alt={t('musical_xylophone')}
                   className="w-full object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Музыкальный ксилофон</p>
+              <p className="text-sm text-gray-700 text-center">{t('musical_xylophone')}</p>
             </div>
             
             {/* Toy Card 8 - Hidden on mobile by default */}
@@ -923,11 +964,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/synt.svg" 
-                  alt="Пазл-головоломка"
+                  alt={t('puzzle_brainteaser')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Пазл-головоломка</p>
+              <p className="text-sm text-gray-700 text-center">{t('puzzle_brainteaser')}</p>
             </div>
             
             {/* Toy Card 9 - Hidden on mobile by default */}
@@ -935,11 +976,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/hero.svg" 
-                  alt="Конструктор-трансформер"
+                  alt={t('transformer_constructor')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Конструктор-трансформер</p>
+              <p className="text-sm text-gray-700 text-center">{t('transformer_constructor')}</p>
             </div>
             
             {/* Toy Card 10 - Hidden on mobile by default */}
@@ -947,11 +988,11 @@ export const LandingPage: React.FC = () => {
               <div className="mb-3">
                 <img 
                   src="/illustrations/cosmo.svg" 
-                  alt="Логическая пирамидка"
+                  alt={t('logical_pyramid')}
                   className="w-full  object-cover rounded-xl"
                 />
               </div>
-              <p className="text-sm text-gray-700 text-center">Логическая пирамидка</p>
+              <p className="text-sm text-gray-700 text-center">{t('logical_pyramid')}</p>
             </div>
           </div>
           
@@ -963,7 +1004,7 @@ export const LandingPage: React.FC = () => {
                 className="text-gray-700 px-6 py-3 rounded-2xl font-medium hover:bg-gray-200 transition-colors" 
                 style={{ backgroundColor: '#E3E3E3' }}
               >
-                Показать еще
+                {t('show_more')}
               </button>
             )}
           </div>
@@ -978,7 +1019,7 @@ export const LandingPage: React.FC = () => {
         <div className="relative flex justify-center">
           <img 
             src="/illustrations/Background.svg" 
-            alt="Добро пожаловать в мир игрушек"
+            alt={t('welcome_to_toy_world')}
             className="w-full max-w-7xl h-64 md:h-80 object-cover rounded-2xl"
           />
           
@@ -992,7 +1033,7 @@ export const LandingPage: React.FC = () => {
                   className="w-full py-4 text-white font-semibold rounded-3xl text-lg transition-all duration-200"
                   style={{ backgroundColor: '#8B80F0' }}
                 >
-                  Собрать коробку
+                  {t('create_box')}
                 </button>
               </div>
             </div>
@@ -1024,13 +1065,12 @@ export const LandingPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">Как работает подписка на игрушки?</h3>
+                <h3 className="font-medium text-gray-800 text-lg flex-1">{t('how_subscription_to_toys_works')}</h3>
               </div>
               {openFaq === 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-gray-600 leading-relaxed">
-                    Подписка работает по принципу регулярной доставки. Вы выбираете план, указываете возраст и интересы ребёнка, 
-                    а мы каждые 2 недели доставляем новый набор игрушек прямо к вам домой.
+                    {t('subscription_works_on_regular_delivery_principle')}
                   </p>
                 </div>
               )}
@@ -1052,13 +1092,12 @@ export const LandingPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">Что входит в набор и как он подбирается?</h3>
+                <h3 className="font-medium text-gray-800 text-lg flex-1">{t('what_is_included_in_the_set_and_how_is_it_selected')}</h3>
               </div>
               {openFaq === 1 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-gray-600 leading-relaxed">
-                    Игрушки подбираются индивидуально — по возрасту, интересам и этапу развития ребёнка. 
-                    В каждой коробке — тщательно отобранные, проверенные и дезинфицированные игрушки.
+                    {t('toys_are_selected_individually_based_on_age_interests_and_development_stage_of_the_child')}
                   </p>
                 </div>
               )}
@@ -1080,13 +1119,12 @@ export const LandingPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">Что если игрушка не понравилась или сломалась?</h3>
+                <h3 className="font-medium text-gray-800 text-lg flex-1">{t('what_if_toy_didnt_like_or_broke')}</h3>
               </div>
               {openFaq === 2 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-gray-600 leading-relaxed">
-                    Если игрушка не понравилась или сломалась, просто сообщите нам об этом. 
-                    Мы заменим её на другую в следующей коробке или предложим альтернативу.
+                    {t('if_toy_didnt_like_or_broke_just_inform_us_about_it_we_will_replace_it_in_the_next_box_or_offer_an_alternative')}
                   </p>
                 </div>
               )}
@@ -1108,13 +1146,12 @@ export const LandingPage: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">Можно ли выкупить понравившуюся игрушку?</h3>
+                <h3 className="font-medium text-gray-800 text-lg flex-1">{t('can_i_buy_the_toy_i_liked')}</h3>
               </div>
               {openFaq === 3 && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <p className="text-gray-600 leading-relaxed">
-                    Да, конечно! Если ребёнку очень понравилась какая-то игрушка, вы можете её выкупить. 
-                    Просто сообщите нам об этом, и мы предложим выгодную цену.
+                    {t('yes_of_course')}
                   </p>
                 </div>
               )}
@@ -1128,14 +1165,14 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-2xl mx-auto text-center">
           {/* Contact Information */}
           <div className="mb-8">
-            <h3 className="text-gray-400 text-sm mb-2">Контакты для связи</h3>
-            <p className="text-white text-lg font-medium">hello@box4baby.com</p>
+            <h3 className="text-gray-400 text-sm mb-2">{t('contact_information')}</h3>
+            <p className="text-white text-lg font-medium">{t('hello_box4baby_com')}</p>
           </div>
 
           {/* Telegram Button */}
           <div className="mb-8">
             <button className="bg-gray-600 text-white px-6 py-3 rounded-xl font-medium shadow-sm hover:bg-gray-700 transition-colors flex items-center justify-center mx-auto">
-              <span className="mr-2">Телеграм</span>
+              <span className="mr-2">{t('telegram')}</span>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
               </svg>
@@ -1147,22 +1184,18 @@ export const LandingPage: React.FC = () => {
 
           {/* Company Info */}
           <div className="mb-6">
-            <p className="text-gray-400 text-sm">BOX4BABY 444500104692</p>
+            <p className="text-gray-400 text-sm">{t('box4baby_company_info')}</p>
           </div>
 
           {/* Legal Links */}
           <div className="mb-4 space-y-2">
-            <a href="#" className="block text-gray-400 text-sm hover:text-white transition-colors">
-              Пользовательское соглашение
-            </a>
-            <a href="#" className="block text-gray-400 text-sm hover:text-white transition-colors">
-              Политика конфиденциальности
-            </a>
+            <a href="#" className="block text-gray-400 text-sm hover:text-white transition-colors">{t('user_agreement')}</a>
+            <a href="#" className="block text-gray-400 text-sm hover:text-white transition-colors">{t('privacy_policy')}</a>
           </div>
 
           {/* Copyright */}
           <div>
-            <p className="text-gray-500 text-xs">(c) 2025 box4baby</p>
+            <p className="text-gray-500 text-xs">{t('copyright')}</p>
           </div>
         </div>
       </div>
@@ -1173,7 +1206,7 @@ export const LandingPage: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-xl text-gray-800">Первые формы</h3>
+              <h3 className="font-bold text-xl text-gray-800">{t('first_forms')}</h3>
               <button
                 onClick={closeModal}
                 className="w-8 h-8 rounded-lg border border-purple-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -1190,8 +1223,8 @@ export const LandingPage: React.FC = () => {
                   <span className="text-orange-600 text-xl">🧱</span>
                 </div>
                 <div className="flex-1">
-                  <span className="text-gray-500 text-sm">x2</span>
-                  <p className="text-gray-800 font-medium">Конструктор</p>
+                  <span className="text-gray-500 text-sm">{t('x2')}</span>
+                  <p className="text-gray-800 font-medium">{t('constructor')}</p>
                 </div>
               </div>
 
@@ -1201,8 +1234,8 @@ export const LandingPage: React.FC = () => {
                   <span className="text-blue-600 text-xl">🎨</span>
                 </div>
                 <div className="flex-1">
-                  <span className="text-gray-500 text-sm">x2</span>
-                  <p className="text-gray-800 font-medium">Творческий набор</p>
+                  <span className="text-gray-500 text-sm">{t('x2')}</span>
+                  <p className="text-gray-800 font-medium">{t('creative_set')}</p>
                 </div>
               </div>
 
@@ -1212,8 +1245,8 @@ export const LandingPage: React.FC = () => {
                   <span className="text-yellow-600 text-xl">🧸</span>
                 </div>
                 <div className="flex-1">
-                  <span className="text-gray-500 text-sm">x1</span>
-                  <p className="text-gray-800 font-medium">Мягкая игрушка</p>
+                  <span className="text-gray-500 text-sm">{t('x1')}</span>
+                  <p className="text-gray-800 font-medium">{t('soft_toy')}</p>
                 </div>
               </div>
 
@@ -1223,8 +1256,8 @@ export const LandingPage: React.FC = () => {
                   <span className="text-pink-600 text-xl">🧠</span>
                 </div>
                 <div className="flex-1">
-                  <span className="text-gray-500 text-sm">x1</span>
-                  <p className="text-gray-800 font-medium">Головоломка</p>
+                  <span className="text-gray-500 text-sm">{t('x1')}</span>
+                  <p className="text-gray-800 font-medium">{t('brainteaser')}</p>
                 </div>
               </div>
             </div>

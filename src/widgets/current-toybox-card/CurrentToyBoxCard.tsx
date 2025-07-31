@@ -5,6 +5,7 @@ import { dateManager } from "../../utils/date/DateManager";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
 import { SubscriptionStatus } from "../../api-client/model";
 import { useSubscriptionPlan } from "../../store/hooks/useSubscription";
+import { useTranslation } from 'react-i18next';
 
 interface CurrentToyBoxCardProps {
   box: SuccessfulBoxesState;
@@ -21,6 +22,7 @@ export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
   handleStarClick,
   userId,
 }) => {
+  const { t } = useTranslation();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
 
   // Получаем активную подписку ребенка
@@ -41,7 +43,7 @@ export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
         <div className="flex flex-col md:flex-row justify-between items-center mb-3">
           <div>
             <h2 className="text-white font-medium">
-              Текущий набор для {box.child.name}
+              {t('current_set_for_child', { name: box.child.name })}
             </h2>
             {subscriptionPlan && (
               <p className="text-white text-center md:text-left text-sm opacity-90">
@@ -80,7 +82,7 @@ export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
           className="w-full text-white py-2 rounded-lg text-sm font-medium"
           style={{ backgroundColor: "#F4B58E" }}
         >
-          Показать все игрушки
+          {t('show_all_toys')}
         </button>
       </div>
 

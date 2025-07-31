@@ -8,6 +8,7 @@ import {
 import { UserChildData } from "../../../types";
 import { notifications } from "../../../utils/notifications";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { useTranslation } from 'react-i18next';
 
 export const CategoriesStep: React.FC<{
   onBack: () => void;
@@ -15,6 +16,7 @@ export const CategoriesStep: React.FC<{
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
+  const { t } = useTranslation();
   const { updateChild } = useStore();
   const { setError } = useStore();
 
@@ -58,7 +60,7 @@ export const CategoriesStep: React.FC<{
   const handleUpdateChildCategories = useCallback(
     async (interestIds: number[], skillIds: number[]) => {
       if (!currentChildToUpdate) {
-        setError("ID ребенка не найден");
+        setError(t('child_id_not_found'));
         return;
       }
 
@@ -86,8 +88,8 @@ export const CategoriesStep: React.FC<{
         // Переходим на следующий шаг
         onNext();
       } catch (error) {
-        setError("Не удалось обновить категории");
-        notifications.error("Не удалось сохранить категории");
+        setError(t('failed_to_update_categories'));
+        notifications.error(t('failed_to_save_categories'));
       }
     },
     [
@@ -97,14 +99,15 @@ export const CategoriesStep: React.FC<{
       onNext,
       setError,
       updateChild,
+      t,
     ]
   );
 
   useEffect(() => {
     if (!currentChildToUpdate) {
-      setError("ID ребенка не найден");
+      setError(t('child_id_not_found'));
     }
-  }, [currentChildToUpdate, setError]);
+  }, [currentChildToUpdate, setError, t]);
 
   const handleBack = () => {
     onBack();
@@ -185,7 +188,7 @@ export const CategoriesStep: React.FC<{
             className="text-md font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Что интересно вашему ребёнку?
+            {t('what_interests_your_child')}
           </h1>
         </div>
 
@@ -199,7 +202,7 @@ export const CategoriesStep: React.FC<{
                   className="text-gray-600 font-medium"
                   style={{ fontFamily: "Nunito, sans-serif" }}
                 >
-                  Сохраняем категории...
+                  {t('saving_categories')}
                 </span>
               </div>
             </div>
@@ -211,7 +214,7 @@ export const CategoriesStep: React.FC<{
               className="text-md font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Интересы
+              {t('interests')}
             </h3>
             <div className="flex flex-wrap gap-3">
               {interestItems.map((interest) => (
@@ -238,7 +241,7 @@ export const CategoriesStep: React.FC<{
               className="text-md font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Навыки для развития
+              {t('skills_for_development')}
             </h3>
             <div className="flex flex-wrap gap-3">
               {skillItems.map((skill) => (
@@ -281,7 +284,7 @@ export const CategoriesStep: React.FC<{
                 : undefined,
           }}
         >
-          {updateChildMutation.isPending ? "Сохраняем..." : "Продолжить"}
+          {updateChildMutation.isPending ? t('saving') : t('continue')}
         </button>
       </div>
     </div>

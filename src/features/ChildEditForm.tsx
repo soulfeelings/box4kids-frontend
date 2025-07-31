@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Gender } from "../api-client/model/gender";
 import { dateManager } from "../utils/date/DateManager";
 import { UserChildData } from "../types";
+import { useTranslation } from 'react-i18next';
 
 interface ChildData {
   name: string;
@@ -22,6 +23,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
   onDataChange,
   isDisabled = false,
 }) => {
+  const { t } = useTranslation();
   const [childData, setChildData] = useState<ChildData>({
     name: "",
     date_of_birth: "",
@@ -60,7 +62,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Имя ребенка
+          {t('child_name')}
         </label>
         <div
           className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -89,7 +91,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Дата рождения
+          {t('birth_date')}
         </label>
         <div
           className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -128,7 +130,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
           className="text-lg font-semibold text-gray-900"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Пол ребенка
+          {t('child_gender')}
         </h3>
         <div className="flex gap-3">
           <button
@@ -141,7 +143,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             }`}
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Мужской
+            {t('male')}
           </button>
           <button
             onClick={() => setChildData({ ...childData, gender: "female" })}
@@ -153,7 +155,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             }`}
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Женский
+            {t('female')}
           </button>
         </div>
       </div>
@@ -164,7 +166,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
           className="text-lg font-semibold text-gray-900"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Особенности
+          {t('features')}
         </h3>
         <div className="flex gap-3">
           <button
@@ -177,7 +179,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             }`}
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Нет
+            {t('no')}
           </button>
           <button
             onClick={() => setChildData({ ...childData, limitations: true })}
@@ -189,7 +191,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             }`}
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Есть ограничения
+            {t('has_limitations')}
           </button>
         </div>
       </div>
@@ -200,7 +202,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          Комментарий
+          {t('comment')}
         </label>
         <div
           className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -215,8 +217,8 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
             placeholder={
               childData.limitations
-                ? "Опишите ограничения ребенка..."
-                : "Дополнительная информация о ребенке..."
+                ? t('describe_child_limitations')
+                : t('additional_child_info')
             }
             value={childData.comment || ""}
             onChange={(e) =>
@@ -233,7 +235,7 @@ export const ChildEditForm: React.FC<ChildEditFormProps> = ({
             className="text-sm text-red-400 px-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Напишите ограничения ребенка
+            {t('write_child_limitations')}
           </p>
         )}
       </div>

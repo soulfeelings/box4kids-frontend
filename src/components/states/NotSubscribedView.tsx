@@ -5,6 +5,7 @@ import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../features/BottomNavigation";
 import { NoSubscribtionsView } from "../../features/NoSubscribtionsView";
+import { useTranslation } from 'react-i18next';
 
 interface NotSubscribedViewProps {
   userData: UserData;
@@ -14,6 +15,7 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
   userData,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -30,7 +32,7 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
         }}
       >
         <h1 className="text-xl text-center font-semibold text-gray-800 mb-6">
-          Привет, {userData.name}! 🦋
+          {t('hello_user', { name: userData.name })}
         </h1>
 
         {/* Welcome Card - styled like welcome screen but half height */}
@@ -42,13 +44,13 @@ export const NotSubscribedView: React.FC<NotSubscribedViewProps> = ({
           }}
           textButton={
             userData.children && userData.children.length > 0
-              ? "Продолжить оформление"
-              : "Добавить ребенка"
+              ? t('continue_subscription')
+              : t('add_child')
           }
           text={
             userData.children && userData.children.length > 0
-              ? "Завершите оформление подписки, чтобы мы могли собрать коробку с игрушками и доставить её вам"
-              : "Добавьте ребенка, чтобы мы могли собрать коробку с игрушками и доставить её вам"
+              ? t('finish_subscription_to_get_box')
+              : t('add_child_to_get_box')
           }
         />
       </div>

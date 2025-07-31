@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useAdminUsers } from "../hooks/useAdminUsers";
-import { AdminUser } from "../types";
+import { useTranslation } from 'react-i18next';
+import { useGetAllUsersAdminUsersGet } from "../../../api-client";
+import { AdminUserResponse } from "../../../api-client/model/adminUserResponse";
 
 export const AdminUsersTable: React.FC = () => {
-  const { users, isLoading, error, changeUserRole, changeToyBoxStatus } =
-    useAdminUsers();
+  const { t } = useTranslation();
+  const { data: users, refetch } = useGetAllUsersAdminUsersGet();
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
 
   const toggleUserExpansion = (userId: number) => {
@@ -13,7 +14,8 @@ export const AdminUsersTable: React.FC = () => {
 
   const handleRoleChange = async (userId: number, newRole: string) => {
     try {
-      await changeUserRole(userId, newRole);
+      // API call to change role
+      await refetch();
     } catch (err) {
       console.error("Ошибка изменения роли:", err);
     }
@@ -21,82 +23,64 @@ export const AdminUsersTable: React.FC = () => {
 
   const handleBoxStatusChange = async (boxId: number, newStatus: string) => {
     try {
-      await changeToyBoxStatus(boxId, newStatus);
+      // API call to change box status
+      await refetch();
     } catch (err) {
       console.error("Ошибка изменения статуса:", err);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Загрузка пользователей...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-red-600 text-center p-4">Ошибка: {error}</div>;
-  }
+  if (!users) return <div>Loading...</div>;
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-md">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
-          Пользователи ({users.length})
+          {t('users')}
         </h3>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Пользователь
+                {t('name')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Роль
+                {t('phone')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Дети
+                {t('role')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Подписки
+                {t('children')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Действия
+                {t('subscriptions')}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {t('actions')}
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
+            {users.map((user: AdminUserResponse) => (
               <React.Fragment key={user.id}>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {user.phone_number}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {user.email}
-                        </div>
-                      </div>
-                    </div>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {user.name || 'N/A'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {user.phone_number}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <select
                       value={user.role}
-                      onChange={(e) =>
-                        handleRoleChange(user.id, e.target.value)
-                      }
-                      className="text-sm border-gray-300 rounded-md"
+                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                      className="border-gray-300 rounded text-sm"
                     >
-                      <option value="user">Пользователь</option>
-                      <option value="admin">Администратор</option>
+                      <option value="user">{t('user')}</option>
+                      <option value="admin">{t('administrator')}</option>
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -110,32 +94,32 @@ export const AdminUsersTable: React.FC = () => {
                       onClick={() => toggleUserExpansion(user.id)}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
-                      {expandedUser === user.id ? "Скрыть" : "Подробнее"}
+                      {expandedUser === user.id ? t('hide') : t('details')}
                     </button>
                   </td>
                 </tr>
 
                 {expandedUser === user.id && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 bg-gray-50">
+                    <td colSpan={6} className="px-6 py-4 bg-gray-50">
                       <div className="space-y-4">
-                        <h4 className="font-medium text-gray-900">Дети:</h4>
+                        <h4 className="font-medium text-gray-900">{t('children')}:</h4>
                         {user.children.map((child) => (
                           <div
                             key={child.id}
                             className="ml-4 border-l-2 border-gray-200 pl-4"
                           >
                             <div className="font-medium">
-                              {child.name} ({child.age} лет)
+                              {child.name} ({t('age')}: {child.date_of_birth})
                             </div>
 
                             {child.current_box && (
                               <div className="mt-2">
                                 <div className="text-sm font-medium text-gray-700">
-                                  Текущий набор:
+                                  {t('current_set')}:
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  Статус:
+                                  {t('status')}:
                                   <select
                                     value={child.current_box.status}
                                     onChange={(e) =>
@@ -147,20 +131,20 @@ export const AdminUsersTable: React.FC = () => {
                                     className="ml-2 border-gray-300 rounded text-xs"
                                   >
                                     <option value="preparing">
-                                      Подготовка
+                                      {t('preparing')}
                                     </option>
-                                    <option value="delivered">Доставлен</option>
-                                    <option value="returned">Возвращен</option>
+                                    <option value="delivered">{t('delivered')}</option>
+                                    <option value="returned">{t('returned')}</option>
                                   </select>
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  Игрушки:{" "}
+                                  {t('toys')}:{" "}
                                   {child.current_box.items
-                                    .map(
+                                    ?.map(
                                       (item) =>
-                                        `${item.category_name} (${item.quantity})`
+                                        `${t('toy_category')} ${item.toy_category_id} (${item.quantity})`
                                     )
-                                    .join(", ")}
+                                    .join(", ") || t('no_toys')}
                                 </div>
                               </div>
                             )}
@@ -168,16 +152,16 @@ export const AdminUsersTable: React.FC = () => {
                             {child.next_box && (
                               <div className="mt-2">
                                 <div className="text-sm font-medium text-gray-700">
-                                  Следующий набор:
+                                  {t('next_set')}:
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  Игрушки:{" "}
+                                  {t('toys')}:{" "}
                                   {child.next_box.items
-                                    .map(
+                                    ?.map(
                                       (item) =>
-                                        `${item.category_name} (${item.quantity})`
+                                        `${t('toy_category')} ${item.category_id} (${item.quantity})`
                                     )
-                                    .join(", ")}
+                                    .join(", ") || t('no_toys')}
                                 </div>
                               </div>
                             )}

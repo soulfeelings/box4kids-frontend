@@ -1,35 +1,7 @@
+import i18n from "../../i18n";
+
 export class DateManager {
-  private readonly monthNames = [
-    "янв",
-    "фев",
-    "мар",
-    "апр",
-    "мая",
-    "июн",
-    "июл",
-    "авг",
-    "сен",
-    "окт",
-    "ноя",
-    "дек",
-  ];
-
-  private readonly monthNamesFull = [
-    "января",
-    "февраля",
-    "марта",
-    "апреля",
-    "мая",
-    "июня",
-    "июля",
-    "августа",
-    "сентября",
-    "октября",
-    "ноября",
-    "декабря",
-  ];
-
-  private readonly dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+  // Массивы со значениями на русском больше не используются.
 
   /**
    * Конвертирует дату в любой формате в ISO (YYYY-MM-DD)
@@ -82,18 +54,24 @@ export class DateManager {
     if (!isoDate || !this.isISOFormat(isoDate)) return "";
 
     const date = new Date(isoDate);
-    const day = date.getDate();
-    const month = this.monthNamesFull[date.getMonth()];
-    const dayOfWeek = this.dayNames[date.getDay()];
+    const locale = i18n.language || "ru";
 
-    return `${day} ${month}, ${dayOfWeek}`;
+    const day = date.getDate();
+    const month = date.toLocaleDateString(locale, {
+      month: "long",
+    });
+    const weekdayShort = date
+      .toLocaleDateString(locale, { weekday: "short" })
+      .replace(/\.$/, ""); // убираем точку, если есть
+
+    return `${day} ${month}, ${weekdayShort}`;
   }
 
   /**
    * Генерирует опции дат для селекта (следующие 14 дней)
    */
   generateDateOptions() {
-    const options = [{ value: "", label: "Выберите дату" }];
+    const options = [{ value: "", label: i18n.t("select_date") }];
     const today = new Date();
 
     for (let i = 0; i < 14; i++) {
@@ -101,18 +79,24 @@ export class DateManager {
       date.setDate(today.getDate() + i);
 
       const day = date.getDate().toString().padStart(2, "0");
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const value = `${day}.${month}`;
-      const dayOfWeek = this.dayNames[date.getDay()];
-      const monthName = this.monthNames[date.getMonth()];
+      const monthNumber = (date.getMonth() + 1).toString().padStart(2, "0");
+      const value = `${day}.${monthNumber}`;
+
+      const locale = i18n.language || "ru";
+      const weekdayShort = date
+        .toLocaleDateString(locale, { weekday: "short" })
+        .replace(/\.$/, "");
+      const monthShort = date.toLocaleDateString(locale, {
+        month: "short",
+      });
 
       let label;
       if (i === 0) {
-        label = `Сегодня, ${day} ${monthName}`;
+        label = `${i18n.t("today")}, ${day} ${monthShort}`;
       } else if (i === 1) {
-        label = `Завтра, ${day} ${monthName}`;
+        label = `${i18n.t("tomorrow")}, ${day} ${monthShort}`;
       } else {
-        label = `${dayOfWeek}, ${day} ${monthName}`;
+        label = `${weekdayShort}, ${day} ${monthShort}`;
       }
 
       options.push({ value, label });
@@ -178,7 +162,7 @@ export class DateManager {
     isValid: boolean;
     error: string;
   } {
-    if (!dateString) return { isValid: false, error: "Выберите дату" };
+    if (!dateString) return { isValid: false, error: i18n.t("select_date") };
 
     if (!this.isShortDateFormat(dateString)) {
       return { isValid: false, error: "Неверный формат даты" };
@@ -256,13 +240,16 @@ export class DateManager {
   getAgeWithDeclension(dateOfBirth: string): string {
     const age = this.calculateAge(dateOfBirth);
 
-    if (age === 1) {
-      return `${age} год`;
-    } else if (age >= 2 && age <= 4) {
-      return `${age} года`;
-    } else {
+    const locale = i18n.language || "ru";
+
+    if (locale.startsWith("ru")) {
+      if (age === 1) return `${age} год`;
+      if (age >= 2 && age <= 4) return `${age} года`;
       return `${age} лет`;
     }
+
+    // Для других языков используем один вариант
+    return `${age} ${i18n.t("year")}`;
   }
 
   /**
@@ -272,8 +259,12 @@ export class DateManager {
     if (!dateString) return "Не указано";
     const date = new Date(dateString);
     const day = date.getDate();
-    const month = this.monthNamesFull[date.getMonth()];
-    const weekday = this.dayNames[date.getDay()];
+    const month = date.toLocaleDateString(i18n.language || "ru", {
+      month: "long",
+    });
+    const weekday = date.toLocaleDateString(i18n.language || "ru", {
+      weekday: "short",
+    });
     return `${day} ${month}, ${weekday}`;
   }
 
