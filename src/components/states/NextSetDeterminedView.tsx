@@ -4,6 +4,8 @@ import { UserData } from "../../types";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
 import { CurrentToyBoxCard, NextToyBoxCard } from "../../widgets";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface NextSetDeterminedViewProps {
   userData: UserData;
@@ -24,6 +26,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
   handleStarClick,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div
       className="w-full min-h-screen pb-24"
@@ -59,9 +62,15 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
       ))}
 
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );

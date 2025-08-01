@@ -7,6 +7,8 @@ import { useChildById } from "../../store/hooks";
 import { dateManager } from "../../utils/date/DateManager";
 import { colorManager } from "../../utils/ColorManager";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface ToySetDetailViewProps {
   currentBox: ToyBoxResponse;
@@ -18,6 +20,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
   close,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
 
   const deliveryLabel = useMemo(() => {
@@ -125,9 +128,15 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
         </div>
       </div>
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );

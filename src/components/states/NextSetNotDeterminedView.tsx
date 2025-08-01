@@ -3,6 +3,8 @@ import { Star } from "lucide-react";
 import { UserData } from "../../types";
 import { BottomNavigation } from "../../features/BottomNavigation";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface NextSetNotDeterminedViewProps {
   userData: UserData;
@@ -33,6 +35,7 @@ export const NextSetNotDeterminedView: React.FC<
   formatDeliveryTime,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div
       className="w-full min-h-screen pb-24"
@@ -175,9 +178,15 @@ export const NextSetNotDeterminedView: React.FC<
       </div>
 
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );

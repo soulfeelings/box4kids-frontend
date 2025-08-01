@@ -146,7 +146,7 @@ function InitialPage() {
   }, [fetchInitData]);
 
   if (isInitDataLoading || !ref.current) {
-    return <LoadingComponent />;
+    return <LoadingComponent type="onboarding" />;
   }
 
   if (initDataError) {
