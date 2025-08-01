@@ -5,6 +5,8 @@ import { useAddBoxReviewToyBoxesBoxIdReviewPost } from "../../api-client";
 import type { ToyBoxReviewRequest } from "../../api-client/model";
 import { notifications } from "../../utils/notifications";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface FeedbackViewProps {
   rating: number;
@@ -26,6 +28,7 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   userId,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const addReviewMutation = useAddBoxReviewToyBoxesBoxIdReviewPost();
 
   // Get feedback text based on rating
@@ -160,9 +163,15 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
         </button>
       </div>
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );

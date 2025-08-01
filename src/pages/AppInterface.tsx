@@ -6,7 +6,7 @@ import {
   NextSetDeterminedView,
 } from "../components/states";
 import { useStore } from "../store/store";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import {
   getCurrentBoxToyBoxesCurrentChildIdGet,
@@ -20,6 +20,7 @@ import {
 } from "../api-client/model";
 import { UserChildData } from "../types";
 import { useTranslation } from 'react-i18next';
+import { LoadingComponent } from "../components/common/LoadingComponent";
 
 export interface BoxesState {
   child: UserChildData;
@@ -41,21 +42,22 @@ export const AppInterface: React.FC = () => {
   >(null);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const { user, currentAppScreen } = useStore();
-  const navigate = useNavigate();
+  const { user } = useStore();
 
-  useEffect(() => {
-    if (currentAppScreen === "home") {
-      setShowFeedback(false);
-      navigate(ROUTES.APP.ROOT);
-    } else if (currentAppScreen === "children") {
-      navigate(ROUTES.APP.CHILDREN);
-    } else if (currentAppScreen === "profile") {
-      navigate(ROUTES.APP.PROFILE);
-      setShowFeedback(false);
-    }
-  }, [currentAppScreen, navigate]);
+  // Убираем автоматическую навигацию, так как она создает бесконечный цикл
+  // useEffect(() => {
+  //   if (currentAppScreen === "home") {
+  //     setShowFeedback(false);
+  //     navigate(ROUTES.APP.ROOT);
+  //   } else if (currentAppScreen === "children") {
+  //     navigate(ROUTES.APP.CHILDREN);
+  //   } else if (currentAppScreen === "profile") {
+  //     navigate(ROUTES.APP.PROFILE);
+  //     setShowFeedback(false);
+  //   }
+  // }, [currentAppScreen, navigate]);
 
   const [currentSuccessfulBoxes, setCurrentSuccessfulBoxes] = useState<
     SuccessfulBoxesState[]
@@ -65,6 +67,7 @@ export const AppInterface: React.FC = () => {
     if (!user) return;
 
     const fetchData = async () => {
+      setIsLoading(true);
       if (user?.children.length) {
         try {
           // Фильтруем детей с активной подпиской
@@ -77,6 +80,7 @@ export const AppInterface: React.FC = () => {
 
           if (subscribedChildren.length === 0) {
             setCurrentSuccessfulBoxes([]);
+            setIsLoading(false);
             return;
           }
 
@@ -121,6 +125,8 @@ export const AppInterface: React.FC = () => {
         } catch (error) {
           console.error("Failed to fetch boxes data:", error);
           notifications.error(t('failed_to_load_toy_boxes_data'));
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -146,6 +152,10 @@ export const AppInterface: React.FC = () => {
 
   if (!user) {
     return <Navigate to={ROUTES.HOME} replace />;
+  }
+
+  if (isLoading) {
+    return <LoadingComponent type="main" />;
   }
 
   const handleStarClick = (starIndex: number): void => {

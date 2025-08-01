@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { UserChildData } from "../types";
 import { AddNewChildBanner } from "../features/AddNewChildBanner";
 import {
@@ -21,14 +21,29 @@ import { NoSubscribtionsView } from "../features/NoSubscribtionsView";
 import { SubscriptionStatus } from "../api-client/model";
 import { ChildInfoWidget } from "../widgets/child-info";
 import { useTranslation } from 'react-i18next';
+import { LoadingComponent } from "../components/common/LoadingComponent";
 
 export const ChildrenPage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useStore();
   const navigateToOnboarding = useNavigateToOnboarding();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const { data: interests } = useGetAllInterestsInterestsGet();
   const { data: skills } = useGetAllSkillsSkillsGet();
+
+  useEffect(() => {
+    // Симулируем загрузку данных
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingComponent type="children" />;
+  }
 
   return (
     <div
@@ -72,7 +87,17 @@ export const ChildrenPage: React.FC = () => {
           />
         )}
       </div>
-      <BottomNavigation />
+      <BottomNavigation 
+        onHomeClick={() => {
+          // Навигация на главную страницу
+        }}
+        onChildrenClick={() => {
+          // Уже на странице детей
+        }}
+        onProfileClick={() => {
+          // Навигация на профиль
+        }}
+      />
     </div>
   );
 };

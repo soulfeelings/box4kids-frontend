@@ -2,6 +2,8 @@ import React from "react";
 import { UserData } from "../../types";
 import { BottomNavigation } from "../../features/BottomNavigation";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface JustSubscribedViewProps {
   userData: UserData;
@@ -19,6 +21,7 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
   getCurrentDate,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div
       className="w-full min-h-screen pb-24"
@@ -76,9 +79,15 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
       </div>
 
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );
