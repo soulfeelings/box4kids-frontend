@@ -3,12 +3,11 @@ name: box4kids-frontend
 
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
       - PORT=3000
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: sh -c "yarn run build && serve -s build -l 3000"
+    command: yarn serve -s build -l 3000
