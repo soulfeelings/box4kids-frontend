@@ -14,6 +14,7 @@ import {
   useNavigateToOnboarding,
 } from "../../../hooks/useNavigateHooks";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { AUTH_STEPS } from "../../../constants/auth";
 
 export const ValidateSubscriptionsStep: React.FC<{
   onBack: () => void;
@@ -44,7 +45,7 @@ export const ValidateSubscriptionsStep: React.FC<{
   };
 
   const handleAddNewChild = () => {
-    navigateToOnboarding({ step: "child" });
+    navigateToOnboarding({ step: AUTH_STEPS.CHILD });
   };
 
   const handleEditChildData = (childId: number) => {
