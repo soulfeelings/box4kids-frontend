@@ -6,7 +6,7 @@ on:
       buildImage:
         description: "Build Docker image?"
         required: true
-        default: "true"
+        default: "false"
         type: choice
         options: ["true", "false"]
       resetDevEnvironment:
