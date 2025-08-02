@@ -110,8 +110,12 @@ export const PaymentStep: React.FC<{
           let price = 0;
 
           for (const subscription of pendingSubscription) {
+            // Используем final_price из API, если доступно, иначе рассчитываем
             const plan = getPlanById(subscription.plan_id);
-            price += plan?.price_monthly || 0;
+            const basePrice = plan?.price_monthly || 0;
+            const finalPrice = (subscription as any).final_price || 
+              basePrice * (1 - (subscription.discount_percent || 0) / 100);
+            price += finalPrice;
           }
 
           // Округляем цену
@@ -244,20 +248,74 @@ export const PaymentStep: React.FC<{
                         </span>
                       </div>
                     )} */}
-                  <div className="flex justify-between items-center">
-                    <span
-                      className="text-gray-700"
-                      style={{ fontFamily: "Nunito, sans-serif" }}
-                    >
-                      Стоимость
-                    </span>
-                    <span
-                      className="text-gray-900 font-medium"
-                      style={{ fontFamily: "Nunito, sans-serif" }}
-                    >
-                      ${plan.price_monthly} / мес.
-                    </span>
-                  </div>
+                  {/* Показываем базовую цену и скидку только если есть скидка */}
+                  {subscription[0]?.discount_percent && subscription[0].discount_percent > 0 ? (
+                    <>
+                      {/* Скидка */}
+                      <div className="flex justify-between items-center">
+                        <span
+                          className="text-gray-700"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          Скидка
+                        </span>
+                        <span
+                          className="text-green-600 font-medium"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          -{subscription[0].discount_percent}%
+                        </span>
+                      </div>
+                      
+                      {/* Базовая цена */}
+                      <div className="flex justify-between items-center">
+                        <span
+                          className="text-gray-700"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          Базовая стоимость
+                        </span>
+                        <span
+                          className="text-gray-900 font-medium"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          ${plan.price_monthly} / мес.
+                        </span>
+                      </div>
+                      
+                      {/* Финальная цена */}
+                      <div className="flex justify-between items-center border-t pt-2">
+                        <span
+                          className="text-gray-900 font-semibold"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          Итого
+                        </span>
+                        <span
+                          className="text-gray-900 font-bold text-lg"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          ${Math.round((subscription[0] as any).final_price || plan.price_monthly * (1 - (subscription[0]?.discount_percent || 0) / 100))} / мес.
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    /* Если скидки нет, показываем только стоимость */
+                    <div className="flex justify-between items-center">
+                      <span
+                        className="text-gray-700"
+                        style={{ fontFamily: "Nunito, sans-serif" }}
+                      >
+                        Стоимость
+                      </span>
+                      <span
+                        className="text-gray-900 font-medium"
+                        style={{ fontFamily: "Nunito, sans-serif" }}
+                      >
+                        ${plan.price_monthly} / мес.
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -265,19 +323,90 @@ export const PaymentStep: React.FC<{
 
           {/* Общая сумма */}
           <div className="bg-gray-100 rounded-xl p-4 mb-6">
-            <div className="flex justify-between items-center">
-              <span
-                className="text-xl font-semibold text-gray-900"
-                style={{ fontFamily: "Nunito, sans-serif" }}
-              >
-                Общая сумма
-              </span>
-              <span
-                className="text-xl font-bold text-gray-900"
-                style={{ fontFamily: "Nunito, sans-serif" }}
-              >
-                ${totalPrice} / мес.
-              </span>
+            <div className="space-y-2">
+              {/* Подсчет базовой суммы */}
+              {(() => {
+                const baseTotal = children.reduce((sum, child) => {
+                  const pendingSubscription = child.subscriptions.filter(
+                    (subscription) =>
+                      subscription.status === SubscriptionStatus.pending_payment
+                  );
+                  if (pendingSubscription.length > 0) {
+                    for (const subscription of pendingSubscription) {
+                      const plan = getPlanById(subscription.plan_id);
+                      sum += plan?.price_monthly || 0;
+                    }
+                  }
+                  return sum;
+                }, 0);
+                
+                const discountTotal = children.reduce((sum, child) => {
+                  const pendingSubscription = child.subscriptions.filter(
+                    (subscription) =>
+                      subscription.status === SubscriptionStatus.pending_payment
+                  );
+                  if (pendingSubscription.length > 0) {
+                    for (const subscription of pendingSubscription) {
+                      const plan = getPlanById(subscription.plan_id);
+                      const basePrice = plan?.price_monthly || 0;
+                      sum += basePrice * ((subscription.discount_percent || 0) / 100);
+                    }
+                  }
+                  return sum;
+                }, 0);
+                
+                return (
+                  <>
+                    {discountTotal > 0 ? (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span
+                            className="text-gray-700"
+                            style={{ fontFamily: "Nunito, sans-serif" }}
+                          >
+                            Скидка
+                          </span>
+                          <span
+                            className="text-green-600 font-medium"
+                            style={{ fontFamily: "Nunito, sans-serif" }}
+                          >
+                            -${Math.round(discountTotal)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center border-t pt-2">
+                          <span
+                            className="text-xl font-semibold text-gray-900"
+                            style={{ fontFamily: "Nunito, sans-serif" }}
+                          >
+                            Общая сумма
+                          </span>
+                          <span
+                            className="text-xl font-bold text-gray-900"
+                            style={{ fontFamily: "Nunito, sans-serif" }}
+                          >
+                            ${totalPrice} / мес.
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span
+                          className="text-xl font-semibold text-gray-900"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          Общая сумма
+                        </span>
+                        <span
+                          className="text-xl font-bold text-gray-900"
+                          style={{ fontFamily: "Nunito, sans-serif" }}
+                        >
+                          ${totalPrice} / мес.
+                        </span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 

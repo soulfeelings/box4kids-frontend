@@ -1,0 +1,48 @@
+name: 🚀 Deploy to Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildImage:
+        description: "Build Docker image?"
+        required: true
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      resetDevEnvironment:
+        description: "Reset environment (remove volumes/images)?"
+        required: true
+        default: "false"
+        type: choice
+        options: ["true", "false"]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, frontend]
+    environment: development
+
+    steps:
+      - name: ✅ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 📂 Create .env
+        run: |
+          echo "PORT=3000" > .env
+          echo "NODE_ENV=development" >> .env
+          echo "REACT_APP_API_URL=http://localhost:8000" >> .env
+
+      - name: 💣 Reset environment (optional)
+        if: ${{ github.event.inputs.resetDevEnvironment == 'true' }}
+        run: make reset-env
+
+      - name: 🛠 Build image (optional)
+        if: ${{ github.event.inputs.buildImage == 'true' }}
+        run: make build-image
+
+      - name: 🚀 Deploy containers
+        run: make deploy-dev
+
+      - name: 🔍 Health check
+        run: |
+          export PORT=3000
+          make health-check

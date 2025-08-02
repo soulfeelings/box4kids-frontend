@@ -1,7 +1,7 @@
 # Box4Kids Frontend Makefile
 # Удобные команды для разработки
 
-.PHONY: help start build test eject ts-check api-sync api-gen api-upd install clean menu
+.PHONY: start build test eject ts-check api-sync api-gen api-upd install clean menu deploy-dev reset-env build-image health-check
 
 # Цвета для вывода
 GREEN = \033[0;32m
@@ -9,6 +9,10 @@ YELLOW = \033[1;33m
 RED = \033[0;31m
 BLUE = \033[0;34m
 NC = \033[0m # No Color
+
+# Docker Compose настройки
+COMPOSE_PROJECT_NAME = box4kids-frontend
+COMPOSE_FILE = docker-compose.dev.yml
 
 # Интерактивное меню
 menu:
@@ -29,12 +33,18 @@ menu:
 	@echo "  $(YELLOW)6)$(NC)  Сгенерировать API клиент"
 	@echo "  $(YELLOW)7)$(NC)  Обновить API (sync + gen)"
 	@echo ""
+	@echo "$(BLUE)Деплой:$(NC)"
+	@echo "  $(YELLOW)8)$(NC)  Деплой в dev"
+	@echo "  $(YELLOW)9)$(NC)  Сброс окружения"
+	@echo "  $(YELLOW)10)$(NC) Сборка образа"
+	@echo "  $(YELLOW)11)$(NC) Проверка здоровья"
+	@echo ""
 	@echo "$(BLUE)Утилиты:$(NC)"
-	@echo "  $(YELLOW)8)$(NC)  Установить зависимости"
-	@echo "  $(YELLOW)9)$(NC)  Очистить и переустановить"
+	@echo "  $(YELLOW)12)$(NC) Установить зависимости"
+	@echo "  $(YELLOW)13)$(NC) Очистить и переустановить"
 	@echo "  $(YELLOW)0)$(NC)  Выход"
 	@echo ""
-	@echo "$(YELLOW)Выберите команду (0-9):$(NC) "
+	@echo "$(YELLOW)Выберите команду (0-13):$(NC) "
 	@read -r choice; \
 	case $$choice in \
 		1) make start ;; \
@@ -44,35 +54,17 @@ menu:
 		5) make api-sync ;; \
 		6) make api-gen ;; \
 		7) make api-upd ;; \
-		8) make install ;; \
-		9) make clean ;; \
+		8) make deploy-dev ;; \
+		9) make reset-env ;; \
+		10) make build-image ;; \
+		11) make health-check ;; \
+		12) make install ;; \
+		13) make clean ;; \
 		0) echo "$(GREEN)До свидания! 👋$(NC)" ;; \
 		*) echo "$(RED)Неверный выбор. Попробуйте снова.$(NC)" && make menu ;; \
 	esac
 
-# Помощь
-help:
-	@echo "$(GREEN)Box4Kids Frontend - Доступные команды:$(NC)"
-	@echo ""
-	@echo "$(YELLOW)Основные команды:$(NC)"
-	@echo "  make start     - Запустить dev сервер (npm start)"
-	@echo "  make build     - Собрать для продакшена (npm run build)"
-	@echo "  make test      - Запустить тесты (npm test)"
-	@echo "  make eject     - Eject из Create React App (npm run eject)"
-	@echo ""
-	@echo "$(YELLOW)TypeScript:$(NC)"
-	@echo "  make ts-check  - Проверить типы TypeScript (npm run ts-check)"
-	@echo ""
-	@echo "$(YELLOW)API команды:$(NC)"
-	@echo "  make api-sync  - Скачать OpenAPI JSON (npm run api:sync)"
-	@echo "  make api-gen   - Сгенерировать API клиент (npm run api:gen)"
-	@echo "  make api-upd   - Обновить API (sync + gen)"
-	@echo ""
-	@echo "$(YELLOW)Утилиты:$(NC)"
-	@echo "  make install   - Установить зависимости (npm install)"
-	@echo "  make clean     - Очистить node_modules и переустановить"
-	@echo "  make menu      - Интерактивное меню"
-	@echo "  make help      - Показать эту справку"
+
 
 # Основные команды
 start:
@@ -115,6 +107,34 @@ api-upd:
 	@echo "$(GREEN)🔄 Обновляю API (sync + gen)...$(NC)"
 	npm run api:upd
 
+# Деплой команды
+deploy-dev:
+	@echo "$(GREEN)🚀 Деплой в dev окружение...$(NC)"
+	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) docker compose -f $(COMPOSE_FILE) up -d --force-recreate
+
+reset-env:
+	@echo "$(RED)💣 Сбрасываю окружение проекта $(COMPOSE_PROJECT_NAME)...$(NC)"
+	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) docker compose -f $(COMPOSE_FILE) down -v --remove-orphans || true
+	docker image prune -f --filter label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)
+	docker volume prune -f --filter label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)
+
+build-image:
+	@echo "$(GREEN)🛠 Собираю Docker образ...$(NC)"
+	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) docker compose -f $(COMPOSE_FILE) build --no-cache
+
+health-check:
+	@echo "$(GREEN)🔍 Проверяю здоровье приложения...$(NC)"
+	@for i in 1 2 3 4 5; do \
+		if curl -fs http://localhost:$${PORT:-3000}/health > /dev/null; then \
+			echo "$(GREEN)✅ Health check passed$(NC)"; \
+			exit 0; \
+		fi; \
+		echo "$(YELLOW)⏳ Waiting for app... ($$i/5)$(NC)"; \
+		sleep 2; \
+	done; \
+	echo "$(RED)❌ App failed health check$(NC)"; \
+	exit 1
+
 # Утилиты
 install:
 	@echo "$(GREEN)📦 Устанавливаю зависимости...$(NC)"
@@ -134,4 +154,8 @@ compile: build
 check: ts-check
 sync: api-sync
 gen: api-gen
-update: api-upd 
+update: api-upd
+deploy: deploy-dev
+reset: reset-env
+build-docker: build-image
+health: health-check 

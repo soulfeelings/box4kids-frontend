@@ -36,6 +36,10 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
       : AUTH_STEPS.WELCOME
   );
 
+  useEffect(() => {
+    setCurrentStep(step);
+  }, [step]);
+
   const {
     user,
     currentChildIdToUpdate,
