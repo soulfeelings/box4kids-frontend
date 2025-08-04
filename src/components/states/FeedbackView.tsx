@@ -4,7 +4,9 @@ import { BottomNavigation } from "../../features/BottomNavigation";
 import { useAddBoxReviewToyBoxesBoxIdReviewPost } from "../../api-client";
 import type { ToyBoxReviewRequest } from "../../api-client/model";
 import { notifications } from "../../utils/notifications";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface FeedbackViewProps {
   rating: number;
@@ -26,29 +28,30 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   userId,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const addReviewMutation = useAddBoxReviewToyBoxesBoxIdReviewPost();
 
   // Get feedback text based on rating
   const getFeedbackText = (rating: number) => {
     switch (rating) {
       case 1:
-        return { title: t('terrible'), subtitle: t('what_can_be_improved') };
+        return { title: t("terrible"), subtitle: t("what_can_be_improved") };
       case 2:
-        return { title: t('bad'), subtitle: t('what_can_be_improved') };
+        return { title: t("bad"), subtitle: t("what_can_be_improved") };
       case 3:
-        return { title: t('so_so'), subtitle: t('what_can_be_improved') };
+        return { title: t("so_so"), subtitle: t("what_can_be_improved") };
       case 4:
         return {
-          title: t('good'),
-          subtitle: t('thanks_for_rating_what_liked'),
+          title: t("good"),
+          subtitle: t("thanks_for_rating_what_liked"),
         };
       case 5:
         return {
-          title: t('excellent'),
-          subtitle: t('thanks_for_rating_what_liked'),
+          title: t("excellent"),
+          subtitle: t("thanks_for_rating_what_liked"),
         };
       default:
-        return { title: '', subtitle: '' };
+        return { title: "", subtitle: "" };
     }
   };
 
@@ -65,13 +68,13 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
         data: reviewData,
       });
 
-      console.log('Feedback submitted successfully');
+      console.log("Feedback submitted successfully");
       notifications.reviewSubmitted();
       setShowFeedback(false);
-      setFeedbackComment('');
+      setFeedbackComment("");
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
-      notifications.error(t('failed_to_send_feedback'));
+      console.error("Failed to submit feedback:", error);
+      notifications.error(t("failed_to_send_feedback"));
     }
   };
 
@@ -84,17 +87,19 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
   return (
     <div
       className="w-full bg-white min-h-screen"
-      style={{ fontFamily: 'Nunito, sans-serif' }}
+      style={{ fontFamily: "Nunito, sans-serif" }}
     >
       {/* Header */}
       <div className="p-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-gray-800">
-          {t('how_do_you_like_the_toy_set')}
+          {t("how_do_you_like_the_toy_set")}
         </h1>
         <button
           onClick={handleCloseFeedback}
           disabled={addReviewMutation.isPending}
-          className={`p-1 ${addReviewMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`p-1 ${
+            addReviewMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
           <X size={24} className="text-gray-600" />
         </button>
@@ -109,15 +114,19 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
               key={starRating}
               onClick={() => setRating(starRating)}
               disabled={addReviewMutation.isPending}
-              className={`focus:outline-none ${addReviewMutation.isPending ? 'cursor-not-allowed opacity-50' : ''}`}
-              aria-label={t('set_rating', { rating: starRating })}
+              className={`focus:outline-none ${
+                addReviewMutation.isPending
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
+              aria-label={t("set_rating", { rating: starRating })}
             >
               <Star
                 size={40}
                 className={
                   starRating <= rating
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'text-gray-300'
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-gray-300"
                 }
               />
             </button>
@@ -143,10 +152,12 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
           <textarea
             value={feedbackComment}
             onChange={(e) => setFeedbackComment(e.target.value)}
-            placeholder={t('leave_comment_here')}
+            placeholder={t("leave_comment_here")}
             disabled={addReviewMutation.isPending}
-            className={`w-full h-32 p-3 bg-gray-100 rounded-xl resize-none text-sm text-gray-700 placeholder-gray-500 border-none outline-none ${addReviewMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
-            style={{ fontFamily: 'Nunito, sans-serif' }}
+            className={`w-full h-32 p-3 bg-gray-100 rounded-xl resize-none text-sm text-gray-700 placeholder-gray-500 border-none outline-none ${
+              addReviewMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            style={{ fontFamily: "Nunito, sans-serif" }}
           />
         </div>
 
@@ -154,15 +165,25 @@ export const FeedbackView: React.FC<FeedbackViewProps> = ({
         <button
           onClick={handleSubmitFeedback}
           disabled={addReviewMutation.isPending}
-          className={`w-full py-4 rounded-xl text-sm font-medium ${addReviewMutation.isPending ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-gray-800 text-white hover:bg-gray-700'}`}
+          className={`w-full py-4 rounded-xl text-sm font-medium ${
+            addReviewMutation.isPending
+              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+              : "bg-gray-800 text-white hover:bg-gray-700"
+          }`}
         >
-          {addReviewMutation.isPending ? t('sending') : t('send')}
+          {addReviewMutation.isPending ? t("sending") : t("send")}
         </button>
       </div>
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );

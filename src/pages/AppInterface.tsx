@@ -6,7 +6,7 @@ import {
   NextSetDeterminedView,
 } from "../components/states";
 import { useStore } from "../store/store";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import {
   getCurrentBoxToyBoxesCurrentChildIdGet,
@@ -19,7 +19,8 @@ import {
   ToyBoxResponse,
 } from "../api-client/model";
 import { UserChildData } from "../types";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+import { LoadingComponent } from "../components/common/LoadingComponent";
 
 export interface BoxesState {
   child: UserChildData;
@@ -41,21 +42,22 @@ export const AppInterface: React.FC = () => {
   >(null);
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [feedbackComment, setFeedbackComment] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const { user, currentAppScreen } = useStore();
-  const navigate = useNavigate();
+  const { user } = useStore();
 
-  useEffect(() => {
-    if (currentAppScreen === "home") {
-      setShowFeedback(false);
-      navigate(ROUTES.APP.ROOT);
-    } else if (currentAppScreen === "children") {
-      navigate(ROUTES.APP.CHILDREN);
-    } else if (currentAppScreen === "profile") {
-      navigate(ROUTES.APP.PROFILE);
-      setShowFeedback(false);
-    }
-  }, [currentAppScreen, navigate]);
+  // Убираем автоматическую навигацию, так как она создает бесконечный цикл
+  // useEffect(() => {
+  //   if (currentAppScreen === "home") {
+  //     setShowFeedback(false);
+  //     navigate(ROUTES.APP.ROOT);
+  //   } else if (currentAppScreen === "children") {
+  //     navigate(ROUTES.APP.CHILDREN);
+  //   } else if (currentAppScreen === "profile") {
+  //     navigate(ROUTES.APP.PROFILE);
+  //     setShowFeedback(false);
+  //   }
+  // }, [currentAppScreen, navigate]);
 
   const [currentSuccessfulBoxes, setCurrentSuccessfulBoxes] = useState<
     SuccessfulBoxesState[]
@@ -65,6 +67,7 @@ export const AppInterface: React.FC = () => {
     if (!user) return;
 
     const fetchData = async () => {
+      setIsLoading(true);
       if (user?.children.length) {
         try {
           // Фильтруем детей с активной подпиской
@@ -77,6 +80,7 @@ export const AppInterface: React.FC = () => {
 
           if (subscribedChildren.length === 0) {
             setCurrentSuccessfulBoxes([]);
+            setIsLoading(false);
             return;
           }
 
@@ -112,15 +116,17 @@ export const AppInterface: React.FC = () => {
           const failedCount = res.filter((r) => !r.success).length;
           if (failedCount > 0) {
             notifications.warning(
-              t('failed_to_load_data_for_children', { 
-                count: failedCount, 
-                child: failedCount === 1 ? t('child') : t('children') 
+              t("failed_to_load_data_for_children", {
+                count: failedCount,
+                child: failedCount === 1 ? t("child") : t("children_genitive"),
               })
             );
           }
         } catch (error) {
           console.error("Failed to fetch boxes data:", error);
-          notifications.error(t('failed_to_load_toy_boxes_data'));
+          notifications.error(t("failed_to_load_toy_boxes_data"));
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -148,6 +154,10 @@ export const AppInterface: React.FC = () => {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 
+  if (isLoading) {
+    return <LoadingComponent type="main" />;
+  }
+
   const handleStarClick = (starIndex: number): void => {
     setRating(starIndex + 1);
     setShowFeedback(true);
@@ -158,18 +168,18 @@ export const AppInterface: React.FC = () => {
     const today = new Date();
     const day = today.getDate();
     const months = [
-      t('january'),
-      t('february'),
-      t('march'),
-      t('april'),
-      t('may'),
-      t('june'),
-      t('july'),
-      t('august'),
-      t('september'),
-      t('october'),
-      t('november'),
-      t('december'),
+      t("january"),
+      t("february"),
+      t("march"),
+      t("april"),
+      t("may"),
+      t("june"),
+      t("july"),
+      t("august"),
+      t("september"),
+      t("october"),
+      t("november"),
+      t("december"),
     ];
     const month = months[today.getMonth()];
     return `${day} ${month}`;
@@ -184,28 +194,28 @@ export const AppInterface: React.FC = () => {
     const date = new Date(currentYear, parseInt(month) - 1, parseInt(day));
 
     const months = [
-      t('january'),
-      t('february'),
-      t('march'),
-      t('april'),
-      t('may'),
-      t('june'),
-      t('july'),
-      t('august'),
-      t('september'),
-      t('october'),
-      t('november'),
-      t('december'),
+      t("january"),
+      t("february"),
+      t("march"),
+      t("april"),
+      t("may"),
+      t("june"),
+      t("july"),
+      t("august"),
+      t("september"),
+      t("october"),
+      t("november"),
+      t("december"),
     ];
 
     const daysOfWeek = [
-      t('sunday'),
-      t('monday'),
-      t('tuesday'),
-      t('wednesday'),
-      t('thursday'),
-      t('friday'),
-      t('saturday'),
+      t("sunday"),
+      t("monday"),
+      t("tuesday"),
+      t("wednesday"),
+      t("thursday"),
+      t("friday"),
+      t("saturday"),
     ];
 
     const monthName = months[date.getMonth()];

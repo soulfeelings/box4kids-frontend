@@ -14,6 +14,7 @@ import {
   useNavigateToOnboarding,
 } from "../../../hooks/useNavigateHooks";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { AUTH_STEPS } from "../../../constants/auth";
 
 export const ValidateSubscriptionsStep: React.FC<{
   onBack: () => void;
@@ -22,15 +23,7 @@ export const ValidateSubscriptionsStep: React.FC<{
   onAddNewChild: () => void;
   onEditChildSubscription: (childId: number) => void;
   onEditChildData: (childId: number) => void;
-}> = ({
-  onBack,
-  onNext,
-  onClose,
-  // onAddNewChild,
-  // onEditChildSubscription,
-  // onEditChildData,
-  ...props
-}) => {
+}> = ({ onBack, onNext, onClose }) => {
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
@@ -40,11 +33,12 @@ export const ValidateSubscriptionsStep: React.FC<{
   const navigateToOnboarding = useNavigateToOnboarding();
 
   const handleEditChildSubscription = (childId: number) => {
+    console.log("handleEditChildSubscription", childId);
     navigateToOnboarding({ step: "subscription" });
   };
 
   const handleAddNewChild = () => {
-    navigateToOnboarding({ step: "child" });
+    navigateToOnboarding({ step: AUTH_STEPS.CHILD });
   };
 
   const handleEditChildData = (childId: number) => {

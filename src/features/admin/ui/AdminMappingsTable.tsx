@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useTranslation } from 'react-i18next';
-import { useGetAllToyCategoriesToyCategoriesGet } from "../../../api-client";
+import { useTranslation } from "react-i18next";
+
 import { useGetAllInterestsInterestsGet } from "../../../api-client";
 import { useGetAllSkillsSkillsGet } from "../../../api-client";
 
 export const AdminMappingsTable: React.FC = () => {
   const { t } = useTranslation();
-  const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
   const { data: interests } = useGetAllInterestsInterestsGet();
   const { data: skills } = useGetAllSkillsSkillsGet();
   const [expandedMapping, setExpandedMapping] = useState<number | null>(null);
@@ -43,7 +42,12 @@ export const AdminMappingsTable: React.FC = () => {
   ) => {
     try {
       // API call to remove interest
-      console.log("Removing interest", interestName, "from category", categoryId);
+      console.log(
+        "Removing interest",
+        interestName,
+        "from category",
+        categoryId
+      );
     } catch (err) {
       console.error("Ошибка удаления интереса:", err);
     }
@@ -59,30 +63,40 @@ export const AdminMappingsTable: React.FC = () => {
   };
 
   const getAvailableInterests = (categoryId: number) => {
-    return interests?.interests.filter(
-      (interest) => !mappings.find((m) => m.category_id === categoryId)?.interests.includes(interest.name)
-    ) || [];
+    return (
+      interests?.interests.filter(
+        (interest) =>
+          !mappings
+            .find((m) => m.category_id === categoryId)
+            ?.interests.includes(interest.name)
+      ) || []
+    );
   };
 
   const getAvailableSkills = (categoryId: number) => {
-    return skills?.skills.filter(
-      (skill) => !mappings.find((m) => m.category_id === categoryId)?.skills.includes(skill.name)
-    ) || [];
+    return (
+      skills?.skills.filter(
+        (skill) =>
+          !mappings
+            .find((m) => m.category_id === categoryId)
+            ?.skills.includes(skill.name)
+      ) || []
+    );
   };
 
   // Mock data - replace with actual API call
   const mappings = [
     {
       category_id: 1,
-      category_name: t('constructors'),
-      interests: [t('logic'), t('motor_skills')],
-      skills: [t('spatial_thinking'), t('creativity')],
+      category_name: t("constructors"),
+      interests: [t("logic"), t("motor_skills")],
+      skills: [t("spatial_thinking"), t("creativity")],
     },
     {
       category_id: 2,
-      category_name: t('creative_sets'),
-      interests: [t('creativity'), t('imagination')],
-      skills: [t('fine_motor_skills'), t('color_perception')],
+      category_name: t("creative_sets"),
+      interests: [t("creativity"), t("imagination")],
+      skills: [t("fine_motor_skills"), t("color_perception")],
     },
   ];
 
@@ -90,7 +104,7 @@ export const AdminMappingsTable: React.FC = () => {
     <div className="bg-white shadow overflow-hidden sm:rounded-md">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
-          {t('category_mappings')}
+          {t("category_mappings")}
         </h3>
       </div>
       <div className="overflow-x-auto">
@@ -98,16 +112,16 @@ export const AdminMappingsTable: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('category')}
+                {t("category")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('interests')}
+                {t("interests")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('skills')}
+                {t("skills")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('actions')}
+                {t("actions")}
               </th>
             </tr>
           </thead>
@@ -132,8 +146,8 @@ export const AdminMappingsTable: React.FC = () => {
                       className="text-indigo-600 hover:text-indigo-900"
                     >
                       {expandedMapping === mapping.category_id
-                        ? t('hide')
-                        : t('manage')}
+                        ? t("hide")
+                        : t("manage")}
                     </button>
                   </td>
                 </tr>
@@ -145,7 +159,7 @@ export const AdminMappingsTable: React.FC = () => {
                         {/* Интересы */}
                         <div>
                           <h4 className="font-medium text-gray-900 mb-3">
-                            {t('interests')}:
+                            {t("interests")}:
                           </h4>
                           <div className="space-y-2">
                             {mapping.interests.map((interest, index) => (
@@ -163,7 +177,7 @@ export const AdminMappingsTable: React.FC = () => {
                                   }
                                   className="text-red-600 hover:text-red-900 text-xs"
                                 >
-                                  {t('delete')}
+                                  {t("delete")}
                                 </button>
                               </div>
                             ))}
@@ -175,7 +189,7 @@ export const AdminMappingsTable: React.FC = () => {
                                 }
                                 className="flex-1 text-sm border-gray-300 rounded-md px-2 py-1"
                               >
-                                <option value="">{t('select_interest')}</option>
+                                <option value="">{t("select_interest")}</option>
                                 {getAvailableInterests(mapping.category_id).map(
                                   (interest) => (
                                     <option
@@ -194,7 +208,7 @@ export const AdminMappingsTable: React.FC = () => {
                                 disabled={!newInterestId}
                                 className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                {t('add')}
+                                {t("add")}
                               </button>
                             </div>
                           </div>
@@ -203,7 +217,7 @@ export const AdminMappingsTable: React.FC = () => {
                         {/* Навыки */}
                         <div>
                           <h4 className="font-medium text-gray-900 mb-3">
-                            {t('skills')}:
+                            {t("skills")}:
                           </h4>
                           <div className="space-y-2">
                             {mapping.skills.map((skill, index) => (
@@ -221,19 +235,17 @@ export const AdminMappingsTable: React.FC = () => {
                                   }
                                   className="text-red-600 hover:text-red-900 text-xs"
                                 >
-                                  {t('delete')}
+                                  {t("delete")}
                                 </button>
                               </div>
                             ))}
                             <div className="flex space-x-2">
                               <select
                                 value={newSkillId}
-                                onChange={(e) =>
-                                  setNewSkillId(e.target.value)
-                                }
+                                onChange={(e) => setNewSkillId(e.target.value)}
                                 className="flex-1 text-sm border-gray-300 rounded-md px-2 py-1"
                               >
-                                <option value="">{t('select_skill')}</option>
+                                <option value="">{t("select_skill")}</option>
                                 {getAvailableSkills(mapping.category_id).map(
                                   (skill) => (
                                     <option key={skill.id} value={skill.id}>
@@ -249,7 +261,7 @@ export const AdminMappingsTable: React.FC = () => {
                                 disabled={!newSkillId}
                                 className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                {t('add')}
+                                {t("add")}
                               </button>
                             </div>
                           </div>

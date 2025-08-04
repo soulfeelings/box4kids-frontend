@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { DeliveryHistoryPage } from "./DeliveryHistoryPage";
 import { SupportPage } from "./SupportPage";
 import { BottomNavigation } from "../features/BottomNavigation";
@@ -9,7 +9,8 @@ import { ProfileItem } from "../components/profile/ProfileItem";
 import { DeliveryProfileSections } from "../features/DeliveryProfileSections";
 import { PaymentDataPage } from "./PaymentDataPage";
 import { useNavigateToEditDelivery } from "../hooks/useNavigateHooks";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+import { LoadingComponent } from "../components/common/LoadingComponent";
 
 export const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -20,6 +21,17 @@ export const ProfilePage: React.FC = () => {
   const [showEditName, setShowEditName] = useState(false);
   const [showEditPhone, setShowEditPhone] = useState(false);
   const [showPaymentData, setShowPaymentData] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    // Симулируем загрузку данных
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Handle delivery history click
   const handleDeliveryHistoryClick = useCallback(() => {
     setShowDeliveryHistory(true);
@@ -33,6 +45,10 @@ export const ProfilePage: React.FC = () => {
   const handlePaymentDataClick = useCallback(() => {
     setShowPaymentData(true);
   }, []);
+
+  if (isLoading) {
+    return <LoadingComponent type="profile" />;
+  }
 
   // Show delivery history page if requested
   if (showDeliveryHistory) {
@@ -79,7 +95,7 @@ export const ProfilePage: React.FC = () => {
       <div className="px-4 py-6">
         {/* Name */}
         <ProfileItem
-          label={t('name')}
+          label={t("name")}
           value={user?.name}
           isEditable={true}
           customRadius="rounded-[24px]"
@@ -88,7 +104,7 @@ export const ProfilePage: React.FC = () => {
 
         {/* Phone */}
         <ProfileItem
-          label={t('phone')}
+          label={t("phone")}
           value={user?.phone}
           isEditable={true}
           customRadius="rounded-[24px]"
@@ -106,7 +122,7 @@ export const ProfilePage: React.FC = () => {
         <div className="mt-6">
           <div onClick={handleDeliveryHistoryClick} className="cursor-pointer">
             <ProfileItem
-              label={t('delivery_history')}
+              label={t("delivery_history")}
               hasArrow={true}
               isMenuItem={true}
             />
@@ -114,14 +130,18 @@ export const ProfilePage: React.FC = () => {
 
           <div onClick={handlePaymentDataClick} className="cursor-pointer">
             <ProfileItem
-              label={t('payment_data')}
+              label={t("payment_data")}
               hasArrow={true}
               isMenuItem={true}
             />
           </div>
 
           <div onClick={handleSupportClick} className="cursor-pointer">
-            <ProfileItem label={t('support')} hasArrow={true} isMenuItem={true} />
+            <ProfileItem
+              label={t("support")}
+              hasArrow={true}
+              isMenuItem={true}
+            />
           </div>
         </div>
 
@@ -134,7 +154,7 @@ export const ProfilePage: React.FC = () => {
             window.location.href = "/";
           }}
         >
-          <ProfileItem label={t('logout')} isLogout={true} />
+          <ProfileItem label={t("logout")} isLogout={true} />
         </div>
       </div>
 
