@@ -10,8 +10,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { AuthContainer } from "./components/layout/AuthContainer";
 import { useStore } from "./store/store";
 import { ROUTES } from "./constants/routes";
-import './i18n';
-import { useTranslation } from 'react-i18next';
+import "./i18n";
 
 // Импорт компонентов шагов авторизации
 import { OtpStep } from "./components/auth/otp/OtpStep";
@@ -28,7 +27,6 @@ import { LanguageSwitcher } from "./components/LanguageSwitcher";
 
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
-  const { i18n, t } = useTranslation();
   return (
     <>
       <LanguageSwitcher />

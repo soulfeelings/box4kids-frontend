@@ -1,5 +1,5 @@
 import { UserData } from "../types";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 export const DeliveryAddressCards = ({
   user,
@@ -35,18 +35,18 @@ export const DeliveryAddressCards = ({
     if (date.includes(".")) {
       const [day, month] = date.split(".");
       const monthNames = [
-        t('jan_short'),
-        t('feb_short'),
-        t('mar_short'),
-        t('apr_short'),
-        t('may_short'),
-        t('jun_short'),
-        t('jul_short'),
-        t('aug_short'),
-        t('sep_short'),
-        t('oct_short'),
-        t('nov_short'),
-        t('dec_short'),
+        t("jan_short"),
+        t("feb_short"),
+        t("mar_short"),
+        t("apr_short"),
+        t("may_short"),
+        t("jun_short"),
+        t("jul_short"),
+        t("aug_short"),
+        t("sep_short"),
+        t("oct_short"),
+        t("nov_short"),
+        t("dec_short"),
       ];
 
       const monthIndex = parseInt(month) - 1;
@@ -67,10 +67,10 @@ export const DeliveryAddressCards = ({
               className="text-lg font-medium text-gray-900 mb-4 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              {t('saved_delivery_addresses')}
+              {t("saved_delivery_addresses")}
             </h3>
 
-            {user.deliveryAddresses.map((address, index) => (
+            {user.deliveryAddresses.map((address) => (
               <div
                 key={address.id}
                 onClick={() => onAddressSelect(address.id)}
@@ -203,7 +203,7 @@ export const DeliveryAddressCards = ({
                 className="font-medium text-gray-700"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                {t('add_new_address')}
+                {t("add_new_address")}
               </p>
             </div>
           </button>

@@ -23,15 +23,7 @@ export const ValidateSubscriptionsStep: React.FC<{
   onAddNewChild: () => void;
   onEditChildSubscription: (childId: number) => void;
   onEditChildData: (childId: number) => void;
-}> = ({
-  onBack,
-  onNext,
-  onClose,
-  // onAddNewChild,
-  // onEditChildSubscription,
-  // onEditChildData,
-  ...props
-}) => {
+}> = ({ onBack, onNext, onClose }) => {
   const { data: interestsData } = useGetAllInterestsInterestsGet();
   const { data: skillsData } = useGetAllSkillsSkillsGet();
 
@@ -41,6 +33,7 @@ export const ValidateSubscriptionsStep: React.FC<{
   const navigateToOnboarding = useNavigateToOnboarding();
 
   const handleEditChildSubscription = (childId: number) => {
+    console.log("handleEditChildSubscription", childId);
     navigateToOnboarding({ step: "subscription" });
   };
 

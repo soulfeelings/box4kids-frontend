@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { DeliveryAddressData } from "../types";
 import { dateManager } from "../utils/date/DateManager";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 export interface DeliveryData {
   name: string;
@@ -23,9 +23,9 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
   isDisabled = false,
 }) => {
   const { t } = useTranslation();
-  
+
   const timeOptions = [
-    { value: "", label: t('select_time') },
+    { value: "", label: t("select_time") },
     { value: "9:00 – 12:00", label: "9:00 - 12:00" },
     { value: "12:00 – 15:00", label: "12:00 - 15:00" },
     { value: "15:00 – 18:00", label: "15:00 - 18:00" },
@@ -104,7 +104,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     setIsLocating(true);
     setLocationError(null);
     if (!navigator.geolocation) {
-      setLocationError(t('geolocation_not_supported'));
+      setLocationError(t("geolocation_not_supported"));
       setIsLocating(false);
       return;
     }
@@ -116,7 +116,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ru`
           );
-          if (!response.ok) throw new Error(t('geocoding_error'));
+          if (!response.ok) throw new Error(t("geocoding_error"));
           const data = await response.json();
           // Формируем адрес: страна, область, город, улица, дом
           const a = data.address || {};
@@ -125,8 +125,10 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
             a.state || a.region,
             a.city || a.town || a.village,
             a.road || a.street,
-            a.house_number
-          ].filter(Boolean).join(', ');
+            a.house_number,
+          ]
+            .filter(Boolean)
+            .join(", ");
           const address = formatted || data.display_name || "";
           setDeliveryData((prev) => {
             const newData = { ...prev, address };
@@ -134,13 +136,13 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
             return newData;
           });
         } catch (e) {
-          setLocationError(t('failed_to_determine_address'));
+          setLocationError(t("failed_to_determine_address"));
         } finally {
           setIsLocating(false);
         }
       },
-      (error) => {
-        setLocationError(t('failed_to_get_geolocation'));
+      () => {
+        setLocationError(t("failed_to_get_geolocation"));
         setIsLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000 }
@@ -159,13 +161,15 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     setIsSuggesting(true);
     suggestTimeout.current = setTimeout(async () => {
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&addressdetails=1&accept-language=ru&limit=10`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          value
+        )}&addressdetails=1&accept-language=ru&limit=10`;
         const response = await fetch(url);
-        if (!response.ok) throw new Error(t('suggestions_error'));
+        if (!response.ok) throw new Error(t("suggestions_error"));
         const data = await response.json();
         setAddressSuggestions(data);
       } catch (e) {
-        setSuggestError(t('failed_to_get_suggestions'));
+        setSuggestError(t("failed_to_get_suggestions"));
       } finally {
         setIsSuggesting(false);
       }
@@ -177,13 +181,17 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     // Формируем адрес только до самого глубокого уровня
     const parts = [a.country];
     if (a.state || a.region) parts.push(a.state || a.region);
-    if (a.city || a.town || a.village) parts.push(a.city || a.town || a.village);
+    if (a.city || a.town || a.village)
+      parts.push(a.city || a.town || a.village);
     if (a.road || a.street) parts.push(a.road || a.street);
     if (a.house_number) parts.push(a.house_number);
     // Обрезаем до самого глубокого уровня, который есть в подсказке
     let lastIdx = parts.length - 1;
     while (lastIdx >= 0 && !parts[lastIdx]) lastIdx--;
-    const smartAddress = parts.slice(0, lastIdx + 1).filter(Boolean).join(', ');
+    const smartAddress = parts
+      .slice(0, lastIdx + 1)
+      .filter(Boolean)
+      .join(", ");
     setDeliveryData((prev) => {
       const newData = { ...prev, address: smartAddress };
       onDataChange(newData);
@@ -200,13 +208,13 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          {t('address_name')}
+          {t("address_name")}
         </label>
         <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all border-gray-200 focus-within:border-[#7782F5]">
           <input
             type="text"
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
-            placeholder={t('enter_address_name')}
+            placeholder={t("enter_address_name")}
             value={deliveryData.name}
             onChange={(e) => {
               setDeliveryData({ ...deliveryData, name: e.target.value });
@@ -224,13 +232,13 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          {t('address')}
+          {t("address")}
         </label>
         <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative border-gray-200 focus-within:border-[#7782F5]">
           <input
             type="text"
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 pr-9"
-            placeholder={t('enter_delivery_address')}
+            placeholder={t("enter_delivery_address")}
             value={deliveryData.address}
             onChange={handleAddressInput}
             maxLength={200}
@@ -243,12 +251,27 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
             className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 hover:text-blue-600 focus:outline-none"
             onClick={handleDetectAddress}
             disabled={isDisabled || isLocating}
-            aria-label={t('auto_detect_address')}
+            aria-label={t("auto_detect_address")}
           >
             {isLocating ? (
-              <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              <svg
+                className="animate-spin w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                />
               </svg>
             ) : (
               <svg
@@ -276,7 +299,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
             <div
               ref={suggestionsRef}
               className="absolute left-0 right-0 top-full z-20 bg-white border border-gray-300 rounded-b-2xl shadow-lg max-h-72 overflow-y-auto"
-              style={{ minWidth: '200px' }}
+              style={{ minWidth: "200px" }}
             >
               {addressSuggestions.map((suggestion, idx) => {
                 const a = suggestion.address || {};
@@ -285,9 +308,9 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
                   a.country,
                   a.state || a.region,
                   a.city || a.town || a.village,
-                  a.road || a.street
+                  a.road || a.street,
                 ].filter(Boolean);
-                let label = parts.join(', ');
+                let label = parts.join(", ");
                 if (a.house_number) {
                   label += `, ${a.house_number}`;
                 }
@@ -295,7 +318,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
                   <div
                     key={idx}
                     className="px-4 py-2 cursor-pointer hover:bg-blue-50 text-sm border-b border-gray-100 last:border-b-0"
-                    style={{ whiteSpace: 'normal', lineHeight: '1.3' }}
+                    style={{ whiteSpace: "normal", lineHeight: "1.3" }}
                     onClick={() => handleSuggestionClick(suggestion)}
                   >
                     {label || suggestion.display_name}
@@ -306,7 +329,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           )}
           {isSuggesting && (
             <div className="absolute left-0 right-0 top-full z-10 bg-white border-t-0 border border-gray-200 rounded-b-2xl shadow-lg px-4 py-2 text-xs text-gray-500">
-              {t('loading_suggestions')}
+              {t("loading_suggestions")}
             </div>
           )}
           {suggestError && (
@@ -324,7 +347,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          {t('delivery_date')}
+          {t("delivery_date")}
         </label>
         <div className="relative">
           <select
@@ -365,7 +388,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          {t('delivery_time')}
+          {t("delivery_time")}
         </label>
         <div className="relative">
           <select
@@ -405,12 +428,12 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
           className="text-sm font-medium text-gray-600 px-3"
           style={{ fontFamily: "Nunito, sans-serif" }}
         >
-          {t('courier_comment')}
+          {t("courier_comment")}
         </label>
         <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all border-gray-200 focus-within:border-[#7782F5]">
           <textarea
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
-            placeholder={t('additional_info_for_courier')}
+            placeholder={t("additional_info_for_courier")}
             value={deliveryData.comment || ""}
             onChange={(e) =>
               setDeliveryData({ ...deliveryData, comment: e.target.value })
