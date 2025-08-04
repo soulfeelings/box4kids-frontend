@@ -6,6 +6,9 @@ import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { useChildById } from "../../store/hooks";
 import { dateManager } from "../../utils/date/DateManager";
 import { colorManager } from "../../utils/ColorManager";
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 interface ToySetDetailViewProps {
   currentBox: ToyBoxResponse;
@@ -16,24 +19,26 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
   currentBox,
   close,
 }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
 
   const deliveryLabel = useMemo(() => {
     switch (currentBox.status) {
       case "planned":
-        return "Запланирован";
+        return t('planned');
       case "assembled":
-        return "Собран";
+        return t('assembled');
       case "shipped":
-        return "В пути";
+        return t('shipped');
       case "delivered":
-        return "Доставлено";
+        return t('delivered');
       case "returned":
-        return "Возвращен";
+        return t('returned');
       default:
-        return "Неизвестный статус";
+        return t('unknown_status');
     }
-  }, [currentBox.status]);
+  }, [currentBox.status, t]);
 
   const child = useChildById(currentBox.child_id);
 
@@ -48,7 +53,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
           <ArrowLeft size={24} className="text-gray-600" />
         </button>
         <h1 className="text-lg font-semibold text-gray-800">
-          Текущий набор для {child?.name}
+          {t('current_set_for_child', { name: child?.name })}
         </h1>
       </div>
 
@@ -66,7 +71,7 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Возврат</p>
+            <p className="text-gray-600 text-sm">{t('return')}</p>
             <p className="text-gray-800 font-medium">
               {dateManager.formatFullDeliveryDateTime(
                 currentBox.return_date,
@@ -117,16 +122,21 @@ export const ToySetDetailView: React.FC<ToySetDetailViewProps> = ({
                 fontFamily: "Nunito, sans-serif",
               }}
             >
-              Если вы хотите оставить какую-то игрушку — сообщите об этом
-              курьеру при возврате и менеджер свяжется с вами для выкупа
+              {t('if_you_want_to_keep_toy')}
             </p>
           </div>
         </div>
       </div>
       <BottomNavigation
-        onHomeClick={() => {}}
-        onChildrenClick={() => {}}
-        onProfileClick={() => {}}
+        onHomeClick={() => {
+          navigate(ROUTES.APP.ROOT);
+        }}
+        onChildrenClick={() => {
+          navigate(ROUTES.APP.CHILDREN);
+        }}
+        onProfileClick={() => {
+          navigate(ROUTES.APP.PROFILE);
+        }}
       />
     </div>
   );

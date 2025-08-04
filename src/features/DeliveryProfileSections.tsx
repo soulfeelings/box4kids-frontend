@@ -2,6 +2,7 @@ import React from "react";
 import { DeliveryProfileSection } from "./DeliveryProfileSection";
 import { UserData } from "../types";
 import { useStore } from "../store/store";
+import { useTranslation } from 'react-i18next';
 
 interface DeliveryAddress {
   id: number;
@@ -33,6 +34,7 @@ export const DeliveryProfileSections: React.FC<
   DeliveryProfileSectionsProps
 > = ({ user, deliveryAddresses = [], onEditDelivery }) => {
   const state = useStore();
+  const { t } = useTranslation();
 
   // Обогащаем адреса информацией о подписках и боксах
   const enrichedAddresses = deliveryAddresses.map((address) => {
@@ -55,8 +57,8 @@ export const DeliveryProfileSections: React.FC<
 
       enrichedAddress.subscriptionInfo = {
         id: relatedSubscription.id,
-        childName: child?.name || "Неизвестный ребенок",
-        planName: plan?.name || `План ${relatedSubscription.plan_id}`,
+        childName: child?.name || t('unknown_child'),
+        planName: plan?.name || t('plan_id', { id: relatedSubscription.plan_id }),
         status: relatedSubscription.status,
       };
     }

@@ -1,23 +1,15 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface DevModeBannerProps {
   message?: string;
 }
 
-export const DevModeBanner: React.FC<DevModeBannerProps> = ({
-  message = "🛠️ DEV MODE: Получаем код автоматически...",
-}) => {
+export const DevModeBanner: React.FC<DevModeBannerProps> = () => {
+  const { t } = useTranslation();
   return (
-    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-4">
-      <div className="flex items-center gap-2">
-        <div className="animate-spin w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full"></div>
-        <p
-          className="text-sm font-medium text-yellow-700"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          {message}
-        </p>
-      </div>
+    <div className="fixed top-0 left-0 w-full bg-yellow-400 text-black text-center py-2 z-50">
+      <strong>{t("dev_mode")}</strong> — {t("dev_mode_warning")}
     </div>
   );
 };

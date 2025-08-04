@@ -10,6 +10,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { AuthContainer } from "./components/layout/AuthContainer";
 import { useStore } from "./store/store";
 import { ROUTES } from "./constants/routes";
+import "./i18n";
 
 // Импорт компонентов шагов авторизации
 import { OtpStep } from "./components/auth/otp/OtpStep";
@@ -22,108 +23,112 @@ import { EditChildPage } from "./pages/EditChildPage";
 import { EditDeliveryInfoPage } from "./pages/EditDeliveryInfoPage";
 import { AdminPage } from "./pages/AdminPage";
 import { CancelSubscriptionPage } from "./pages/CancelSubscriptionPage";
+import { LanguageSwitcher } from "./components/LanguageSwitcher";
 
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Авторизация - компоненты напрямую с AuthContainer */}
-        <Route
-          path={ROUTES.AUTH.OTP}
-          element={
-            <AuthContainer>
-              <OtpStep />
-            </AuthContainer>
-          }
-        />
-
-        {/* Новый объединенный роут для онбординга */}
-        <Route
-          path={ROUTES.AUTH.ONBOARDING}
-          element={
-            <RouteGuard>
-              <DataGuard>
-                <OnboardingPage />
-              </DataGuard>
-            </RouteGuard>
-          }
-        />
-
-        <Route
-          path={ROUTES.AUTH.SUCCESS}
-          element={
-            <RouteGuard>
-              <SuccessStep />
-            </RouteGuard>
-          }
-        />
-
-        {/* Приложение - защищенные маршруты */}
-        <Route
-          path={ROUTES.APP.ROOT}
-          element={
-            <RouteGuard>
-              <DataGuard>
-                <AppLayout />
-              </DataGuard>
-            </RouteGuard>
-          }
-        >
-          <Route index element={<AppInterface />} />
-          <Route path={ROUTES.APP.CHILDREN} element={<ChildrenPage />} />
-          <Route path={ROUTES.APP.PROFILE} element={<ProfilePage />} />
-          <Route path={ROUTES.APP.EDIT_CHILD} element={<EditChildPage />} />
+    <>
+      <LanguageSwitcher />
+      <BrowserRouter>
+        <Routes>
+          {/* Авторизация - компоненты напрямую с AuthContainer */}
           <Route
-            path={ROUTES.APP.EDIT_DELIVERY}
-            element={<EditDeliveryInfoPage />}
+            path={ROUTES.AUTH.OTP}
+            element={
+              <AuthContainer>
+                <OtpStep />
+              </AuthContainer>
+            }
           />
+
+          {/* Новый объединенный роут для онбординга */}
           <Route
-            path={ROUTES.APP.CANCEL_SUBSCRIPTION}
-            element={<CancelSubscriptionPage />}
+            path={ROUTES.AUTH.ONBOARDING}
+            element={
+              <RouteGuard>
+                <DataGuard>
+                  <OnboardingPage />
+                </DataGuard>
+              </RouteGuard>
+            }
           />
-        </Route>
 
-        {/* Админка */}
-        <Route path={ROUTES.ADMIN} element={<AdminPage />} />
+          <Route
+            path={ROUTES.AUTH.SUCCESS}
+            element={
+              <RouteGuard>
+                <SuccessStep />
+              </RouteGuard>
+            }
+          />
 
-        {/* Fallback - перенаправление на регистрацию */}
-        <Route
-          path={ROUTES.HOME}
-          element={
-            <RouteGuard>
-              <InitialPage />
-            </RouteGuard>
-          }
+          {/* Приложение - защищенные маршруты */}
+          <Route
+            path={ROUTES.APP.ROOT}
+            element={
+              <RouteGuard>
+                <DataGuard>
+                  <AppLayout />
+                </DataGuard>
+              </RouteGuard>
+            }
+          >
+            <Route index element={<AppInterface />} />
+            <Route path={ROUTES.APP.CHILDREN} element={<ChildrenPage />} />
+            <Route path={ROUTES.APP.PROFILE} element={<ProfilePage />} />
+            <Route path={ROUTES.APP.EDIT_CHILD} element={<EditChildPage />} />
+            <Route
+              path={ROUTES.APP.EDIT_DELIVERY}
+              element={<EditDeliveryInfoPage />}
+            />
+            <Route
+              path={ROUTES.APP.CANCEL_SUBSCRIPTION}
+              element={<CancelSubscriptionPage />}
+            />
+          </Route>
+
+          {/* Админка */}
+          <Route path={ROUTES.ADMIN} element={<AdminPage />} />
+
+          {/* Fallback - перенаправление на регистрацию */}
+          <Route
+            path={ROUTES.HOME}
+            element={
+              <RouteGuard>
+                <InitialPage />
+              </RouteGuard>
+            }
+          />
+          <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        </Routes>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#363636",
+              color: "#fff",
+              fontFamily: "Nunito, sans-serif",
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: "#4ade80",
+                secondary: "#fff",
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: "#ef4444",
+                secondary: "#fff",
+              },
+            },
+          }}
         />
-        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-      </Routes>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-            fontFamily: "Nunito, sans-serif",
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: "#4ade80",
-              secondary: "#fff",
-            },
-          },
-          error: {
-            duration: 5000,
-            iconTheme: {
-              primary: "#ef4444",
-              secondary: "#fff",
-            },
-          },
-        }}
-      />
-    </BrowserRouter>
+      </BrowserRouter>
+    </>
   );
 };
 
@@ -139,7 +144,7 @@ function InitialPage() {
   }, [fetchInitData]);
 
   if (isInitDataLoading || !ref.current) {
-    return <LoadingComponent />;
+    return <LoadingComponent type="onboarding" />;
   }
 
   if (initDataError) {

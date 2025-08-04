@@ -8,6 +8,7 @@ import {
 } from "../../../api-client";
 import { SECONDS_TO_RESEND_CODE } from "../../../constants/phone";
 import { notifications } from "../../../utils/notifications";
+import { useTranslation } from 'react-i18next';
 
 interface CodeStepProps {
   onBack: () => void;
@@ -15,6 +16,7 @@ interface CodeStepProps {
 }
 
 export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
+  const { t } = useTranslation();
   const { phoneData, setPhoneData, setError, error } = useStore();
   const [resendTimer, setResendTimer] = useState(SECONDS_TO_RESEND_CODE);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
@@ -77,7 +79,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
 
   const handleCheckCode = async () => {
     if (!phoneData.code || phoneData.code.length !== 4) {
-      setError("Введите 4-значный код");
+      setError(t('enter_4_digit_code'));
       return;
     }
 
@@ -101,8 +103,8 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
 
       onSuccess();
     } catch (error) {
-      setError("Неверный код подтверждения");
-      notifications.error("Неверный код подтверждения");
+      setError(t('incorrect_confirmation_code'));
+      notifications.error(t('incorrect_confirmation_code'));
     }
   };
 
@@ -116,7 +118,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
 
       setResendTimer(SECONDS_TO_RESEND_CODE);
       setError(null);
-      notifications.success("Код отправлен повторно");
+      notifications.success(t('code_sent_again'));
 
       // DEV MODE: Автоматически получаем код после повторной отправки
       setIsAutoFilling(true);
@@ -133,8 +135,8 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         }
       }, 2000);
     } catch (error) {
-      setError("Не удалось отправить код повторно");
-      notifications.error("Не удалось отправить код повторно");
+      setError(t('failed_to_send_code_again'));
+      notifications.error(t('failed_to_send_code_again'));
     }
   };
 
@@ -152,9 +154,9 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
     >
       {/* Title and Description */}
       <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-xl font-medium text-gray-900">Подтвердите номер</h1>
+        <h1 className="text-xl font-medium text-gray-900">{t('confirm_number')}</h1>
         <p className="text-base font-medium text-gray-500">
-          Мы отправили код подтверждения на номер {phoneData.phone}
+          {t('we_sent_code_to_number', { number: phoneData.phone })}
         </p>
         <button
           onClick={handleBack}
@@ -165,7 +167,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
               : "text-indigo-600 hover:text-indigo-700"
           }`}
         >
-          Изменить номер
+          {t('change_number')}
         </button>
       </div>
 
@@ -229,10 +231,10 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         }}
       >
         {isLoading
-          ? "Проверяем..."
+          ? t('checking')
           : isAutoFilling
-          ? "Получаем код..."
-          : "Подтвердить"}
+          ? t('getting_code')
+          : t('confirm')}
       </button>
 
       {/* Resend Timer */}
@@ -247,18 +249,12 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         style={{ fontFamily: "Nunito, sans-serif" }}
       >
         {isLoading
-          ? "Отправляем..."
+          ? t('sending')
           : isAutoFilling
-          ? "Получаем код..."
+          ? t('getting_code')
           : resendTimer > 0
-          ? `Получить новый код через ${resendTimer} ${
-              resendTimer === 1
-                ? "секунду"
-                : resendTimer < 5
-                ? "секунды"
-                : "секунд"
-            }`
-          : "Отправить код повторно"}
+          ? t('get_new_code_in_seconds', { seconds: resendTimer })
+          : t('send_code_again')}
       </button>
     </div>
   );

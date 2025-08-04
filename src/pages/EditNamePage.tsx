@@ -4,6 +4,7 @@ import { BottomNavigation } from "../features/BottomNavigation";
 import { useStore } from "../store/store";
 import { useUpdateUserProfileUsersProfilePut } from "../api-client";
 import { notifications } from "../utils/notifications";
+import { useTranslation } from 'react-i18next';
 
 interface EditNamePageProps {
   currentName: string;
@@ -16,6 +17,7 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState(currentName);
   const { setUserName } = useStore();
   const updateUserMutation = useUpdateUserProfileUsersProfilePut();
@@ -42,10 +44,10 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
       onSave(userUpdated.name);
       onClose();
 
-      notifications.success("Имя успешно обновлено");
+      notifications.success(t('name_updated_successfully'));
     } catch (error) {
       console.error("Update name error:", error);
-      notifications.error("Ошибка при обновлении имени");
+      notifications.error(t('error_updating_name'));
     }
   };
 
@@ -58,7 +60,7 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
       <div className="px-4 py-6">
         <div className="flex items-center justify-center relative">
           <h1 className="text-[20px] font-semibold text-gray-900 text-center">
-            Изменить имя
+            {t('edit_name')}
           </h1>
           <button
             onClick={onClose}
@@ -77,7 +79,7 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
             className="block text-sm font-medium text-gray-600 mb-2 px-3"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Имя
+            {t('name')}
           </label>
           <div
             className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -91,7 +93,7 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
-              placeholder="Введите имя"
+              placeholder={t('enter_name')}
               maxLength={32}
               autoFocus
               style={{ fontFamily: "Nunito, sans-serif" }}
@@ -111,7 +113,7 @@ export const EditNamePage: React.FC<EditNamePageProps> = ({
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          {updateUserMutation.isPending ? "Сохраняем..." : "Сохранить"}
+          {updateUserMutation.isPending ? t('saving') : t('save')}
         </button>
       </div>
 

@@ -14,12 +14,14 @@ import { dateManager } from "../../../utils/date/DateManager";
 import { useChildrenSubscriptionsIds } from "../../../store/hooks";
 import { useNavigateToEditDelivery } from "../../../hooks/useNavigateHooks";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { useTranslation } from 'react-i18next';
 
 export const DeliveryStep: React.FC<{
   onBack: () => void;
   onNext: () => void;
   onClose: () => void;
 }> = ({ onBack, onNext, onClose }) => {
+  const { t } = useTranslation();
   const { user, setSelectedDeliveryAddressId, addDeliveryAddress } = useStore();
   const subscriptionsIds = useChildrenSubscriptionsIds();
   const createDeliveryAddressMutation =
@@ -193,7 +195,7 @@ export const DeliveryStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Куда доставить набор?
+            {t('where_to_deliver_set')}
           </h1>
         </div>
 
@@ -239,12 +241,12 @@ export const DeliveryStep: React.FC<{
           }}
         >
           {isLoading
-            ? "Создаем адрес..."
+            ? t('creating_address')
             : selectedAddressId !== null
-            ? "Использовать этот адрес"
+            ? t('use_this_address')
             : !user?.deliveryAddresses || user.deliveryAddresses.length === 0
-            ? "Создать адрес"
-            : "Создать новый адрес"}
+            ? t('create_address')
+            : t('create_new_address')}
         </button>
       </div>
     </div>

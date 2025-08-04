@@ -7,6 +7,7 @@ import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 import { SingleChildSubscriptionView } from "./subscription-step-components/SingleChildSubscriptionView";
 import { notifications } from "../../../utils/notifications";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { useTranslation } from 'react-i18next';
 
 export const SubscriptionStep: React.FC<{
   onBack: () => void;
@@ -15,6 +16,7 @@ export const SubscriptionStep: React.FC<{
   currentChildToUpdate: UserChildData | null;
   onAddNewChild?: () => void;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate, onAddNewChild }) => {
+  const { t } = useTranslation();
   const [subscriptionId, setSubscriptionId] = useState<number | null>(
     currentChildToUpdate?.subscriptions[0]?.plan_id || null
   );
@@ -40,17 +42,17 @@ export const SubscriptionStep: React.FC<{
     const targetChild = currentChildToUpdate;
 
     if (!targetChild?.id) {
-      setError("Не выбран ребенок");
+      setError(t('child_not_selected'));
       return;
     }
 
     if (!subscriptionId) {
-      setError("Не выбран план подписки");
+      setError(t('subscription_plan_not_selected'));
       return;
     }
 
     if (!subscriptionPlan) {
-      setError("Не загрузились планы подписки");
+      setError(t('subscription_plans_not_loaded'));
       return;
     }
 
@@ -77,9 +79,9 @@ export const SubscriptionStep: React.FC<{
       if (error instanceof Error) {
         setError(error.message);
       } else {
-        setError("Неизвестная ошибка");
+        setError(t('unknown_error'));
       }
-      notifications.error("Не удалось создать подписку");
+      notifications.error(t('failed_to_create_subscription'));
       console.error("Failed to create subscription:", error);
     }
   };
@@ -146,7 +148,7 @@ export const SubscriptionStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            Какой набор подойдёт для ребенка {currentChildToUpdate?.name}?
+            {t('which_set_suits_child', { name: currentChildToUpdate?.name })}
           </h1>
         </div>
 
@@ -157,8 +159,7 @@ export const SubscriptionStep: React.FC<{
               className="text-sm font-medium text-indigo-700 text-center"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              Мы подбираем игрушки вручную, с учётом интересов. Хотите поменять
-              состав набора? Просто обновите интересы ребёнка
+              {t('we_select_toys_manually_with_interests')}
             </p>
           </div>
 
@@ -188,7 +189,7 @@ export const SubscriptionStep: React.FC<{
           disabled={!isButtonEnabled()}
           onClick={handleSubscriptionSubmit}
         >
-          {isLoading ? "Создаем подписку..." : "Перейти к оформлению"}
+          {isLoading ? t('creating_subscription') : t('proceed_to_checkout')}
         </button>
       </div>
     </div>

@@ -12,6 +12,6 @@ export const useCancelSubscriptionParams = () => {
 };
 
 // Общий хук для типизированных параметров
-export const useTypedParams = <T extends keyof RouteParams>(route: T) => {
+export const useTypedParams = <T extends keyof RouteParams>() => {
   return useParams<RouteParams[T]>();
 };
