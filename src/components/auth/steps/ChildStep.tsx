@@ -15,7 +15,7 @@ import { ChoseChildCards } from "../../../features/ChoseChildCards";
 import { notifications } from "../../../utils/notifications";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { StepIndicator } from "../../ui/StepIndicator";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 interface ChildData {
   name: string;
@@ -32,8 +32,14 @@ export const ChildStep: React.FC<{
   currentChildToUpdate: UserChildData | null;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
   const { t } = useTranslation();
-  const { setCurrentChildIdToUpdate, addChild, updateChild, setError, fetchInitData } =
-    useStore();
+  const {
+    setCurrentChildIdToUpdate,
+    addChild,
+    updateChild,
+    setError,
+    fetchInitData,
+  } = useStore();
+  const isInitDataLoading = useStore((data) => data.isInitDataLoading);
   const createChildMutation = useCreateChildChildrenPost();
   const updateChildMutation = useUpdateChildChildrenChildIdPut();
 
@@ -191,8 +197,8 @@ export const ChildStep: React.FC<{
       onNext();
     } catch (error) {
       console.error("Failed to update child:", error);
-      setError(t('failed_to_update_child'));
-      notifications.error(t('failed_to_save_child_data'));
+      setError(t("failed_to_update_child"));
+      notifications.error(t("failed_to_save_child_data"));
     }
   }, [
     isFormValid,
@@ -210,6 +216,8 @@ export const ChildStep: React.FC<{
     onNext,
     t,
   ]);
+
+  const isLoading = isInitDataLoading || createChildMutation.isPending;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -258,13 +266,13 @@ export const ChildStep: React.FC<{
             className="text-xl font-medium text-gray-900"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            {t('who_are_we_collecting_set_for')}
+            {t("who_are_we_collecting_set_for")}
           </h1>
           <p
             className="text-sm text-gray-600 mt-2"
             style={{ fontFamily: "Nunito, sans-serif" }}
           >
-            {t('only_children_without_active_subscription')}
+            {t("only_children_without_active_subscription")}
           </p>
         </div>
 
@@ -287,7 +295,7 @@ export const ChildStep: React.FC<{
               className="text-sm font-medium text-gray-600 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              {t('child_name')}
+              {t("child_name")}
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -318,7 +326,7 @@ export const ChildStep: React.FC<{
               className="text-sm font-medium text-gray-600 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              {t('birth_date')}
+              {t("birth_date")}
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -364,7 +372,7 @@ export const ChildStep: React.FC<{
               className="text-lg font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              {t('child_gender')}
+              {t("child_gender")}
             </h3>
             <div className="flex gap-3">
               <button
@@ -379,7 +387,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                {t('male')}
+                {t("male")}
               </button>
               <button
                 onClick={useCallback(
@@ -393,7 +401,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                {t('female')}
+                {t("female")}
               </button>
             </div>
           </div>
@@ -404,7 +412,7 @@ export const ChildStep: React.FC<{
               className="text-lg font-semibold text-gray-900"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              {t('features')}
+              {t("features")}
             </h3>
             <div className="flex gap-3">
               <button
@@ -420,7 +428,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                {t('no')}
+                {t("no")}
               </button>
               <button
                 onClick={useCallback(
@@ -435,7 +443,7 @@ export const ChildStep: React.FC<{
                 }`}
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                {t('has_limitations')}
+                {t("has_limitations")}
               </button>
             </div>
           </div>
@@ -446,7 +454,7 @@ export const ChildStep: React.FC<{
               className="text-sm font-medium text-gray-600 px-3"
               style={{ fontFamily: "Nunito, sans-serif" }}
             >
-              {t('comment')}
+              {t("comment")}
             </label>
             <div
               className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all ${
@@ -461,8 +469,8 @@ export const ChildStep: React.FC<{
                 className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 resize-none"
                 placeholder={
                   childData.limitations
-                    ? t('describe_child_limitations')
-                    : t('additional_child_info')
+                    ? t("describe_child_limitations")
+                    : t("additional_child_info")
                 }
                 value={childData.comment || ""}
                 onChange={useCallback(
@@ -483,7 +491,7 @@ export const ChildStep: React.FC<{
                 className="text-sm text-red-400 px-3"
                 style={{ fontFamily: "Nunito, sans-serif" }}
               >
-                {t('write_child_limitations')}
+                {t("write_child_limitations")}
               </p>
             )}
           </div>
@@ -494,21 +502,18 @@ export const ChildStep: React.FC<{
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 max-w-[800px] mx-auto">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-            isFormValid && !createChildMutation.isPending
+            isFormValid && !isLoading
               ? "text-white shadow-sm"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
-          disabled={!isFormValid || createChildMutation.isPending}
+          disabled={!isFormValid || isLoading}
           onClick={handleChildSubmit}
           style={{
             fontFamily: "Nunito, sans-serif",
-            backgroundColor:
-              isFormValid && !createChildMutation.isPending
-                ? "#30313D"
-                : undefined,
+            backgroundColor: isFormValid && !isLoading ? "#30313D" : undefined,
           }}
         >
-          {createChildMutation.isPending ? t('saving') : t('continue')}
+          {isLoading ? t("saving") : t("continue")}
         </button>
       </div>
     </div>
