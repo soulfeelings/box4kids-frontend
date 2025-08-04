@@ -8,10 +8,10 @@ export const refreshTokenClient = async (
   refreshTokenRequest: RefreshTokenRequest,
   signal?: AbortSignal
 ): Promise<TokenResponse> => {
-  const baseUrl = process.env.REACT_APP_API_URL;
+  const baseUrl = import.meta.env.VITE_API_URL;
 
   if (!baseUrl) {
-    throw new Error("REACT_APP_API_URL is not set");
+    throw new Error("VITE_API_URL is not set");
   }
 
   const response = await fetch(`${baseUrl}/auth/refresh`, {

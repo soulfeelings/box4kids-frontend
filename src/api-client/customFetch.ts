@@ -64,10 +64,10 @@ export const customFetch = async <T>({
   headers,
   signal,
 }: CustomFetchParams): Promise<T> => {
-  const baseUrl = process.env.REACT_APP_API_URL;
+  const baseUrl = import.meta.env.VITE_API_URL;
 
   if (!baseUrl) {
-    throw new Error("REACT_APP_API_URL is not set");
+    throw new Error("VITE_API_URL is not set");
   }
 
   // 🧩 Собираем query string
@@ -113,7 +113,7 @@ export const customFetch = async <T>({
     };
 
     // 🌐 dev-лог
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
       console.debug("[customFetch] →", method, fullUrl, requestInit);
     }
 
@@ -193,7 +193,7 @@ export const customFetch = async <T>({
 
     const json = await response.json();
 
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
       console.debug("[customFetch] ✅", json);
     }
 

@@ -5,7 +5,7 @@ const path = require("path");
 const url = require("url");
 require("dotenv").config({ path: path.join(__dirname, "../.env.development") });
 
-const OPENAPI_URL = `${process.env.REACT_APP_API_URL}/openapi.json`;
+const OPENAPI_URL = `${process.env.VITE_API_URL}/openapi.json`;
 const OUTPUT_PATH = path.join(__dirname, "../src/generated/api.json");
 
 const parsedUrl = url.parse(OPENAPI_URL);

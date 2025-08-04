@@ -45,4 +45,14 @@ jobs:
       - name: 🔍 Health check
         run: |
           export PORT=3000
-          make health-check
+          echo "🔍 Проверяю здоровье приложения..."
+          for i in 1 2 3 4 5; do
+            if curl -fs http://localhost:${PORT:-3000}/health > /dev/null; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            echo "⏳ Waiting for app... ($i/5)"
+            sleep 2
+          done
+          echo "❌ App failed health check"
+          exit 1
