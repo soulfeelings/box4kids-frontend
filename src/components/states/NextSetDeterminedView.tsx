@@ -3,7 +3,7 @@ import { BottomNavigation } from "../../features/BottomNavigation";
 import { UserData } from "../../types";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
 import { CurrentToyBoxCard, NextToyBoxCard } from "../../widgets";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 
@@ -42,7 +42,7 @@ export const NextSetDeterminedView: React.FC<NextSetDeterminedViewProps> = ({
         }}
       >
         <h1 className="text-xl text-center font-semibold text-gray-800 mb-6">
-          {t('hello_user', { name: userData.name })}
+          {t("hello_user", { name: userData.name })}
         </h1>
 
         {boxes.map((box) => (

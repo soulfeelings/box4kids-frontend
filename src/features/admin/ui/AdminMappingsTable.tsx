@@ -6,7 +6,6 @@ import { useGetAllSkillsSkillsGet } from "../../../api-client";
 
 export const AdminMappingsTable: React.FC = () => {
   const { t } = useTranslation();
-
   const { data: interests } = useGetAllInterestsInterestsGet();
   const { data: skills } = useGetAllSkillsSkillsGet();
   const [expandedMapping, setExpandedMapping] = useState<number | null>(null);

@@ -19,7 +19,7 @@ import {
   ToyBoxResponse,
 } from "../api-client/model";
 import { UserChildData } from "../types";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { LoadingComponent } from "../components/common/LoadingComponent";
 
 export interface BoxesState {
@@ -116,15 +116,15 @@ export const AppInterface: React.FC = () => {
           const failedCount = res.filter((r) => !r.success).length;
           if (failedCount > 0) {
             notifications.warning(
-              t('failed_to_load_data_for_children', { 
-                count: failedCount, 
-                child: failedCount === 1 ? t('child') : t('children') 
+              t("failed_to_load_data_for_children", {
+                count: failedCount,
+                child: failedCount === 1 ? t("child") : t("children_genitive"),
               })
             );
           }
         } catch (error) {
           console.error("Failed to fetch boxes data:", error);
-          notifications.error(t('failed_to_load_toy_boxes_data'));
+          notifications.error(t("failed_to_load_toy_boxes_data"));
         } finally {
           setIsLoading(false);
         }
@@ -168,18 +168,18 @@ export const AppInterface: React.FC = () => {
     const today = new Date();
     const day = today.getDate();
     const months = [
-      t('january'),
-      t('february'),
-      t('march'),
-      t('april'),
-      t('may'),
-      t('june'),
-      t('july'),
-      t('august'),
-      t('september'),
-      t('october'),
-      t('november'),
-      t('december'),
+      t("january"),
+      t("february"),
+      t("march"),
+      t("april"),
+      t("may"),
+      t("june"),
+      t("july"),
+      t("august"),
+      t("september"),
+      t("october"),
+      t("november"),
+      t("december"),
     ];
     const month = months[today.getMonth()];
     return `${day} ${month}`;
@@ -194,28 +194,28 @@ export const AppInterface: React.FC = () => {
     const date = new Date(currentYear, parseInt(month) - 1, parseInt(day));
 
     const months = [
-      t('january'),
-      t('february'),
-      t('march'),
-      t('april'),
-      t('may'),
-      t('june'),
-      t('july'),
-      t('august'),
-      t('september'),
-      t('october'),
-      t('november'),
-      t('december'),
+      t("january"),
+      t("february"),
+      t("march"),
+      t("april"),
+      t("may"),
+      t("june"),
+      t("july"),
+      t("august"),
+      t("september"),
+      t("october"),
+      t("november"),
+      t("december"),
     ];
 
     const daysOfWeek = [
-      t('sunday'),
-      t('monday'),
-      t('tuesday'),
-      t('wednesday'),
-      t('thursday'),
-      t('friday'),
-      t('saturday'),
+      t("sunday"),
+      t("monday"),
+      t("tuesday"),
+      t("wednesday"),
+      t("thursday"),
+      t("friday"),
+      t("saturday"),
     ];
 
     const monthName = months[date.getMonth()];

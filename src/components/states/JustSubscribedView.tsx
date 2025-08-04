@@ -1,7 +1,7 @@
 import React from "react";
 import { UserData } from "../../types";
 import { BottomNavigation } from "../../features/BottomNavigation";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 
@@ -37,7 +37,7 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
         }}
       >
         <h1 className="text-xl font-semibold text-gray-800 mb-6">
-          {t('congrats_user', { name: userData.name })}
+          {t("congrats_user", { name: userData.name })}
         </h1>
 
         {/* Current Set Card */}
@@ -47,7 +47,7 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
         >
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-white font-medium">
-              {t('current_set_with_date', { date: getCurrentDate() })}
+              {t("current_set_with_date", { date: getCurrentDate() })}
             </h2>
           </div>
 
@@ -68,8 +68,11 @@ export const JustSubscribedView: React.FC<JustSubscribedViewProps> = ({
           </div>
 
           {/* Delivery Info */}
-          <div className="p-4 rounded-2xl" style={{ backgroundColor: "#FFFFFF" }}>
-            <p className="text-gray-600 text-sm mb-1">{t('delivery')}</p>
+          <div
+            className="p-4 rounded-2xl"
+            style={{ backgroundColor: "#FFFFFF" }}
+          >
+            <p className="text-gray-600 text-sm mb-1">{t("delivery")}</p>
             <p className="text-gray-800 font-medium">
               {formatDeliveryDate(userData.deliveryAddresses[0]?.date)} •{" "}
               {formatDeliveryTime(userData.deliveryAddresses[0]?.time)}

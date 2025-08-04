@@ -2,7 +2,7 @@ import React from "react";
 import { Star } from "lucide-react";
 import { UserData } from "../../types";
 import { BottomNavigation } from "../../features/BottomNavigation";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 
@@ -51,7 +51,7 @@ export const NextSetNotDeterminedView: React.FC<
         }}
       >
         <h1 className="text-xl text-center font-semibold text-gray-800 mb-6">
-          {t('hello_user', { name: userData.name })}
+          {t("hello_user", { name: userData.name })}
         </h1>
 
         {/* Current Set Card */}
@@ -60,7 +60,7 @@ export const NextSetNotDeterminedView: React.FC<
           style={{ backgroundColor: "#F0955E", borderRadius: "24px" }}
         >
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-white font-medium">{t('current_set')}</h2>
+            <h2 className="text-white font-medium">{t("current_set")}</h2>
             <span className="text-white text-sm">{getCurrentDate()}</span>
           </div>
 
@@ -85,7 +85,7 @@ export const NextSetNotDeterminedView: React.FC<
             className="w-full text-white py-2 rounded-lg text-sm font-medium"
             style={{ backgroundColor: "#F4B58E" }}
           >
-            {t('show_all_toys')}
+            {t("show_all_toys")}
           </button>
         </div>
 
@@ -94,7 +94,9 @@ export const NextSetNotDeterminedView: React.FC<
           className="p-4 mb-6"
           style={{ backgroundColor: "#747EEC", borderRadius: "24px" }}
         >
-          <h3 className="text-white font-medium mb-3">{t('how_do_you_like_the_current_set')}</h3>
+          <h3 className="text-white font-medium mb-3">
+            {t("how_do_you_like_the_current_set")}
+          </h3>
           <div className="flex justify-center space-x-2">
             {[0, 1, 2, 3, 4].map((index) => (
               <button
@@ -127,7 +129,7 @@ export const NextSetNotDeterminedView: React.FC<
           marginRight: "16px",
         }}
       >
-        <h3 className="text-gray-800 font-medium mb-4">{t('next_set')}</h3>
+        <h3 className="text-gray-800 font-medium mb-4">{t("next_set")}</h3>
 
         {/* Not determined message */}
         <div
@@ -139,10 +141,10 @@ export const NextSetNotDeterminedView: React.FC<
           }}
         >
           <p className="text-gray-700 text-sm mb-2">
-            <strong>{t('next_set_not_determined')}</strong>
+            <strong>{t("next_set_not_determined")}</strong>
           </p>
           <p className="text-gray-600 text-sm">
-            {t('you_can_influence_toys_by_changing_interests')}
+            {t("you_can_influence_toys_by_changing_interests")}
           </p>
         </div>
 
@@ -152,7 +154,7 @@ export const NextSetNotDeterminedView: React.FC<
           style={{ backgroundColor: "#F2F2F2", borderRadius: "16px" }}
         >
           <div>
-            <p className="text-gray-600 text-sm mb-1">{t('delivery')}</p>
+            <p className="text-gray-600 text-sm mb-1">{t("delivery")}</p>
             <p className="text-gray-800 font-medium">
               {formatDeliveryDate(userData.deliveryAddresses[0]?.date)} •{" "}
               {formatDeliveryTime(userData.deliveryAddresses[0]?.time)}
@@ -165,7 +167,7 @@ export const NextSetNotDeterminedView: React.FC<
           className="w-full text-white py-4 text-sm font-medium mb-4"
           style={{ backgroundColor: "#F0955E", borderRadius: "16px" }}
         >
-          {t('change_child_interests')}
+          {t("change_child_interests")}
         </button>
 
         {/* Secondary button */}
@@ -173,7 +175,7 @@ export const NextSetNotDeterminedView: React.FC<
           className="w-full text-gray-600 py-3 text-sm font-medium"
           style={{ backgroundColor: "#E3E3E3", borderRadius: "16px" }}
         >
-          {t('view_previous_sets')}
+          {t("view_previous_sets")}
         </button>
       </div>
 

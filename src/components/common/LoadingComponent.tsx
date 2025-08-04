@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { OnboardingSkeleton } from "./OnboardingSkeleton";
 import { MainPageSkeleton } from "./MainPageSkeleton";
 import { ChildrenPageSkeleton } from "./ChildrenPageSkeleton";
@@ -7,11 +7,17 @@ import { ProfilePageSkeleton } from "./ProfilePageSkeleton";
 import { DeliveryHistorySkeleton } from "./DeliveryHistorySkeleton";
 
 interface LoadingComponentProps {
-  type?: "onboarding" | "main" | "children" | "profile" | "delivery-history" | "default";
+  type?:
+    | "onboarding"
+    | "main"
+    | "children"
+    | "profile"
+    | "delivery-history"
+    | "default";
 }
 
-export const LoadingComponent: React.FC<LoadingComponentProps> = ({ 
-  type = "default" 
+export const LoadingComponent: React.FC<LoadingComponentProps> = ({
+  type = "default",
 }) => {
   const { t } = useTranslation();
 
@@ -50,10 +56,10 @@ export const LoadingComponent: React.FC<LoadingComponentProps> = ({
             <div className="w-16 h-16 border-4 border-green-200 border-t-green-500 rounded-full animate-spin"></div>
           </div>
           <h3 className="text-gray-800 text-2xl font-semibold mb-4">
-            {t('loading_data')}
+            {t("loading_data")}
           </h3>
           <p className="text-gray-600 text-base leading-relaxed max-w-xs">
-            {t('please_wait_loading_child_data')}
+            {t("please_wait_loading_child_data")}
           </p>
         </div>
       </div>
