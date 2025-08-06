@@ -18,3 +18,8 @@ code {
   max-width: 800px;
   margin: 0 auto;
 }
+
+/* Override static blue borders on filled inputs to keep neutral color when not focused */
+[class*="border-[#7782F5]"]:not(:focus):not(:focus-within) {
+  border-color: #e5e7eb !important;
+}
