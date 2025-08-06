@@ -147,17 +147,12 @@ export const CategoriesStep: React.FC<{
       <div className="flex items-center justify-between px-4 py-2 h-16">
         <button
           onClick={handleBack}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+          className="flex items-center justify-center"
+          style={{ minWidth: 40, minHeight: 40 }}
+          aria-label="Назад"
         >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 18l-6-6 6-6" />
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 7H1M1 7L7 13M1 7L7 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
 
@@ -165,13 +160,15 @@ export const CategoriesStep: React.FC<{
 
         <button
           onClick={handleClose}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+          className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors"
+          style={{ backgroundColor: '#F2F2F2' }}
+          aria-label="Закрыть"
         >
           <svg
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             fill="none"
-            stroke="currentColor"
+            stroke="black"
             strokeWidth="2"
             viewBox="0 0 24 24"
           >
