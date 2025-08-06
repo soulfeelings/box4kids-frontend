@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useStore } from "../../../store/store";
 import { useSubscriptionPlan } from "../../../store/hooks";
 import { useCreateSubscriptionOrderSubscriptionsPost } from "../../../api-client/";
@@ -17,15 +17,7 @@ export const SubscriptionStep: React.FC<{
   onAddNewChild?: () => void;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate, onAddNewChild }) => {
   const { t } = useTranslation();
-  const [subscriptionId, setSubscriptionId] = useState<number | null>(
-    currentChildToUpdate?.subscriptions[0]?.plan_id || null
-  );
-
-  useEffect(() => {
-    if (currentChildToUpdate?.subscriptions[0]?.plan_id) {
-      setSubscriptionId(currentChildToUpdate?.subscriptions[0]?.plan_id);
-    }
-  }, [currentChildToUpdate]);
+  const [subscriptionId, setSubscriptionId] = useState<number | null>(null);
 
   const { isLoading, setError, updateChild, subscriptionPlans } = useStore();
 
