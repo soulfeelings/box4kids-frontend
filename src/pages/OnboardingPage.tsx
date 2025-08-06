@@ -71,7 +71,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     switch (currentStep) {
       case AUTH_STEPS.WELCOME:
         return (
-          <WelcomeStep onNext={() => setCurrentStep(AUTH_STEPS.UPDATE_NAME)} />
+          <WelcomeStep onNext={() => setCurrentStep(AUTH_STEPS.UPDATE_NAME)} onClose={handleClose} />
         );
 
       case AUTH_STEPS.UPDATE_NAME:

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useStore } from "../../../store/store";
 import { useSendOtpAuthSendOtpPost } from "../../../api-client";
 import { PHONE_MIN_LENGTH } from "../../../constants/phone";
@@ -11,6 +11,7 @@ interface PhoneStepProps {
 export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
   const { t } = useTranslation();
   const { phoneData, setPhoneData, setError } = useStore();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
 
@@ -35,14 +36,47 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
     }
   }, [phoneData.phone, sendOtpMutation, setError, onSuccess, t]);
 
+  // Маска: 00 000 00 00
+  function formatPhone(phone: string) {
+    const digits = phone.replace(/\D/g, "").slice(0, 9);
+    let formatted = "";
+    if (digits.length > 0) formatted += digits.slice(0, 2);
+    if (digits.length > 2) formatted += " " + digits.slice(2, 5);
+    if (digits.length > 5) formatted += " " + digits.slice(5, 7);
+    if (digits.length > 7) formatted += " " + digits.slice(7, 9);
+    return formatted;
+  }
+
+  // Обработка ввода
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 9); // только цифры, максимум 9
+    setPhoneData({ phone: value });
+    setError(null);
+  };
+
+  // Валидация: 9 цифр
+  const isPhoneValid = phoneData.phone.length === 9;
+  const isLoading = sendOtpMutation.isPending;
+
+  // Фокус при маунте
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Ошибка при невалидном номере
+  useEffect(() => {
+    if (phoneData.phone.length > 0 && !isPhoneValid) {
+      setError(t('enter_valid_phone_number'));
+    } else {
+      setError(null);
+    }
+  }, [phoneData.phone, isPhoneValid, setError, t]);
+
   useEffect(() => {
     return () => {
       setPhoneData({ code: "" });
     };
   }, [setPhoneData]);
-
-  const isPhoneValid = phoneData.phone.length >= PHONE_MIN_LENGTH;
-  const isLoading = sendOtpMutation.isPending;
 
   return (
     <div
@@ -71,20 +105,30 @@ export const PhoneStep: React.FC<PhoneStepProps> = ({ onSuccess }) => {
               : "border-gray-200 focus-within:border-[#7782F5]"
           }`}
         >
-          <input
-            type="tel"
-            className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
-            placeholder="+998"
-            value={phoneData.phone}
-            onChange={(e) =>
-              setPhoneData({ phone: e.target.value.replace(/[^\d+]/g, "") })
-            }
-            maxLength={17}
-            inputMode="tel"
-            autoFocus
-            style={{ fontFamily: "Nunito, sans-serif" }}
-          />
+          <div className="flex items-center gap-2">
+            <span className="text-base font-medium select-none">+998</span>
+            <input
+              ref={inputRef}
+              type="tel"
+              className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
+              placeholder="00 000 00 00"
+              value={formatPhone(phoneData.phone)}
+              onChange={handleInputChange}
+              maxLength={12} // 9 цифр + пробелы
+              inputMode="tel"
+              autoFocus
+              style={{ fontFamily: "Nunito, sans-serif" }}
+            />
+          </div>
         </div>
+        {(!!phoneData.phone && !isPhoneValid) && (
+          <p
+            className="text-red-500 text-sm font-medium px-3"
+            style={{ fontFamily: "Nunito, sans-serif" }}
+          >
+            {t('enter_valid_phone_number')}
+          </p>
+        )}
         {sendOtpMutation.error && (
           <p
             className="text-red-500 text-sm font-medium px-3"
