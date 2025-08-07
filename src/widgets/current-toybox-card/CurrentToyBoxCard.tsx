@@ -3,8 +3,6 @@ import { RatingSection } from "../../features/RatingSection";
 import { useGetAllToyCategoriesToyCategoriesGet } from "../../api-client";
 import { dateManager } from "../../utils/date/DateManager";
 import { SuccessfulBoxesState } from "../../pages/AppInterface";
-import { SubscriptionStatus } from "../../api-client/model";
-import { useSubscriptionPlan } from "../../store/hooks/useSubscription";
 import { useTranslation } from 'react-i18next';
 
 interface CurrentToyBoxCardProps {
@@ -25,13 +23,6 @@ export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
   const { t } = useTranslation();
   const { data: categories } = useGetAllToyCategoriesToyCategoriesGet();
 
-  // Получаем активную подписку ребенка
-  const activeSubscription = box.child.subscriptions.find(
-    (sub) => sub.status === SubscriptionStatus.active
-  );
-
-  // Получаем план подписки
-  const subscriptionPlan = useSubscriptionPlan(activeSubscription?.plan_id);
 
   return (
     <React.Fragment>
@@ -45,11 +36,6 @@ export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
             <h2 className="text-white font-medium">
               {t('current_set_for_child', { name: box.child.name })}
             </h2>
-            {subscriptionPlan && (
-              <p className="text-white text-center md:text-left text-sm opacity-90">
-                {subscriptionPlan.name}
-              </p>
-            )}
           </div>
           <span className="text-white text-sm">
             {dateManager.formatFullDeliveryDateTime(

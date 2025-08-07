@@ -6,7 +6,9 @@ export const LanguageSwitcher: React.FC = () => {
   const currentLanguage = i18n.language;
 
   const handleLanguageChange = (language: string) => {
-    i18n.changeLanguage(language);
+    i18n.changeLanguage(language).then(() => {
+      window.location.reload();
+    });
   };
 
   return (
