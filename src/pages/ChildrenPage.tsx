@@ -22,6 +22,7 @@ import { SubscriptionStatus } from "../api-client/model";
 import { ChildInfoWidget } from "../widgets/child-info";
 import { useTranslation } from 'react-i18next';
 import { LoadingComponent } from "../components/common/LoadingComponent";
+import { ActionButton } from "../features/ActionButton";
 
 export const ChildrenPage: React.FC = () => {
   const { t } = useTranslation();
@@ -179,58 +180,75 @@ function ChildCard({
         )}
 
       {/* Action buttons */}
-      <div className="space-y-3">
-        {subscriptionPlan && subscription ? (
+      <div className="space-y-3 pt-4">
+        {/* Pause / Resume subscription */}
+        {subscriptionPlan && subscription && (
           subscription.status === SubscriptionStatus.active ? (
-            <button
+            <ActionButton
               onClick={() => {
-                navigateToCancelSubscription({
-                  subscriptionId: subscription.id,
-                });
+                navigateToCancelSubscription({ subscriptionId: subscription.id });
               }}
-              className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+              variant="danger"
             >
               {t('pause_subscription')}
-            </button>
+            </ActionButton>
           ) : subscription.status === SubscriptionStatus.paused ? (
-            <button
+            <ActionButton
               onClick={() => {
-                navigateToCancelSubscription({
-                  subscriptionId: subscription.id,
-                });
+                navigateToCancelSubscription({ subscriptionId: subscription.id });
               }}
-              className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+              variant="primary"
             >
               {t('resume_subscription')}
-            </button>
+            </ActionButton>
           ) : null
-        ) : (
-          <button
+        )}
+
+        {/* Edit child data */}
+        <ActionButton
+          onClick={() => {
+            navigateToEditChild({ childId: child.id });
+          }}
+          variant="secondary"
+        >
+          {t('edit_child_data')}
+        </ActionButton>
+
+        {/* Edit tariff (only when subscription active) */}
+        {subscriptionPlan && subscription && subscription.status === SubscriptionStatus.active && (
+          <ActionButton
             onClick={() => {
               navigateToOnboarding({ step: AUTH_STEPS.SUBSCRIPTION });
               setCurrentChildIdToUpdate(child.id);
             }}
-            className="w-full bg-black text-white py-2 rounded-2xl text-sm font-medium"
+            variant="secondary"
+          >
+            {t('edit_tariff')}
+          </ActionButton>
+        )}
+
+        {/* Choose tariff when no subscription */}
+        {!subscription && (
+          <ActionButton
+            onClick={() => {
+              navigateToOnboarding({ step: AUTH_STEPS.SUBSCRIPTION });
+              setCurrentChildIdToUpdate(child.id);
+            }}
+            variant="secondary"
           >
             {t('choose_tariff')}
-          </button>
+          </ActionButton>
         )}
-        <button
-          onClick={() => {
-            navigateToEditChild({ childId: child.id });
-          }}
-          className="w-full bg-[#E3E3E3] text-black py-2 rounded-2xl text-sm font-medium"
-        >
-          {t('edit_child_data')}
-        </button>
-        <button
+
+        {/* Delete button */}
+        <ActionButton
           onClick={() => {
             handleDeleteChild(child.id);
           }}
-          className="w-full bg-[#FBC8D5] text-[#E14F75] py-2 rounded-2xl text-sm font-medium"
+          variant="danger"
         >
           {t('delete')}
-        </button>
+        </ActionButton>
       </div>
     </div>
   );

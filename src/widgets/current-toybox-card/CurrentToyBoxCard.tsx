@@ -13,7 +13,7 @@ interface CurrentToyBoxCardProps {
   userId: number;
 }
 
-export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
+const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
   box,
   rating,
   setCurrentBox,
@@ -85,3 +85,7 @@ export const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
     </React.Fragment>
   );
 };
+
+export { CurrentToyBoxCard };
+export default CurrentToyBoxCard;
+
