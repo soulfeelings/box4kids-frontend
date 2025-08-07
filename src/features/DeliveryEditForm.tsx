@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import axios from "axios";
 import { DeliveryAddressData } from "../types";
 import { dateManager } from "../utils/date/DateManager";
 import { useTranslation } from "react-i18next";
@@ -15,12 +16,14 @@ interface DeliveryEditFormProps {
   deliveryAddress?: DeliveryAddressData;
   onDataChange: (data: DeliveryData) => void;
   isDisabled?: boolean;
+  showErrors?: boolean;
 }
 
 export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
   deliveryAddress,
   onDataChange,
   isDisabled = false,
+  showErrors = false,
 }) => {
   const { t } = useTranslation();
 
@@ -74,7 +77,29 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     onDataChange(deliveryData);
   }, [deliveryData, onDataChange]);
 
-  const dateOptions = dateManager.generateDateOptions();
+  const [disabledDates, setDisabledDates] = useState<string[]>([]);
+
+  // Fetch disabled dates once
+  useEffect(() => {
+    axios
+      .get<{ dates: string[] }>(`${import.meta.env.VITE_API_URL ?? "http://localhost:8000"}/delivery-dates/disabled`)
+      .then((resp) => {
+        setDisabledDates(resp.data.dates || []);
+      })
+      .catch(() => {
+        // ignore
+      });
+  }, []);
+
+  const dateOptions = useMemo(() => {
+    const opts = dateManager.generateDateOptions();
+    if (disabledDates.length === 0) return opts;
+    return opts.filter((opt) => {
+      if (!opt.value) return true; // keep placeholder
+      const iso = dateManager.toISO(opt.value);
+      return !disabledDates.includes(iso);
+    });
+  }, [disabledDates]);
 
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -202,29 +227,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Название адреса */}
-      <div className="flex flex-col gap-1">
-        <label
-          className="text-sm font-medium text-gray-600 px-3"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          {t("address_name")}
-        </label>
-        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all border-gray-200 focus-within:border-[#7782F5]">
-          <input
-            type="text"
-            className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
-            placeholder={t("enter_address_name")}
-            value={deliveryData.name}
-            onChange={(e) => {
-              setDeliveryData({ ...deliveryData, name: e.target.value });
-            }}
-            maxLength={50}
-            disabled={isDisabled}
-            style={{ fontFamily: "Nunito, sans-serif" }}
-          />
-        </div>
-      </div>
+      
 
       {/* Адрес */}
       <div className="flex flex-col gap-1">
@@ -234,7 +237,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         >
           {t("address")}
         </label>
-        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative border-gray-200 focus-within:border-[#7782F5]">
+        <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative ${showErrors && !deliveryData.address.trim() ? "border-red-500" : "border-gray-200"} focus-within:border-[#7782F5]`}>
           <input
             type="text"
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 pr-9"
@@ -356,7 +359,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
               const isoDate = dateManager.toISO(e.target.value);
               setDeliveryData({ ...deliveryData, date: isoDate });
             }}
-            className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
+            className={`w-full px-4 py-4 bg-gray-50 border-2 rounded-2xl appearance-none focus:outline-none pr-12 ${showErrors && !deliveryData.date ? "border-red-500" : "border-gray-200"} ${deliveryData.date ? "text-gray-900" : "text-gray-400"} focus:border-[#7782F5]`}
             style={{ fontFamily: "Nunito, sans-serif" }}
             disabled={isDisabled}
           >
@@ -396,7 +399,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
             onChange={(e) => {
               setDeliveryData({ ...deliveryData, time: e.target.value });
             }}
-            className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
+            className={`w-full px-4 py-4 bg-gray-50 border-2 rounded-2xl appearance-none focus:outline-none pr-12 ${showErrors && !deliveryData.time ? "border-red-500" : "border-gray-200"} ${deliveryData.time ? "text-gray-900" : "text-gray-400"} focus:border-[#7782F5]`}
             style={{ fontFamily: "Nunito, sans-serif" }}
             disabled={isDisabled}
           >

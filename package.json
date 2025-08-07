@@ -21,6 +21,7 @@
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^15.6.1",
     "react-router-dom": "^7.6.3",
+    "axios": "^1.6.7",
 
     "typescript": "^5.8.3",
     "tailwindcss": "^4.1.11",
