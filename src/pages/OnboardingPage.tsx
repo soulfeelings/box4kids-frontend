@@ -108,7 +108,14 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
         return (
           <SubscriptionStep
             onBack={() => setCurrentStep(AUTH_STEPS.CATEGORIES)}
-            onNext={() => setCurrentStep(AUTH_STEPS.VALIDATE_SUBSCRIPTIONS)}
+            onNext={() => {
+              const childrenCount = useStore.getState().user?.children.length || 0;
+              if (childrenCount > 1) {
+                setCurrentStep(AUTH_STEPS.VALIDATE_SUBSCRIPTIONS);
+              } else {
+                setCurrentStep(AUTH_STEPS.DELIVERY);
+              }
+            }}
             onClose={handleClose}
             currentChildToUpdate={currentChildToUpdate}
             onAddNewChild={() => {
