@@ -77,29 +77,38 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     onDataChange(deliveryData);
   }, [deliveryData, onDataChange]);
 
-  const [disabledDates, setDisabledDates] = useState<string[]>([]);
-
-  // Fetch disabled dates once
+  const [allowedDates, setAllowedDates] = useState<string[] | null>(null);
   useEffect(() => {
-    axios
-      .get<{ dates: string[] }>(`${import.meta.env.VITE_API_URL ?? "http://localhost:8000"}/delivery-dates/disabled`)
-      .then((resp) => {
-        setDisabledDates(resp.data.dates || []);
-      })
-      .catch(() => {
-        // ignore
-      });
+    // Подтягиваем разрешенные даты для селекта
+    (async () => {
+      try {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/delivery-dates/available`);
+        if (resp.ok) {
+          const json = await resp.json();
+          setAllowedDates(json?.dates ?? null);
+        } else {
+          setAllowedDates(null);
+        }
+      } catch {
+        setAllowedDates(null);
+      }
+    })();
   }, []);
 
   const dateOptions = useMemo(() => {
-    const opts = dateManager.generateDateOptions();
-    if (disabledDates.length === 0) return opts;
-    return opts.filter((opt) => {
-      if (!opt.value) return true; // keep placeholder
-      const iso = dateManager.toISO(opt.value);
-      return !disabledDates.includes(iso);
-    });
-  }, [disabledDates]);
+    if (allowedDates && allowedDates.length > 0) {
+      const opts = [{ value: "", label: t("select_date") }];
+      for (const iso of allowedDates) {
+        // iso YYYY-MM-DD -> DD.MM
+        const [y, m, d] = iso.split("-");
+        const short = `${d}.${m}`;
+        const label = dateManager.toFormatted(iso);
+        opts.push({ value: short, label });
+      }
+      return opts;
+    }
+    return dateManager.generateDateOptions();
+  }, [allowedDates, t]);
 
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);

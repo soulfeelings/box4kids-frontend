@@ -5,8 +5,9 @@ import { AdminAuthForm } from "./AdminAuthForm";
 import { AdminUsersTable } from "./AdminUsersTable";
 import { AdminInventoryTable } from "./AdminInventoryTable";
 import { AdminMappingsTable } from "./AdminMappingsTable";
+import { AdminDeliveryDates } from "./AdminDeliveryDates";
 
-type AdminTab = "users" | "inventory" | "mappings";
+type AdminTab = "users" | "inventory" | "mappings" | "deliveryDates";
 
 export const AdminLayout: React.FC = () => {
   const { t } = useTranslation();
@@ -27,6 +28,7 @@ export const AdminLayout: React.FC = () => {
     { id: "users" as AdminTab, name: t('users'), icon: "👥" },
     { id: "inventory" as AdminTab, name: t('inventory'), icon: "📦" },
     { id: "mappings" as AdminTab, name: t('mapping'), icon: "🔗" },
+    { id: "deliveryDates" as AdminTab, name: t('allowed_delivery_dates'), icon: "📅" },
   ];
 
   const renderTabContent = () => {
@@ -37,6 +39,8 @@ export const AdminLayout: React.FC = () => {
         return <AdminInventoryTable />;
       case "mappings":
         return <AdminMappingsTable />;
+      case "deliveryDates":
+        return <AdminDeliveryDates />;
       default:
         return <AdminUsersTable />;
     }

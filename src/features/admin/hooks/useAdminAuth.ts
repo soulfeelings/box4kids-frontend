@@ -6,7 +6,7 @@ export const useAdminAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(
-    localStorage.getItem("adminToken")
+    localStorage.getItem("adminToken") || localStorage.getItem("admin_token")
   );
 
   const login = async (credentials: AdminLoginRequest): Promise<boolean> => {
@@ -16,7 +16,9 @@ export const useAdminAuth = () => {
     try {
       const response: AdminLoginResponse = await adminLogin(credentials);
       setToken(response.access_token);
+      // Сохраняем в оба ключа для совместимости с разными клиентами
       localStorage.setItem("adminToken", response.access_token);
+      localStorage.setItem("admin_token", response.access_token);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка авторизации");
@@ -29,6 +31,7 @@ export const useAdminAuth = () => {
   const logout = () => {
     setToken(null);
     localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin_token");
   };
 
   const isAuthenticated = !!token;

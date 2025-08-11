@@ -29,11 +29,45 @@ export const adminLogin = async (
   return response.json();
 };
 
+// Admin Delivery Dates API
+export const getAllowedDeliveryDates = async (): Promise<string[]> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-dates/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Ошибка получения дат доставки");
+  const data = await response.json();
+  return data.dates ?? [];
+};
+
+export const addAllowedDeliveryDate = async (dateIso: string): Promise<string[]> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-dates/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ date: dateIso }),
+  });
+  if (!response.ok) throw new Error("Ошибка добавления даты доставки");
+  const data = await response.json();
+  return data.dates ?? [];
+};
+
+export const removeAllowedDeliveryDate = async (dateIso: string): Promise<string[]> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-dates/${dateIso}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Ошибка удаления даты доставки");
+  const data = await response.json();
+  return data.dates ?? [];
+};
+
 // Admin Interests API
 export const getAllInterests = async (): Promise<
   Array<{ id: number; name: string }>
 > => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
   const response = await fetch(`${API_BASE}/admin/interests`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -51,7 +85,7 @@ export const getAllInterests = async (): Promise<
 export const getAllSkills = async (): Promise<
   Array<{ id: number; name: string }>
 > => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
   const response = await fetch(`${API_BASE}/admin/skills`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -67,7 +101,7 @@ export const getAllSkills = async (): Promise<
 
 // Users API
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
   const response = await fetch(`${API_BASE}/admin/users`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -85,7 +119,7 @@ export const updateUserRole = async (
   userId: number,
   newRole: string
 ): Promise<void> => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
   const response = await fetch(`${API_BASE}/admin/users/${userId}/role`, {
     method: "PUT",
     headers: {
@@ -104,7 +138,7 @@ export const updateToyBoxStatus = async (
   boxId: number,
   newStatus: string
 ): Promise<void> => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
   const response = await fetch(`${API_BASE}/admin/toy-boxes/${boxId}/status`, {
     method: "PUT",
     headers: {
@@ -121,7 +155,7 @@ export const updateToyBoxStatus = async (
 
 // Inventory API
 export const getAdminInventory = async (): Promise<AdminInventoryItem[]> => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
   const response = await fetch(`${API_BASE}/admin/inventory`, {
     headers: {
       Authorization: `Bearer ${token}`,
