@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import axios from "axios";
 import { DeliveryAddressData } from "../types";
 import { dateManager } from "../utils/date/DateManager";
 import { useTranslation } from "react-i18next";
@@ -27,7 +26,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const timeOptions = [
+  const fallbackTimeOptions = [
     { value: "", label: t("select_time") },
     { value: "9:00 – 12:00", label: "9:00 - 12:00" },
     { value: "12:00 – 15:00", label: "12:00 - 15:00" },
@@ -78,6 +77,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
   }, [deliveryData, onDataChange]);
 
   const [allowedDates, setAllowedDates] = useState<string[] | null>(null);
+  const [allowedTimes, setAllowedTimes] = useState<{ ranges: string[]; hours: string[] } | null>(null);
   useEffect(() => {
     // Подтягиваем разрешенные даты для селекта
     (async () => {
@@ -93,6 +93,26 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         setAllowedDates(null);
       }
     })();
+    // Подтягиваем разрешенное время для селекта (интервалы и часы)
+    (async () => {
+      try {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/delivery-times/available`);
+        if (resp.ok) {
+          const json = await resp.json();
+          const ranges: string[] = Array.isArray(json?.ranges) ? json.ranges : [];
+          const hours: string[] = Array.isArray(json?.hours) ? json.hours : [];
+          if (ranges.length || hours.length) {
+            setAllowedTimes({ ranges, hours });
+          } else {
+            setAllowedTimes(null);
+          }
+        } else {
+          setAllowedTimes(null);
+        }
+      } catch {
+        setAllowedTimes(null);
+      }
+    })();
   }, []);
 
   const dateOptions = useMemo(() => {
@@ -100,7 +120,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
       const opts = [{ value: "", label: t("select_date") }];
       for (const iso of allowedDates) {
         // iso YYYY-MM-DD -> DD.MM
-        const [y, m, d] = iso.split("-");
+        const [, m, d] = iso.split("-");
         const short = `${d}.${m}`;
         const label = dateManager.toFormatted(iso);
         opts.push({ value: short, label });
@@ -109,6 +129,20 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     }
     return dateManager.generateDateOptions();
   }, [allowedDates, t]);
+
+  const timeOptions = useMemo(() => {
+    if (allowedTimes) {
+      const opts = [{ value: "", label: t("select_time") }];
+      for (const r of allowedTimes.ranges) {
+        opts.push({ value: r, label: r.replace("–", "-") });
+      }
+      for (const h of allowedTimes.hours) {
+        opts.push({ value: h, label: h });
+      }
+      return opts;
+    }
+    return fallbackTimeOptions;
+  }, [allowedTimes, t]);
 
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);

@@ -63,6 +63,83 @@ export const removeAllowedDeliveryDate = async (dateIso: string): Promise<string
   return data.dates ?? [];
 };
 
+// Admin Delivery Times API
+export interface AllowedDeliveryTimesResponse {
+  ranges: string[];
+  hours: string[];
+}
+
+export const getAllowedDeliveryTimes = async (): Promise<AllowedDeliveryTimesResponse> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-times/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Ошибка получения времени доставки");
+  const data = await response.json();
+  return {
+    ranges: data?.ranges ?? [],
+    hours: data?.hours ?? [],
+  };
+};
+
+export const addAllowedDeliveryTimeRange = async (range: string): Promise<AllowedDeliveryTimesResponse> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-times/range`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ range }),
+  });
+  if (!response.ok) throw new Error("Ошибка добавления интервала времени");
+  const data = await response.json();
+  return {
+    ranges: data?.ranges ?? [],
+    hours: data?.hours ?? [],
+  };
+};
+
+export const removeAllowedDeliveryTimeRange = async (range: string): Promise<AllowedDeliveryTimesResponse> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-times/range/${encodeURIComponent(range)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Ошибка удаления интервала времени");
+  const data = await response.json();
+  return {
+    ranges: data?.ranges ?? [],
+    hours: data?.hours ?? [],
+  };
+};
+
+export const addAllowedDeliveryHour = async (hour: string): Promise<AllowedDeliveryTimesResponse> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-times/hour`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ hour }),
+  });
+  if (!response.ok) throw new Error("Ошибка добавления часа доставки");
+  const data = await response.json();
+  return {
+    ranges: data?.ranges ?? [],
+    hours: data?.hours ?? [],
+  };
+};
+
+export const removeAllowedDeliveryHour = async (hour: string): Promise<AllowedDeliveryTimesResponse> => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/delivery-times/hour/${encodeURIComponent(hour)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Ошибка удаления часа доставки");
+  const data = await response.json();
+  return {
+    ranges: data?.ranges ?? [],
+    hours: data?.hours ?? [],
+  };
+};
+
 // Admin Interests API
 export const getAllInterests = async (): Promise<
   Array<{ id: number; name: string }>
