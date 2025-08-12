@@ -87,5 +87,4 @@ const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
 };
 
 export { CurrentToyBoxCard };
-export default CurrentToyBoxCard;
 
