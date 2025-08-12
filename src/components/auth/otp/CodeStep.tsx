@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useStore } from "../../../store/store";
 import { DevModeBanner } from "../../../features/DevModeBanner";
 import {
@@ -24,6 +24,8 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
   const verifyOtpMutation = useVerifyOtpAuthVerifyOtpPost();
   const sendOtpMutation = useSendOtpAuthSendOtpPost();
   const devGetCodeMutation = useDevGetCodeAuthDevGetCodePost();
+
+  const fullPhoneNumber = useMemo(() => `+998${phoneData.phone}`, [phoneData.phone]);
 
   // Функция для получения dev кода
   const getDevCode = useCallback(
@@ -58,7 +60,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
       setIsAutoFilling(true);
       id = setTimeout(async () => {
         try {
-          const devCode = await getDevCode(phoneData.phone);
+          const devCode = await getDevCode(fullPhoneNumber);
           if (devCode) {
             setPhoneData({ code: devCode });
           }
@@ -75,7 +77,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
         clearTimeout(id);
       }
     };
-  }, [phoneData.phone, phoneData.code, setPhoneData]);
+  }, [phoneData.phone, phoneData.code, setPhoneData, fullPhoneNumber]);
 
   const handleCheckCode = async () => {
     if (!phoneData.code || phoneData.code.length !== 4) {
@@ -88,7 +90,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
     try {
       const response = await verifyOtpMutation.mutateAsync({
         data: {
-          phone_number: phoneData.phone,
+          phone_number: fullPhoneNumber,
           code: phoneData.code,
         },
       });
@@ -113,7 +115,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
 
     try {
       await sendOtpMutation.mutateAsync({
-        data: { phone_number: phoneData.phone },
+        data: { phone_number: fullPhoneNumber },
       });
 
       setResendTimer(SECONDS_TO_RESEND_CODE);
@@ -124,7 +126,7 @@ export const CodeStep: React.FC<CodeStepProps> = ({ onBack, onSuccess }) => {
       setIsAutoFilling(true);
       setTimeout(async () => {
         try {
-          const devCode = await getDevCode(phoneData.phone);
+          const devCode = await getDevCode(fullPhoneNumber);
           if (devCode) {
             setPhoneData({ code: devCode });
           }

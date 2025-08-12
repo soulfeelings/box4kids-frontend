@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useStore } from "../../../store/store";
 import { useUpdateUserProfileUsersProfilePut } from "../../../api-client";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { BackButton } from "../../ui";
 import { useTranslation } from 'react-i18next';
 
 export const UpdateNameStep: React.FC<{
@@ -9,37 +10,13 @@ export const UpdateNameStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
   userName?: string;
-}> = ({ onBack, onNext, onClose, userName }) => {
+}> = ({ onBack, onNext, onClose: _onClose, userName }) => {
   const { t } = useTranslation();
   const [name, setName] = useState(userName ?? "");
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const { setUserName } = useStore();
 
   const updateUserMutation = useUpdateUserProfileUsersProfilePut();
 
-  // Обработка видимости клавиатуры
-  useEffect(() => {
-    const handleFocus = () => {
-      setIsKeyboardVisible(true);
-    };
-
-    const handleBlur = () => {
-      setIsKeyboardVisible(false);
-    };
-
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-    if (input) {
-      input.addEventListener('focus', handleFocus);
-      input.addEventListener('blur', handleBlur);
-    }
-
-    return () => {
-      if (input) {
-        input.removeEventListener('focus', handleFocus);
-        input.removeEventListener('blur', handleBlur);
-      }
-    };
-  }, []);
 
   const handleUpdateUser = async (name: string) => {
     try {
@@ -64,36 +41,10 @@ export const UpdateNameStep: React.FC<{
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16">
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center"
-          style={{ minWidth: 40, minHeight: 40 }}
-          aria-label="Назад"
-        >
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 7H1M1 7L7 13M1 7L7 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <BackButton onClick={onBack} />
 
         <StepIndicator currentStep={1} />
-
-        <button
-          onClick={onClose}
-          className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors"
-          style={{ backgroundColor: '#F2F2F2' }}
-          aria-label="Закрыть"
-        >
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="black"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+        <div style={{ width: 40 }} />
       </div>
 
       {/* Main content */}
@@ -139,13 +90,9 @@ export const UpdateNameStep: React.FC<{
       </div>
 
       {/* Bottom action button */}
-      <div 
-        className={`px-4 pb-6 transition-all duration-300 ${
-          isKeyboardVisible ? 'pb-safe' : ''
-        }`}
-        style={{
-          paddingBottom: isKeyboardVisible ? 'env(safe-area-inset-bottom, 20px)' : '24px'
-        }}
+      <div
+        className="px-4 pb-6 pb-safe transition-all duration-300"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 24px)' }}
       >
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${

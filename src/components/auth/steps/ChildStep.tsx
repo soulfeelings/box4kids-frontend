@@ -15,6 +15,7 @@ import { ChoseChildCards } from "../../../features/ChoseChildCards";
 import { notifications } from "../../../utils/notifications";
 import { SubscriptionStatus } from "../../../api-client/model/subscriptionStatus";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { BackButton } from "../../ui";
 import { useTranslation } from "react-i18next";
 
 interface ChildData {
@@ -30,7 +31,7 @@ export const ChildStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
   currentChildToUpdate: UserChildData | null;
-}> = ({ onBack, onNext, onClose, currentChildToUpdate }) => {
+}> = ({ onBack, onNext, onClose: _onClose, currentChildToUpdate }) => {
   const { t } = useTranslation();
   const {
     setCurrentChildIdToUpdate,
@@ -55,33 +56,29 @@ export const ChildStep: React.FC<{
     childrenWithoutActiveSubscription
   );
 
-  const [childData, setChildData] = useState<ChildData>({
-    name: currentChildToUpdate?.name || "",
-    date_of_birth: currentChildToUpdate?.date_of_birth || "",
-    gender: currentChildToUpdate?.gender || null,
-    limitations: currentChildToUpdate?.limitations !== undefined ? currentChildToUpdate.limitations : null,
-    comment: currentChildToUpdate?.comment || "",
-  });
+  const buildChildDataFrom = useCallback(
+    (child: UserChildData | null): ChildData => ({
+      name: child?.name || "",
+      date_of_birth: child?.date_of_birth || "",
+      gender: child?.gender || null,
+      limitations:
+        child?.limitations !== undefined ? child.limitations : null,
+      comment: child?.comment || "",
+    }),
+    []
+  );
+
+  const [childData, setChildData] = useState<ChildData>(() =>
+    buildChildDataFrom(currentChildToUpdate)
+  );
+
+  const applyChildData = useCallback((partial: Partial<ChildData>) => {
+    setChildData((prev) => ({ ...prev, ...partial }));
+  }, []);
 
   useEffect(() => {
-    if (currentChildToUpdate) {
-      setChildData({
-        name: currentChildToUpdate?.name || "",
-        date_of_birth: currentChildToUpdate?.date_of_birth || "",
-        gender: currentChildToUpdate?.gender || null,
-        limitations: currentChildToUpdate?.limitations !== undefined ? currentChildToUpdate.limitations : null,
-        comment: currentChildToUpdate?.comment || "",
-      });
-    } else {
-      setChildData({
-        name: "",
-        date_of_birth: "",
-        gender: null,
-        limitations: null,
-        comment: "",
-      });
-    }
-  }, [currentChildToUpdate]);
+    setChildData(buildChildDataFrom(currentChildToUpdate));
+  }, [currentChildToUpdate, buildChildDataFrom]);
 
   // Мемоизируем функции-обработчики
   const handleChildSelect = useCallback(
@@ -136,9 +133,7 @@ export const ChildStep: React.FC<{
     onBack();
   }, [onBack]);
 
-  const handleClose = useCallback(() => {
-    onClose();
-  }, [onClose]);
+  // Close button removed on step 2; no handler needed
 
   const handleChildSubmit = useCallback(async () => {
     if (!isFormValid) return;
@@ -236,36 +231,10 @@ export const ChildStep: React.FC<{
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16">
-        <button
-          onClick={handleBack}
-          className="flex items-center justify-center"
-          style={{ minWidth: 40, minHeight: 40 }}
-          aria-label="Назад"
-        >
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 7H1M1 7L7 13M1 7L7 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <BackButton onClick={handleBack} />
 
         <StepIndicator currentStep={2} />
-
-        <button
-          onClick={handleClose}
-          className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors"
-          style={{ backgroundColor: '#F2F2F2' }}
-          aria-label="Закрыть"
-        >
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="black"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+        <div style={{ width: 40 }} />
       </div>
 
       {/* Main content */}
@@ -320,9 +289,9 @@ export const ChildStep: React.FC<{
                 value={childData.name}
                 onChange={useCallback(
                   (e: React.ChangeEvent<HTMLInputElement>) => {
-                    setChildData((prev) => ({ ...prev, name: e.target.value }));
+                    applyChildData({ name: e.target.value });
                   },
-                  []
+                  [applyChildData]
                 )}
                 maxLength={32}
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -357,12 +326,9 @@ export const ChildStep: React.FC<{
                     const formatted = dateManager.formatDateInput(
                       e.target.value
                     );
-                    setChildData((prev) => ({
-                      ...prev,
-                      date_of_birth: formatted,
-                    }));
+                    applyChildData({ date_of_birth: formatted });
                   },
-                  []
+                  [applyChildData]
                 )}
                 maxLength={10}
                 style={{ fontFamily: "Nunito, sans-serif" }}
@@ -390,14 +356,14 @@ export const ChildStep: React.FC<{
               <button
                 onClick={useCallback(
                   () => {
-                    setChildData((prev) => ({ ...prev, gender: "male" }));
+                    applyChildData({ gender: "male" });
                     // Снимаем фокус с активного элемента
                     const activeElement = document.activeElement as HTMLElement;
                     if (activeElement) {
                       activeElement.blur();
                     }
                   },
-                  []
+                  [applyChildData]
                 )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.gender === "male"
@@ -411,14 +377,14 @@ export const ChildStep: React.FC<{
               <button
                 onClick={useCallback(
                   () => {
-                    setChildData((prev) => ({ ...prev, gender: "female" }));
+                    applyChildData({ gender: "female" });
                     // Снимаем фокус с активного элемента
                     const activeElement = document.activeElement as HTMLElement;
                     if (activeElement) {
                       activeElement.blur();
                     }
                   },
-                  []
+                  [applyChildData]
                 )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.gender === "female"
@@ -444,14 +410,14 @@ export const ChildStep: React.FC<{
               <button
                 onClick={useCallback(
                   () => {
-                    setChildData((prev) => ({ ...prev, limitations: false }));
+                    applyChildData({ limitations: false });
                     // Снимаем фокус с активного элемента
                     const activeElement = document.activeElement as HTMLElement;
                     if (activeElement) {
                       activeElement.blur();
                     }
                   },
-                  []
+                  [applyChildData]
                 )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.limitations === false
@@ -465,14 +431,14 @@ export const ChildStep: React.FC<{
               <button
                 onClick={useCallback(
                   () => {
-                    setChildData((prev) => ({ ...prev, limitations: true }));
+                    applyChildData({ limitations: true });
                     // Снимаем фокус с активного элемента
                     const activeElement = document.activeElement as HTMLElement;
                     if (activeElement) {
                       activeElement.blur();
                     }
                   },
-                  []
+                  [applyChildData]
                 )}
                 className={`px-4 py-3 rounded-xl font-medium transition-all ${
                   childData.limitations === true
@@ -513,11 +479,8 @@ export const ChildStep: React.FC<{
                 value={childData.comment || ""}
                 onChange={useCallback(
                   (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setChildData((prev) => ({
-                      ...prev,
-                      comment: e.target.value,
-                    })),
-                  []
+                    applyChildData({ comment: e.target.value }),
+                  [applyChildData]
                 )}
                 rows={3}
                 maxLength={200}

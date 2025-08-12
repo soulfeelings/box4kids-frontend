@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { BackButton } from "../../ui";
 import { useTranslation } from 'react-i18next';
 
 const welcomeScreens = [
@@ -47,17 +48,10 @@ export const WelcomeStep: React.FC<{ onNext: () => void; onClose?: () => void }>
       <div className="flex justify-between items-center px-4 py-4 relative z-10">
         {/* Back button (only for 2 and 3 screens) */}
         {welcomeIndex > 0 ? (
-          <button
-            onClick={handleBack}
-            className="flex items-center justify-center"
-            style={{ minWidth: 40, minHeight: 40 }}
-            aria-label="Назад"
-          >
-            <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17 7H1M1 7L7 13M1 7L7 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        ) : <div style={{ width: 40 }} />}
+          <BackButton onClick={handleBack} stroke="white" />
+        ) : (
+          <div style={{ width: 40 }} />
+        )}
         <h1
           className="text-white font-semibold text-base"
           style={{ fontFamily: "Open Sans, sans-serif" }}

@@ -7,6 +7,7 @@ import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 import { SingleChildSubscriptionView } from "./subscription-step-components/SingleChildSubscriptionView";
 import { notifications } from "../../../utils/notifications";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { BackButton } from "../../ui";
 import { useTranslation } from 'react-i18next';
 
 export const SubscriptionStep: React.FC<{
@@ -97,16 +98,7 @@ export const SubscriptionStep: React.FC<{
     >
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16 bg-white">
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center"
-          style={{ minWidth: 40, minHeight: 40 }}
-          aria-label="Назад"
-        >
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 7H1M1 7L7 13M1 7L7 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <BackButton onClick={onBack} />
 
         <StepIndicator currentStep={4} />
 
