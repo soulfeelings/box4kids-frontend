@@ -172,8 +172,8 @@ function ChildCard({
       {subscriptionPlan &&
         subscription &&
         subscription.status === SubscriptionStatus.paused && (
-          <div className="mb-4 p-3 rounded-xl border border-[#DC7E45] bg-[#F0955E] bg-opacity-15">
-            <p className="text-sm text-gray-800 leading-5">
+          <div className="mb-4 p-3 rounded-xl" style={{ backgroundColor: "#FCEFE7" }}>
+            <p className="text-sm leading-5" style={{ color: "#DC7E45" }}>
               {t('subscription_paused_warning')}
             </p>
           </div>
