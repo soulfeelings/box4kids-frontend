@@ -39,7 +39,7 @@ export const SuccessStep: React.FC = () => {
         {/* Success Icon */}
         <div className="mb-8">
           <img
-            src="/illustrations/ok.png"
+            src="/illustrations/ok.svg"
             alt="Success"
             className="w-32 h-32 mx-auto"
           />

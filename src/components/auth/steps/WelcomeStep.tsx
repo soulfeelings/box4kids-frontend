@@ -4,17 +4,17 @@ import { useTranslation } from 'react-i18next';
 
 const welcomeScreens = [
   {
-    img: "/illustrations/welcome1.png",
+    img: "/illustrations/welcome1.svg",
     titleKey: 'welcome_title_1',
     descKey: 'welcome_desc_1',
   },
   {
-    img: "/illustrations/welcome2.png",
+    img: "/illustrations/welcome2.svg",
     titleKey: 'welcome_title_2',
     descKey: 'welcome_desc_2',
   },
   {
-    img: "/illustrations/welcome3.png",
+    img: "/illustrations/welcome3.svg",
     titleKey: 'welcome_title_3',
     descKey: 'welcome_desc_3',
   },
