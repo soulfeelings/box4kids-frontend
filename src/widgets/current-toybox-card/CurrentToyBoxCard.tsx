@@ -42,6 +42,8 @@ const CurrentToyBoxCard: React.FC<CurrentToyBoxCardProps> = ({
               box.currentBox.delivery_date ?? "",
               box.currentBox.delivery_time ?? ""
             )}
+            {" • "}
+            {t(box.currentBox.status || "planned")}
           </span>
         </div>
 

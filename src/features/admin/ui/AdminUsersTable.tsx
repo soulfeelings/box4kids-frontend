@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGetAllUsersAdminUsersGet } from "../../../api-client";
 import { AdminUserResponse } from "../../../api-client/model/adminUserResponse";
+import { AdminOrdersPage } from "./AdminOrdersPage";
 
 export const AdminUsersTable: React.FC = () => {
   const { t } = useTranslation();
@@ -102,88 +103,19 @@ export const AdminUsersTable: React.FC = () => {
                     >
                       {expandedUser === user.id ? t("hide") : t("details")}
                     </button>
+                    <button
+                      onClick={() => setExpandedUser(user.id)}
+                      className="ml-4 text-indigo-600 hover:text-indigo-900"
+                    >
+                      {t("manage")}
+                    </button>
                   </td>
                 </tr>
 
                 {expandedUser === user.id && (
                   <tr>
                     <td colSpan={6} className="px-6 py-4 bg-gray-50">
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-gray-900">
-                          {t("children")}:
-                        </h4>
-                        {user.children.map((child) => (
-                          <div
-                            key={child.id}
-                            className="ml-4 border-l-2 border-gray-200 pl-4"
-                          >
-                            <div className="font-medium">
-                              {child.name} ({t("age")}: {child.date_of_birth})
-                            </div>
-
-                            {child.current_box && (
-                              <div className="mt-2">
-                                <div className="text-sm font-medium text-gray-700">
-                                  {t("current_set")}:
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {t("status")}:
-                                  <select
-                                    value={child.current_box.status}
-                                    onChange={(e) =>
-                                      handleBoxStatusChange(
-                                        child.current_box!.id,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="ml-2 border-gray-300 rounded text-xs"
-                                  >
-                                    <option value="preparing">
-                                      {t("preparing")}
-                                    </option>
-                                    <option value="delivered">
-                                      {t("delivered")}
-                                    </option>
-                                    <option value="returned">
-                                      {t("returned")}
-                                    </option>
-                                  </select>
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {t("toys")}:{" "}
-                                  {child.current_box.items
-                                    ?.map(
-                                      (item) =>
-                                        `${t("toy_category")} ${
-                                          item.toy_category_id
-                                        } (${item.quantity})`
-                                    )
-                                    .join(", ") || t("no_toys")}
-                                </div>
-                              </div>
-                            )}
-
-                            {child.next_box && (
-                              <div className="mt-2">
-                                <div className="text-sm font-medium text-gray-700">
-                                  {t("next_set")}:
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {t("toys")}:{" "}
-                                  {child.next_box.items
-                                    ?.map(
-                                      (item) =>
-                                        `${t("toy_category")} ${
-                                          item.category_id
-                                        } (${item.quantity})`
-                                    )
-                                    .join(", ") || t("no_toys")}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                      <AdminOrdersPage userId={user.id} userName={user.name || undefined} onBack={() => setExpandedUser(null)} />
                     </td>
                   </tr>
                 )}

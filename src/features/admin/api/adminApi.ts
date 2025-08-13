@@ -230,6 +230,19 @@ export const updateToyBoxStatus = async (
   }
 };
 
+export const getUserToyBoxes = async (userId: number) => {
+  const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
+  const response = await fetch(`${API_BASE}/admin/users/${userId}/toy-boxes`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Ошибка получения заказов пользователя");
+  }
+  return response.json();
+};
+
 // Inventory API
 export const getAdminInventory = async (): Promise<AdminInventoryItem[]> => {
   const token = localStorage.getItem("adminToken") || localStorage.getItem("admin_token");
