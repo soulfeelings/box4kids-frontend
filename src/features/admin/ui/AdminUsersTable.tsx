@@ -24,16 +24,7 @@ export const AdminUsersTable: React.FC = () => {
     }
   };
 
-  const handleBoxStatusChange = async (boxId: number, newStatus: string) => {
-    try {
-      console.log("boxId", boxId);
-      console.log("newStatus", newStatus);
-      // API call to change box status
-      await refetch();
-    } catch (err) {
-      console.error("Ошибка изменения статуса:", err);
-    }
-  };
+  
 
   if (!users) return <div>Loading...</div>;
 

@@ -11,6 +11,7 @@ import { PaymentDataPage } from "./PaymentDataPage";
 import { useNavigateToEditDelivery } from "../hooks/useNavigateHooks";
 import { useTranslation } from "react-i18next";
 import { LoadingComponent } from "../components/common/LoadingComponent";
+import { LanguageSettingsPage } from "./LanguageSettingsPage";
 
 export const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export const ProfilePage: React.FC = () => {
   const [showEditName, setShowEditName] = useState(false);
   const [showEditPhone, setShowEditPhone] = useState(false);
   const [showPaymentData, setShowPaymentData] = useState(false);
+  const [showLanguageSettings, setShowLanguageSettings] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -44,6 +46,10 @@ export const ProfilePage: React.FC = () => {
 
   const handlePaymentDataClick = useCallback(() => {
     setShowPaymentData(true);
+  }, []);
+
+  const handleLanguageSettingsClick = useCallback(() => {
+    setShowLanguageSettings(true);
   }, []);
 
   if (isLoading) {
@@ -84,6 +90,10 @@ export const ProfilePage: React.FC = () => {
 
   if (showPaymentData) {
     return <PaymentDataPage onClose={() => setShowPaymentData(false)} />;
+  }
+
+  if (showLanguageSettings) {
+    return <LanguageSettingsPage onClose={() => setShowLanguageSettings(false)} />;
   }
 
   return (
@@ -139,6 +149,14 @@ export const ProfilePage: React.FC = () => {
           <div onClick={handleSupportClick} className="cursor-pointer">
             <ProfileItem
               label={t("support")}
+              hasArrow={true}
+              isMenuItem={true}
+            />
+          </div>
+
+          <div onClick={handleLanguageSettingsClick} className="cursor-pointer">
+            <ProfileItem
+              label={t("language_change")}
               hasArrow={true}
               isMenuItem={true}
             />

@@ -8,7 +8,9 @@ export const LandingPage: React.FC = () => {
   const currentLanguage = i18n.language;
 
   const handleLanguageChange = (language: string) => {
-    i18n.changeLanguage(language);
+    i18n.changeLanguage(language).then(() => {
+      window.location.reload();
+    });
   };
   const [openFaq, setOpenFaq] = useState<number | null>(null); // All items closed by default
   const [selectedAge, setSelectedAge] = useState<string>(t("age_0_3_months"));
