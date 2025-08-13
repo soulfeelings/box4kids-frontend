@@ -10,7 +10,7 @@ interface AdminOrdersPageProps {
 
 const STATUS_OPTIONS = [
   "planned",
-  "preparing",
+  "assembled",
   "shipped",
   "delivered",
   "returned",
