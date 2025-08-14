@@ -25,7 +25,7 @@ export const NoSubscribtionsView = ({
         style={{ height: "calc(50vh - 140px)" }}
       >
         <img
-          src="/illustrations/continue.png"
+          src="/illustrations/continue.svg"
           alt="Girl with toy box"
           className="absolute inset-0 w-full h-full object-contain"
         />

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useStore } from "../../../store/store";
 import { useUpdateUserProfileUsersProfilePut } from "../../../api-client";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { BackButton } from "../../ui";
 import { useTranslation } from 'react-i18next';
 
 export const UpdateNameStep: React.FC<{
@@ -9,12 +10,13 @@ export const UpdateNameStep: React.FC<{
   onNext: () => void;
   onClose: () => void;
   userName?: string;
-}> = ({ onBack, onNext, onClose, userName }) => {
+}> = ({ onBack, onNext, onClose: _onClose, userName }) => {
   const { t } = useTranslation();
   const [name, setName] = useState(userName ?? "");
   const { setUserName } = useStore();
 
   const updateUserMutation = useUpdateUserProfileUsersProfilePut();
+
 
   const handleUpdateUser = async (name: string) => {
     try {
@@ -35,49 +37,14 @@ export const UpdateNameStep: React.FC<{
     }
   };
 
-  const isLoading = updateUserMutation.isPending;
-
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16">
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-        >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+        <BackButton onClick={onBack} />
 
         <StepIndicator currentStep={1} />
-
-        <button
-          onClick={onClose}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-          style={{
-            // To make flow simple, we hide this button, but we save it for html markdown
-            visibility: "hidden",
-          }}
-        >
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+        <div style={{ width: 40 }} />
       </div>
 
       {/* Main content */}
@@ -123,21 +90,23 @@ export const UpdateNameStep: React.FC<{
       </div>
 
       {/* Bottom action button */}
-      <div className="px-4 pb-6">
+      <div
+        className="px-4 pb-6 pb-safe transition-all duration-300"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 24px)' }}
+      >
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
-            name.trim() && !isLoading
-              ? "text-white shadow-sm"
+            name.trim()
+              ? "bg-[#30313D] text-white shadow-sm"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
           }`}
-          disabled={!name.trim() || isLoading}
+          disabled={!name.trim()}
           onClick={() => handleUpdateUser(name)}
           style={{
             fontFamily: "Nunito, sans-serif",
-            backgroundColor: name.trim() && !isLoading ? "#30313D" : undefined,
           }}
         >
-          {isLoading ? t('saving') : t('continue')}
+          {t('continue')}
         </button>
       </div>
     </div>

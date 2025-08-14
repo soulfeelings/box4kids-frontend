@@ -67,7 +67,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
           >
             <div className="bg-[#F2F2F2] rounded-[12px] w-10 h-10 flex items-center justify-center mr-3">
               <img
-                src="/illustrations/whatsup.png"
+                src="/illustrations/whatsup.svg"
                 alt="WhatsApp"
                 className="w-5 h-5"
               />
@@ -84,7 +84,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onClose }) => {
           >
             <div className="bg-[#F2F2F2] rounded-[12px] w-10 h-10 flex items-center justify-center mr-3">
               <img
-                src="/illustrations/Telegram.png"
+                src="/illustrations/Telegram.svg"
                 alt="Telegram"
                 className="w-5 h-5"
               />

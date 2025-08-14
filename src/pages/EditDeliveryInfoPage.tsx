@@ -47,6 +47,8 @@ export const EditDeliveryInfoPage: React.FC = () => {
     comment: currentAddress?.comment || "",
   });
 
+  const [showErrors, setShowErrors] = useState(false);
+
   const handleClose = useCallback(() => {
     navigate(-1);
   }, [navigate]);
@@ -54,6 +56,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
   const handleDeliveryDataChange = useCallback((data: DeliveryData) => {
     setDeliveryData(data);
   }, []);
+
 
   const isDeliveryDataChanged = useMemo(() => {
     if (!currentAddress) return false;
@@ -68,13 +71,16 @@ export const EditDeliveryInfoPage: React.FC = () => {
   }, [deliveryData, currentAddress]);
 
   const isFormValid =
-    deliveryData.name.trim() &&
     deliveryData.address.trim() &&
     deliveryData.date &&
     deliveryData.time;
 
   const handleSave = useCallback(async () => {
-    if (!isFormValid || !currentAddress) return;
+    if (!currentAddress) return;
+    if (!isFormValid) {
+      setShowErrors(true);
+      return;
+    }
 
     try {
       const updateData: any = {};
@@ -115,6 +121,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
     deliveryData,
     isDeliveryDataChanged,
     updateDeliveryAddress,
+    setShowErrors,
     setError,
     isFormValid,
     navigate,
@@ -163,6 +170,7 @@ export const EditDeliveryInfoPage: React.FC = () => {
             deliveryAddress={currentAddress}
             onDataChange={handleDeliveryDataChange}
             isDisabled={updateDeliveryAddressMutation.isPending}
+            showErrors={showErrors}
           />
         </div>
       </div>
@@ -171,11 +179,11 @@ export const EditDeliveryInfoPage: React.FC = () => {
       <div className="fixed bottom-24 left-4 right-4">
         <ActionButton
           onClick={handleSave}
-          disabled={!isFormValid || !isDeliveryDataChanged}
+          disabled={updateDeliveryAddressMutation.isPending}
           isLoading={updateDeliveryAddressMutation.isPending}
           variant="primary"
         >
-          {t('save')}
+          {updateDeliveryAddressMutation.isPending ? t('saving') : t('continue')}
         </ActionButton>
       </div>
 

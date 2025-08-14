@@ -64,7 +64,7 @@ export const BottomNavigation = ({
             currentAppScreen === "children" ? "bg-purple-500" : ""
           }`}
         >
-          <img src="/illustrations/Icon.png" alt="Icon" className="w-6 h-6" />
+          <img src="/illustrations/Icon.svg" alt="Icon" className="w-6 h-6" />
         </button>
         <button
           onClick={handleProfileClick}

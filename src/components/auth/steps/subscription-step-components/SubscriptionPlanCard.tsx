@@ -12,13 +12,13 @@ export const SubscriptionPlanCard: React.FC<{
   
   return (
     <div
-      className={`rounded-3xl p-6 shadow-sm border transition-all cursor-pointer ${
+      className={`rounded-3xl p-6 shadow-sm transition-all cursor-pointer ${
         isSelected
-          ? "border-indigo-400"
-          : "border-gray-100 hover:border-gray-300"
+          ? "border-2 border-indigo-400"
+          : "border border-gray-100 hover:border-gray-300"
       }`}
       style={{
-        backgroundColor: "#F2F2F2",
+        backgroundColor: isSelected ? "#FFFFFF" : "#F2F2F2",
       }}
       onClick={() => onSelect(plan.id)}
     >
@@ -83,7 +83,7 @@ export const SubscriptionPlanCard: React.FC<{
       </div>
 
       <button
-        className={`w-full py-3 rounded-xl font-medium transition-colors ${
+        className={`w-full py-3 rounded-[32px] font-medium transition-colors ${
           isSelected
             ? "bg-indigo-400 text-white"
             : "text-gray-700 hover:opacity-80"

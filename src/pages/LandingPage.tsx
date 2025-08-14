@@ -8,7 +8,9 @@ export const LandingPage: React.FC = () => {
   const currentLanguage = i18n.language;
 
   const handleLanguageChange = (language: string) => {
-    i18n.changeLanguage(language);
+    i18n.changeLanguage(language).then(() => {
+      window.location.reload();
+    });
   };
   const [openFaq, setOpenFaq] = useState<number | null>(null); // All items closed by default
   const [selectedAge, setSelectedAge] = useState<string>(t("age_0_3_months"));
@@ -160,7 +162,7 @@ export const LandingPage: React.FC = () => {
               style={{ height: 160 }}
             >
               <img
-                src="/illustrations/bear.png"
+                src="/illustrations/bear.svg"
                 alt={t("less_chaos")}
                 className="w-full h-full object-contain"
               />
@@ -186,7 +188,7 @@ export const LandingPage: React.FC = () => {
               style={{ height: 160 }}
             >
               <img
-                src="/illustrations/toys.png"
+                src="/illustrations/toys.svg"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -210,7 +212,7 @@ export const LandingPage: React.FC = () => {
               style={{ height: 160 }}
             >
               <img
-                src="/illustrations/toys2.png"
+                src="/illustrations/toys2.svg"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -235,7 +237,7 @@ export const LandingPage: React.FC = () => {
               style={{ height: 160 }}
             >
               <img
-                src="/illustrations/toys3.png"
+                src="/illustrations/toys3.svg"
                 className="w-full h-full object-contain"
               />
             </div>

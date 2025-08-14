@@ -3,6 +3,23 @@ import i18n from "../../i18n";
 export class DateManager {
   // Массивы со значениями на русском больше не используются.
 
+  private getPreferredLocales(): string[] {
+    const lang = i18n.language || "ru";
+    const locales: string[] = [];
+
+    // Текущий язык
+    locales.push(lang);
+
+    // Специальные варианты для узбекского, где часто нет локали по умолчанию
+    if (lang.startsWith("uz")) {
+      locales.push("uz-Cyrl-UZ", "uz-Latn-UZ");
+    }
+
+    // Надёжный откат на русский
+    locales.push("ru-RU", "ru");
+    return locales;
+  }
+
   /**
    * Конвертирует дату в любой формате в ISO (YYYY-MM-DD)
    */
@@ -54,14 +71,14 @@ export class DateManager {
     if (!isoDate || !this.isISOFormat(isoDate)) return "";
 
     const date = new Date(isoDate);
-    const locale = i18n.language || "ru";
+    const locales = this.getPreferredLocales();
 
     const day = date.getDate();
-    const month = date.toLocaleDateString(locale, {
+    const month = date.toLocaleDateString(locales as unknown as string, {
       month: "long",
     });
     const weekdayShort = date
-      .toLocaleDateString(locale, { weekday: "short" })
+      .toLocaleDateString(locales as unknown as string, { weekday: "short" })
       .replace(/\.$/, ""); // убираем точку, если есть
 
     return `${day} ${month}, ${weekdayShort}`;
@@ -73,6 +90,7 @@ export class DateManager {
   generateDateOptions() {
     const options = [{ value: "", label: i18n.t("select_date") }];
     const today = new Date();
+    const locales = this.getPreferredLocales();
 
     for (let i = 0; i < 14; i++) {
       const date = new Date(today);
@@ -82,11 +100,10 @@ export class DateManager {
       const monthNumber = (date.getMonth() + 1).toString().padStart(2, "0");
       const value = `${day}.${monthNumber}`;
 
-      const locale = i18n.language || "ru";
       const weekdayShort = date
-        .toLocaleDateString(locale, { weekday: "short" })
+        .toLocaleDateString(locales as unknown as string, { weekday: "short" })
         .replace(/\.$/, "");
-      const monthShort = date.toLocaleDateString(locale, {
+      const monthShort = date.toLocaleDateString(locales as unknown as string, {
         month: "short",
       });
 

@@ -6,11 +6,13 @@ export const LanguageSwitcher: React.FC = () => {
   const currentLanguage = i18n.language;
 
   const handleLanguageChange = (language: string) => {
-    i18n.changeLanguage(language);
+    i18n.changeLanguage(language).then(() => {
+      window.location.reload();
+    });
   };
 
   return (
-    <div className="fixed top-4 left-4 z-50">
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
       <div className="flex bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
         <button
           onClick={() => handleLanguageChange('ru')}
