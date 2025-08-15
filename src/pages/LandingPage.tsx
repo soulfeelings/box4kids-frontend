@@ -3,15 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 export const LandingPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const currentLanguage = i18n.language;
-
-  const handleLanguageChange = (language: string) => {
-    i18n.changeLanguage(language).then(() => {
-      window.location.reload();
-    });
-  };
   const [openFaq, setOpenFaq] = useState<number | null>(null); // All items closed by default
   const [selectedAge, setSelectedAge] = useState<string>(t("age_0_3_months"));
   const [isAgeMenuOpen, setIsAgeMenuOpen] = useState<boolean>(false);
@@ -59,39 +52,6 @@ export const LandingPage: React.FC = () => {
     <div className="min-h-screen" style={{ backgroundColor: "#FFE8C8" }}>
       {/* Header */}
       <header className="flex justify-between items-center px-4 md:px-8 lg:px-12 py-4 bg-white">
-        {/* Language Switcher */}
-        <div className="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <button
-            onClick={() => handleLanguageChange("ru")}
-            className={`px-3 py-1 text-sm font-medium transition-all duration-200 ${
-              currentLanguage === "ru"
-                ? "text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-            style={{
-              fontFamily: "Nunito, sans-serif",
-              backgroundColor: currentLanguage === "ru" ? "#747EEC" : undefined,
-            }}
-          >
-            RU
-          </button>
-          <div className="w-px bg-gray-200"></div>
-          <button
-            onClick={() => handleLanguageChange("uz")}
-            className={`px-3 py-1 text-sm font-medium transition-all duration-200 ${
-              currentLanguage === "uz"
-                ? "text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-            style={{
-              fontFamily: "Nunito, sans-serif",
-              backgroundColor: currentLanguage === "uz" ? "#747EEC" : undefined,
-            }}
-          >
-            UZ
-          </button>
-        </div>
-
         <div className="text-xl md:text-2xl font-bold text-gray-800">
           BOX4BABY
         </div>

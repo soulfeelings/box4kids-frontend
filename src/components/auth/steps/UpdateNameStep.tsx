@@ -90,10 +90,7 @@ export const UpdateNameStep: React.FC<{
       </div>
 
       {/* Bottom action button */}
-      <div
-        className="px-4 pb-6 pb-safe transition-all duration-300"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 24px)' }}
-      >
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 max-w-[800px] mx-auto">
         <button
           className={`w-full rounded-[32px] py-4 text-base font-medium transition-all ${
             name.trim()
