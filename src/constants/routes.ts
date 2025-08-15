@@ -3,6 +3,7 @@ export const ROUTES = {
   // Основные роуты
   HOME: "/",
   DEMO: "/demo",
+  LANDING: "/landing",
 
   // Авторизация
   AUTH: {

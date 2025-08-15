@@ -23,12 +23,14 @@ import { EditChildPage } from "./pages/EditChildPage";
 import { EditDeliveryInfoPage } from "./pages/EditDeliveryInfoPage";
 import { AdminPage } from "./pages/AdminPage";
 import { CancelSubscriptionPage } from "./pages/CancelSubscriptionPage";
+import { LandingPage } from "./pages/LandingPage";
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          <Route path={ROUTES.LANDING} element={<LandingPage />} />
           {/* Авторизация - компоненты напрямую с AuthContainer */}
           <Route
             path={ROUTES.AUTH.OTP}
