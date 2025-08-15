@@ -15,16 +15,18 @@ interface DeliveryEditFormProps {
   deliveryAddress?: DeliveryAddressData;
   onDataChange: (data: DeliveryData) => void;
   isDisabled?: boolean;
+  showErrors?: boolean;
 }
 
 export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
   deliveryAddress,
   onDataChange,
   isDisabled = false,
+  showErrors = false,
 }) => {
   const { t } = useTranslation();
 
-  const timeOptions = [
+  const fallbackTimeOptions = [
     { value: "", label: t("select_time") },
     { value: "9:00 – 12:00", label: "9:00 - 12:00" },
     { value: "12:00 – 15:00", label: "12:00 - 15:00" },
@@ -74,7 +76,73 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
     onDataChange(deliveryData);
   }, [deliveryData, onDataChange]);
 
-  const dateOptions = dateManager.generateDateOptions();
+  const [allowedDates, setAllowedDates] = useState<string[] | null>(null);
+  const [allowedTimes, setAllowedTimes] = useState<{ ranges: string[]; hours: string[] } | null>(null);
+  useEffect(() => {
+    // Подтягиваем разрешенные даты для селекта
+    (async () => {
+      try {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/delivery-dates/available`);
+        if (resp.ok) {
+          const json = await resp.json();
+          setAllowedDates(json?.dates ?? null);
+        } else {
+          setAllowedDates(null);
+        }
+      } catch {
+        setAllowedDates(null);
+      }
+    })();
+    // Подтягиваем разрешенное время для селекта (интервалы и часы)
+    (async () => {
+      try {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/delivery-times/available`);
+        if (resp.ok) {
+          const json = await resp.json();
+          const ranges: string[] = Array.isArray(json?.ranges) ? json.ranges : [];
+          const hours: string[] = Array.isArray(json?.hours) ? json.hours : [];
+          if (ranges.length || hours.length) {
+            setAllowedTimes({ ranges, hours });
+          } else {
+            setAllowedTimes(null);
+          }
+        } else {
+          setAllowedTimes(null);
+        }
+      } catch {
+        setAllowedTimes(null);
+      }
+    })();
+  }, []);
+
+  const dateOptions = useMemo(() => {
+    if (allowedDates && allowedDates.length > 0) {
+      const opts = [{ value: "", label: t("select_date") }];
+      for (const iso of allowedDates) {
+        // iso YYYY-MM-DD -> DD.MM
+        const [, m, d] = iso.split("-");
+        const short = `${d}.${m}`;
+        const label = dateManager.toFormatted(iso);
+        opts.push({ value: short, label });
+      }
+      return opts;
+    }
+    return dateManager.generateDateOptions();
+  }, [allowedDates, t]);
+
+  const timeOptions = useMemo(() => {
+    if (allowedTimes) {
+      const opts = [{ value: "", label: t("select_time") }];
+      for (const r of allowedTimes.ranges) {
+        opts.push({ value: r, label: r.replace("–", "-") });
+      }
+      for (const h of allowedTimes.hours) {
+        opts.push({ value: h, label: h });
+      }
+      return opts;
+    }
+    return fallbackTimeOptions;
+  }, [allowedTimes, t]);
 
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -202,29 +270,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Название адреса */}
-      <div className="flex flex-col gap-1">
-        <label
-          className="text-sm font-medium text-gray-600 px-3"
-          style={{ fontFamily: "Nunito, sans-serif" }}
-        >
-          {t("address_name")}
-        </label>
-        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all border-gray-200 focus-within:border-[#7782F5]">
-          <input
-            type="text"
-            className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0"
-            placeholder={t("enter_address_name")}
-            value={deliveryData.name}
-            onChange={(e) => {
-              setDeliveryData({ ...deliveryData, name: e.target.value });
-            }}
-            maxLength={50}
-            disabled={isDisabled}
-            style={{ fontFamily: "Nunito, sans-serif" }}
-          />
-        </div>
-      </div>
+      
 
       {/* Адрес */}
       <div className="flex flex-col gap-1">
@@ -234,7 +280,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
         >
           {t("address")}
         </label>
-        <div className="w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative border-gray-200 focus-within:border-[#7782F5]">
+        <div className={`w-full border-2 rounded-2xl px-3 py-3 bg-gray-50 focus-within:ring-0 transition-all relative ${showErrors && !deliveryData.address.trim() ? "border-red-500" : "border-gray-200"} focus-within:border-[#7782F5]`}>
           <input
             type="text"
             className="w-full text-base font-medium bg-transparent border-0 outline-none focus:ring-0 pr-9"
@@ -356,7 +402,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
               const isoDate = dateManager.toISO(e.target.value);
               setDeliveryData({ ...deliveryData, date: isoDate });
             }}
-            className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
+            className={`w-full px-4 py-4 bg-gray-50 border-2 rounded-2xl appearance-none focus:outline-none pr-12 ${showErrors && !deliveryData.date ? "border-red-500" : "border-gray-200"} ${deliveryData.date ? "text-gray-900" : "text-gray-400"} focus:border-[#7782F5]`}
             style={{ fontFamily: "Nunito, sans-serif" }}
             disabled={isDisabled}
           >
@@ -396,7 +442,7 @@ export const DeliveryEditForm: React.FC<DeliveryEditFormProps> = ({
             onChange={(e) => {
               setDeliveryData({ ...deliveryData, time: e.target.value });
             }}
-            className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl text-gray-900 appearance-none focus:outline-none focus:border-[#7782F5] pr-12"
+            className={`w-full px-4 py-4 bg-gray-50 border-2 rounded-2xl appearance-none focus:outline-none pr-12 ${showErrors && !deliveryData.time ? "border-red-500" : "border-gray-200"} ${deliveryData.time ? "text-gray-900" : "text-gray-400"} focus:border-[#7782F5]`}
             style={{ fontFamily: "Nunito, sans-serif" }}
             disabled={isDisabled}
           >

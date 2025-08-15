@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useStore } from "../../../store/store";
 import { useSubscriptionPlan } from "../../../store/hooks";
 import { useCreateSubscriptionOrderSubscriptionsPost } from "../../../api-client/";
@@ -7,6 +7,7 @@ import { AddNewChildBanner } from "../../../features/AddNewChildBanner";
 import { SingleChildSubscriptionView } from "./subscription-step-components/SingleChildSubscriptionView";
 import { notifications } from "../../../utils/notifications";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { BackButton } from "../../ui";
 import { useTranslation } from 'react-i18next';
 
 export const SubscriptionStep: React.FC<{
@@ -17,15 +18,7 @@ export const SubscriptionStep: React.FC<{
   onAddNewChild?: () => void;
 }> = ({ onBack, onNext, onClose, currentChildToUpdate, onAddNewChild }) => {
   const { t } = useTranslation();
-  const [subscriptionId, setSubscriptionId] = useState<number | null>(
-    currentChildToUpdate?.subscriptions[0]?.plan_id || null
-  );
-
-  useEffect(() => {
-    if (currentChildToUpdate?.subscriptions[0]?.plan_id) {
-      setSubscriptionId(currentChildToUpdate?.subscriptions[0]?.plan_id);
-    }
-  }, [currentChildToUpdate]);
+  const [subscriptionId, setSubscriptionId] = useState<number | null>(null);
 
   const { isLoading, setError, updateChild, subscriptionPlans } = useStore();
 
@@ -105,33 +98,21 @@ export const SubscriptionStep: React.FC<{
     >
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16 bg-white">
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-        >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+        <BackButton onClick={onBack} />
 
         <StepIndicator currentStep={4} />
 
         <button
           onClick={handleClose}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+          className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors"
+          style={{ backgroundColor: '#F2F2F2' }}
+          aria-label="Закрыть"
         >
           <svg
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             fill="none"
-            stroke="currentColor"
+            stroke="black"
             strokeWidth="2"
             viewBox="0 0 24 24"
           >

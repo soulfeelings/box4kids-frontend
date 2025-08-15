@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-
-import { useGetAllInterestsInterestsGet } from "../../../api-client";
-import { useGetAllSkillsSkillsGet } from "../../../api-client";
+import { useAdminMappings } from "../hooks/useAdminMappings";
+import { useAdminInterests } from "../hooks/useAdminInterests";
+import { useAdminSkills } from "../hooks/useAdminSkills";
 
 export const AdminMappingsTable: React.FC = () => {
   const { t } = useTranslation();
-  const { data: interests } = useGetAllInterestsInterestsGet();
-  const { data: skills } = useGetAllSkillsSkillsGet();
+  const { mappings, isLoading, error, addInterest, addSkill, removeInterest, removeSkill } = useAdminMappings();
+  const { interests } = useAdminInterests();
+  const { skills } = useAdminSkills();
   const [expandedMapping, setExpandedMapping] = useState<number | null>(null);
   const [newInterestId, setNewInterestId] = useState("");
   const [newSkillId, setNewSkillId] = useState("");
@@ -18,8 +19,7 @@ export const AdminMappingsTable: React.FC = () => {
 
   const handleAddInterest = async (categoryId: number) => {
     try {
-      // API call to add interest
-      console.log("Adding interest", newInterestId, "to category", categoryId);
+      await addInterest(categoryId, parseInt(newInterestId));
       setNewInterestId("");
     } catch (err) {
       console.error("Ошибка добавления интереса:", err);
@@ -28,8 +28,7 @@ export const AdminMappingsTable: React.FC = () => {
 
   const handleAddSkill = async (categoryId: number) => {
     try {
-      // API call to add skill
-      console.log("Adding skill", newSkillId, "to category", categoryId);
+      await addSkill(categoryId, parseInt(newSkillId));
       setNewSkillId("");
     } catch (err) {
       console.error("Ошибка добавления навыка:", err);
@@ -41,13 +40,10 @@ export const AdminMappingsTable: React.FC = () => {
     interestName: string
   ) => {
     try {
-      // API call to remove interest
-      console.log(
-        "Removing interest",
-        interestName,
-        "from category",
-        categoryId
-      );
+      const interest = interests.find(i => i.name === interestName);
+      if (interest) {
+        await removeInterest(categoryId, interest.id);
+      }
     } catch (err) {
       console.error("Ошибка удаления интереса:", err);
     }
@@ -55,56 +51,50 @@ export const AdminMappingsTable: React.FC = () => {
 
   const handleRemoveSkill = async (categoryId: number, skillName: string) => {
     try {
-      // API call to remove skill
-      console.log("Removing skill", skillName, "from category", categoryId);
+      const skill = skills.find(s => s.name === skillName);
+      if (skill) {
+        await removeSkill(categoryId, skill.id);
+      }
     } catch (err) {
       console.error("Ошибка удаления навыка:", err);
     }
   };
 
   const getAvailableInterests = (categoryId: number) => {
-    return (
-      interests?.interests.filter(
-        (interest) =>
-          !mappings
-            .find((m) => m.category_id === categoryId)
-            ?.interests.includes(interest.name)
-      ) || []
+    return interests.filter(
+      (interest) =>
+        !mappings
+          .find((m) => m.category_id === categoryId)
+          ?.interests.includes(interest.name)
     );
   };
 
   const getAvailableSkills = (categoryId: number) => {
-    return (
-      skills?.skills.filter(
-        (skill) =>
-          !mappings
-            .find((m) => m.category_id === categoryId)
-            ?.skills.includes(skill.name)
-      ) || []
+    return skills.filter(
+      (skill) =>
+        !mappings
+          .find((m) => m.category_id === categoryId)
+          ?.skills.includes(skill.name)
     );
   };
 
-  // Mock data - replace with actual API call
-  const mappings = [
-    {
-      category_id: 1,
-      category_name: t("constructors"),
-      interests: [t("logic"), t("motor_skills")],
-      skills: [t("spatial_thinking"), t("creativity")],
-    },
-    {
-      category_id: 2,
-      category_name: t("creative_sets"),
-      interests: [t("creativity"), t("imagination")],
-      skills: [t("fine_motor_skills"), t("color_perception")],
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg">Загрузка маппингов...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-red-600 text-center p-4">Ошибка: {error}</div>;
+  }
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-md">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
-          {t("category_mappings")}
+          Маппинги категорий ({mappings.length})
         </h3>
       </div>
       <div className="overflow-x-auto">

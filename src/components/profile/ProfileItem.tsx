@@ -53,7 +53,7 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({
               className="bg-[#E3E3E3] rounded-full p-2 mr-2 hover:bg-gray-300 transition-colors"
             >
               <img
-                src="/illustrations/pen.png"
+                src="/illustrations/pen.svg"
                 alt="Edit"
                 className="w-4 h-4"
               />

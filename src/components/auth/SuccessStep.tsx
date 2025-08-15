@@ -9,7 +9,7 @@ export const SuccessStep: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col justify-between h-screen bg-white overflow-hidden">
       {/* Header */}
       <div className="flex justify-center items-center p-4 relative">
         <span
@@ -39,7 +39,7 @@ export const SuccessStep: React.FC = () => {
         {/* Success Icon */}
         <div className="mb-8">
           <img
-            src="/illustrations/ok.png"
+            src="/illustrations/ok.svg"
             alt="Success"
             className="w-32 h-32 mx-auto"
           />

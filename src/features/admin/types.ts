@@ -67,6 +67,8 @@ export interface AdminInventoryItem {
   category_id: number;
   category_name: string;
   available_quantity: number;
+  reserved_quantity: number;
+  total_quantity: number;
   created_at: string;
   updated_at: string;
 }

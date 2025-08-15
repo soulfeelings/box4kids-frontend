@@ -57,6 +57,12 @@ export const AdminInventoryTable: React.FC = () => {
                 Доступно
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Зарезервировано
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Всего
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Обновлено
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -91,6 +97,16 @@ export const AdminInventoryTable: React.FC = () => {
                       {item.available_quantity}
                     </div>
                   )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-orange-600 font-medium">
+                    {item.reserved_quantity}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-blue-600 font-medium">
+                    {item.total_quantity}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(item.updated_at).toLocaleDateString("ru-RU")}

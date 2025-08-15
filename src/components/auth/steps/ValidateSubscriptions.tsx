@@ -14,6 +14,7 @@ import {
   useNavigateToOnboarding,
 } from "../../../hooks/useNavigateHooks";
 import { StepIndicator } from "../../ui/StepIndicator";
+import { BackButton } from "../../ui";
 import { AUTH_STEPS } from "../../../constants/auth";
 
 export const ValidateSubscriptionsStep: React.FC<{
@@ -62,33 +63,21 @@ export const ValidateSubscriptionsStep: React.FC<{
     >
       {/* Header with step indicator */}
       <div className="flex items-center justify-between px-4 py-2 h-16 bg-white">
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-        >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+        <BackButton onClick={onBack} />
 
         <StepIndicator currentStep={5} />
 
         <button
           onClick={onClose}
-          className="flex items-center justify-center w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+          className="flex items-center justify-center w-10 h-10 rounded-xl transition-colors"
+          style={{ backgroundColor: '#F2F2F2' }}
+          aria-label="Закрыть"
         >
           <svg
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             fill="none"
-            stroke="currentColor"
+            stroke="black"
             strokeWidth="2"
             viewBox="0 0 24 24"
           >

@@ -23,13 +23,10 @@ import { EditChildPage } from "./pages/EditChildPage";
 import { EditDeliveryInfoPage } from "./pages/EditDeliveryInfoPage";
 import { AdminPage } from "./pages/AdminPage";
 import { CancelSubscriptionPage } from "./pages/CancelSubscriptionPage";
-import { LanguageSwitcher } from "./components/LanguageSwitcher";
-
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
   return (
     <>
-      <LanguageSwitcher />
       <BrowserRouter>
         <Routes>
           {/* Авторизация - компоненты напрямую с AuthContainer */}
