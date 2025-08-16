@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ImageBlock } from "./components/ImageBlock";
+import { FAQSection } from "./components/FAQSection";
 
 export const LandingPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [openFaq, setOpenFaq] = useState<number | null>(null); // All items closed by default
+
   const [selectedAge, setSelectedAge] = useState<string>(t("age_0_3_months"));
   const [isAgeMenuOpen, setIsAgeMenuOpen] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -19,10 +21,6 @@ export const LandingPage: React.FC = () => {
 
   const handleCreateBoxClick = () => {
     navigate("/login");
-  };
-
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
   };
 
   const toggleAgeMenu = () => {
@@ -66,15 +64,7 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <div className="flex flex-col items-center">
-        {/* Family illustration */}
-        <div className="w-full">
-          <img
-            src="/illustrations/family.svg"
-            alt={t("family_with_children")}
-            className="w-full h-64 md:h-80 lg:h-[534px] object-cover"
-          />
-        </div>
-
+        <ImageBlock />
         {/* Main content */}
         <div
           className="bg-white p-8 md:p-12 mx-4 md:mx-8 text-center -mt-8 md:-mt-12 max-w-7xl mx-auto"
@@ -1217,167 +1207,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* FAQ Section */}
-      <div
-        className="px-4 md:px-8 lg:px-12 py-12"
-        style={{ backgroundColor: "#F2F2F2" }}
-      >
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-center font-bold text-2xl md:text-3xl lg:text-4xl text-gray-800 mb-8 md:mb-12">
-            Часто задаваемые вопросы
-          </h2>
-
-          <div className="bg-white rounded-2xl shadow-sm">
-            {/* FAQ Item 1 */}
-            <div className="p-6 border-b border-gray-100">
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => toggleFaq(0)}
-              >
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                  <svg
-                    className={`w-4 h-4 text-gray-600 transition-transform ${
-                      openFaq === 0 ? "rotate-90" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">
-                  {t("how_subscription_to_toys_works")}
-                </h3>
-              </div>
-              {openFaq === 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-gray-600 leading-relaxed">
-                    {t("subscription_works_on_regular_delivery_principle")}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* FAQ Item 2 */}
-            <div className="p-6 border-b border-gray-100">
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => toggleFaq(1)}
-              >
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                  <svg
-                    className={`w-4 h-4 text-gray-600 transition-transform ${
-                      openFaq === 1 ? "rotate-90" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">
-                  {t("what_is_included_in_the_set_and_how_is_it_selected")}
-                </h3>
-              </div>
-              {openFaq === 1 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-gray-600 leading-relaxed">
-                    {t(
-                      "toys_are_selected_individually_based_on_age_interests_and_development_stage_of_the_child"
-                    )}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* FAQ Item 3 */}
-            <div className="p-6 border-b border-gray-100">
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => toggleFaq(2)}
-              >
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                  <svg
-                    className={`w-4 h-4 text-gray-600 transition-transform ${
-                      openFaq === 2 ? "rotate-90" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">
-                  {t("what_if_toy_didnt_like_or_broke")}
-                </h3>
-              </div>
-              {openFaq === 2 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-gray-600 leading-relaxed">
-                    {t(
-                      "if_toy_didnt_like_or_broke_just_inform_us_about_it_we_will_replace_it_in_the_next_box_or_offer_an_alternative"
-                    )}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* FAQ Item 4 */}
-            <div className="p-6">
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => toggleFaq(3)}
-              >
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4">
-                  <svg
-                    className={`w-4 h-4 text-gray-600 transition-transform ${
-                      openFaq === 3 ? "rotate-90" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-                <h3 className="font-medium text-gray-800 text-lg flex-1">
-                  {t("can_i_buy_the_toy_i_liked")}
-                </h3>
-              </div>
-              {openFaq === 3 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-gray-600 leading-relaxed">
-                    {t("yes_of_course")}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <FAQSection />
 
       {/* Footer */}
       <div

@@ -23,7 +23,7 @@ import { EditChildPage } from "./pages/EditChildPage";
 import { EditDeliveryInfoPage } from "./pages/EditDeliveryInfoPage";
 import { AdminPage } from "./pages/AdminPage";
 import { CancelSubscriptionPage } from "./pages/CancelSubscriptionPage";
-import { LandingPage } from "./pages/LandingPage";
+import { LandingPage } from "./pages/LandingPage/LandingPage";
 // Основное приложение с роутингом
 const AppWithRoutes: React.FC = () => {
   return (
