@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ImageBlock } from "./components/ImageBlock";
 import { FAQSection } from "./components/FAQSection";
+import { HowItWorksSection } from "./components/HowItWorksSection";
 
 export const LandingPage: React.FC = () => {
   const { t } = useTranslation();
@@ -204,60 +205,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Как это работает */}
-      <div className="px-4 md:px-8 lg:px-12 mt-10 max-w-7xl mx-auto">
-        <div className="w-full mx-full bg-white rounded-3xl p-6 md:p-8 lg:p-12">
-          <h2 className="text-center font-bold text-[26px] md:text-[32px] lg:text-[36px] mb-8 md:mb-12">
-            Как это работает
-          </h2>
-          <div className="flex flex-col gap-6 md:gap-8 lg:grid lg:grid-cols-2 lg:gap-8">
-            {/* Шаг 1 */}
-            <div className="flex items-start gap-4">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
-                <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">
-                  1
-                </span>
-              </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">
-                {t("choose_age_interests_development_goals")}
-              </div>
-            </div>
-            {/* Шаг 2 */}
-            <div className="flex items-start gap-4">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
-                <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">
-                  2
-                </span>
-              </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">
-                {t("we_collect_personal_toy_set")}
-              </div>
-            </div>
-            {/* Шаг 3 */}
-            <div className="flex items-start gap-4">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
-                <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">
-                  3
-                </span>
-              </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">
-                {t("courier_delivers_the_box_to_your_home")}
-              </div>
-            </div>
-            {/* Шаг 4 */}
-            <div className="flex items-start gap-4">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-[12px] bg-[#F2F2F2] flex items-center justify-center">
-                <span className="text-[40px] md:text-[48px] text-[#747EEC] font-bold">
-                  4
-                </span>
-              </div>
-              <div className="pt-1 text-[18px] md:text-[20px]">
-                {t("new_set_after_2_weeks")}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <HowItWorksSection />
 
       {/* Примеры наборов Section */}
       <div

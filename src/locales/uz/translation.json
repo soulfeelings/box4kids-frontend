@@ -362,5 +362,10 @@
   "landing.what_if_toy_didnt_like_or_broke": "Agar o'yinchoq yoqmagan yoki buzilgan bo'lsa nima bo'ladi?",
   "landing.if_toy_didnt_like_or_broke_just_inform_us_about_it_we_will_replace_it_in_the_next_box_or_offer_an_alternative": "Agar o'yinchoq yoqmagan yoki buzilgan bo'lsa, bizga xabar bering. Biz uni keyingi qutida almashtiramiz yoki alternativani taklif qilamiz.",
   "landing.can_i_buy_the_toy_i_liked": "Yoqgan o'yinchoqni sotib olishim mumkinmi?",
-  "landing.yes_of_course": "Ha, albatta! Agar bolaga o'yinchoq juda yoqsa, uni qo'shimcha to'lov evaziga o'zingizda qoldirishingiz mumkin."
+  "landing.yes_of_course": "Ha, albatta! Agar bolaga o'yinchoq juda yoqsa, uni qo'shimcha to'lov evaziga o'zingizda qoldirishingiz mumkin.",
+  "landing.how_it_works": "Bu qanday ishlaydi",
+  "landing.choose_age_interests_development_goals": "Siz yosh, qiziqishlar va rivojlanish maqsadlarini tanlaysiz",
+  "landing.we_collect_personal_toy_set": "Biz shaxsiy o'yinchoqlar to'plamini yig'amiz",
+  "landing.courier_delivers_the_box_to_your_home": "Kuryer qutini to'g'ridan-to'g'ri uyingizga yetkazib beradi",
+  "landing.new_set_after_2_weeks": "2 haftadan keyin — yangi to'plam"
 }
