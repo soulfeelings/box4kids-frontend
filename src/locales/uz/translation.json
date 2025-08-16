@@ -136,7 +136,6 @@
   "failed_to_update_categories": "Kategoriyalarni yangilash amalga oshmadi",
   "failed_to_update_child": "Bolani yangilab bo'lmadi",
   "failed_to_update_delivery_address": "Yetkazib berish manzilini yangilash amalga oshmadi",
-  "family_with_children": "Bolalar bilan oila",
   "faq": "Ko'p so'raladigan savollar",
   "features": "Xususiyatlar",
   "feb_short": "fev",
@@ -352,5 +351,16 @@
   "you_will_be_redirected_to_payment_service": "Xavfsiz to'lov uchun to'lov xizmatiga yo'naltirilasiz",
   "your_message": "Xabaringiz...",
   "your_review_about_the_box": "To'plam haqidagi fikringiz",
-  "your_subscription_is_active": "Sizning obunangiz faollashtirildi"
+  "your_subscription_is_active": "Sizning obunangiz faollashtirildi",
+
+  "landing.family_with_children": "Bolalar bilan oila",
+  "landing.faq_title": "Ko'p so'raladigan savollar",
+  "landing.how_subscription_to_toys_works": "O'yinchoqlar obunasi qanday ishlaydi?",
+  "landing.subscription_works_on_regular_delivery_principle": "Obuna muntazam yetkazib berish printsipi asosida ishlaydi. Har 2 haftada biz bolangiz uchun maxsus tanlangan o'yinchoqlar bilan yangi qutini olib kelamiz.",
+  "landing.what_is_included_in_the_set_and_how_is_it_selected": "To'plamga nima kiradi va u qanday tanlanadi?",
+  "landing.toys_are_selected_individually_based_on_age_interests_and_development_stage_of_the_child": "O'yinchoqlar individual ravishda tanlanadi — bolaning yoshi, qiziqishlari va rivojlanish bosqichiga qarab. Har bir qutida — diqqat bilan tanlangan, tekshirilgan va dezinfeksiya qilingan o'yinchoqlar.",
+  "landing.what_if_toy_didnt_like_or_broke": "Agar o'yinchoq yoqmagan yoki buzilgan bo'lsa nima bo'ladi?",
+  "landing.if_toy_didnt_like_or_broke_just_inform_us_about_it_we_will_replace_it_in_the_next_box_or_offer_an_alternative": "Agar o'yinchoq yoqmagan yoki buzilgan bo'lsa, bizga xabar bering. Biz uni keyingi qutida almashtiramiz yoki alternativani taklif qilamiz.",
+  "landing.can_i_buy_the_toy_i_liked": "Yoqgan o'yinchoqni sotib olishim mumkinmi?",
+  "landing.yes_of_course": "Ha, albatta! Agar bolaga o'yinchoq juda yoqsa, uni qo'shimcha to'lov evaziga o'zingizda qoldirishingiz mumkin."
 }

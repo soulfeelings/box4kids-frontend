@@ -136,7 +136,6 @@
   "failed_to_update_categories": "Не удалось обновить категории",
   "failed_to_update_child": "Не удалось обновить данные ребёнка",
   "failed_to_update_delivery_address": "Не удалось обновить адрес доставки",
-  "family_with_children": "Семья с детьми",
   "finish_subscription_to_get_box": "Завершите подписку, чтобы получить коробку",
   "faq": "Часто задаваемые вопросы",
   "features": "Особенности",
@@ -155,7 +154,6 @@
   "get_new_code": "Получить новый код",
   "getting_code": "Получение кода...",
   "girl": "Девочка",
-  "go_to_home": "Перейти на главную",
   "go_to_home": "Перейти на главную",
   "go_to_profile": "Перейти в профиль",
   "good": "Хорошо",
@@ -356,5 +354,16 @@
   "you_will_be_redirected_to_payment_service": "Вы будете перенаправлены на платёжный сервис",
   "your_message": "Ваше сообщение...",
   "your_review_about_the_box": "Ваш отзыв о наборе",
-  "your_subscription_is_active": "Ваша подписка активирована"
+  "your_subscription_is_active": "Ваша подписка активирована",
+  "landing.less_chaos": "Меньше хаоса",
+  "landing.family_with_children": "Семья с детьми",
+  "landing.faq_title": "Часто задаваемые вопросы",
+  "landing.how_subscription_to_toys_works": "Как работает подписка на игрушки?",
+  "landing.subscription_works_on_regular_delivery_principle": "Подписка работает по принципу регулярной доставки. Каждые 2 недели мы привозим новую коробку с игрушками, подобранными специально для вашего ребенка.",
+  "landing.what_is_included_in_the_set_and_how_is_it_selected": "Что входит в набор и как он подбирается?",
+  "landing.toys_are_selected_individually_based_on_age_interests_and_development_stage_of_the_child": "Игрушки подбираются индивидуально — по возрасту, интересам и этапу развития ребёнка. В каждой коробке — тщательно отобранные, проверенные и дезинфицированные игрушки.",
+  "landing.what_if_toy_didnt_like_or_broke": "Что если игрушка не понравилась или сломалась?",
+  "landing.if_toy_didnt_like_or_broke_just_inform_us_about_it_we_will_replace_it_in_the_next_box_or_offer_an_alternative": "Если игрушка не понравилась или сломалась, просто сообщите нам об этом. Мы заменим её в следующей коробке или предложим альтернативу.",
+  "landing.can_i_buy_the_toy_i_liked": "Можно ли выкупить понравившуюся игрушку?",
+  "landing.yes_of_course": "Да, конечно! Если ребёнку очень понравилась игрушка, вы можете оставить её себе за дополнительную плату."
 }
