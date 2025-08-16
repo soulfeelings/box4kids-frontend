@@ -37,6 +37,14 @@ export const WelcomeStep: React.FC<{ onNext: () => void; onClose?: () => void }>
   useEffect(() => {
     localStorage.setItem("hasSeenWelcome", "true");
   }, []);
+
+  // Preload welcome images
+  useEffect(() => {
+    welcomeScreens.forEach(screen => {
+      const img = new Image();
+      img.src = screen.img;
+    });
+  }, []);
   return (
     <div
       className="fixed inset-0 w-full h-full flex flex-col "
@@ -79,32 +87,38 @@ export const WelcomeStep: React.FC<{ onNext: () => void; onClose?: () => void }>
       </div>
       {/* Illustration area - takes remaining space above bottom container */}
       <div
-        className="relative flex-1 overflow-hidden"
+        className="relative flex-1 overflow-hidden flex items-end lg:items-center justify-center"
         style={{ height: "calc(100vh - 33.33vh - 4rem)" }}
       >
         <img
           src={w.img}
-          alt="welcome"
-          className="absolute inset-0 w-full h-full object-contain"
+          alt=""
+          className="w-full h-auto max-h-full object-contain"
+          loading="eager"
         />
       </div>
       {/* Bottom container with text and button - fixed at 1/3 of screen */}
       <div
-        className="bg-[#747EEC] px-4 py-6 flex flex-col justify-center"
+        className="bg-[#747EEC] px-4 py-6 flex flex-col"
         style={{ height: "33.33vh", minHeight: "280px" }}
       >
-        <h2
-          className="font-bold text-2xl mb-4 text-white text-center"
-          style={{ fontFamily: "Open Sans, sans-serif" }}
-        >
-          {t(w.titleKey)}
-        </h2>
-        <p
-          className="text-base text-white/90 text-center mb-6 max-w-sm mx-auto"
-          style={{ fontFamily: "Open Sans, sans-serif" }}
-        >
-          {t(w.descKey)}
-        </p>
+        {/* Text content area - takes available space */}
+        <div className="flex-1 flex flex-col justify-center">
+          <h2
+            className="font-bold text-2xl mb-4 text-white text-center"
+            style={{ fontFamily: "Open Sans, sans-serif" }}
+          >
+            {t(w.titleKey)}
+          </h2>
+          <p
+            className="text-base text-white/90 text-center mb-6 max-w-sm mx-auto"
+            style={{ fontFamily: "Open Sans, sans-serif" }}
+          >
+            {t(w.descKey)}
+          </p>
+        </div>
+
+        {/* Button area - fixed at bottom */}
         <div className="px-4">
           <button
             onClick={handleNext}

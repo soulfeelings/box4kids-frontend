@@ -10,6 +10,7 @@ import {
   addAllowedDeliveryHour,
   removeAllowedDeliveryHour,
 } from "../api/adminApi";
+import { WeekdayDateGenerator } from "../../../utils/date/WeekdayDateGenerator";
 
 export const AdminDeliveryDates: React.FC = () => {
   const { t } = useTranslation();
@@ -17,6 +18,9 @@ export const AdminDeliveryDates: React.FC = () => {
   const [newDate, setNewDate] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Weekdays management
+  const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
 
   // Times management
   const [timeRanges, setTimeRanges] = useState<string[]>([]);
@@ -87,6 +91,66 @@ export const AdminDeliveryDates: React.FC = () => {
     }
   };
 
+  const onAddWeekdays = async () => {
+    if (selectedWeekdays.length === 0) return;
+    setLoading(true);
+    setError(null);
+    try {
+      // Генерируем даты для выбранных дней недели
+      const generatedDates = WeekdayDateGenerator.generateDatesForWeekdays(selectedWeekdays);
+      
+      // Добавляем каждую дату по отдельности
+      let updatedDates = [...dates];
+      for (const date of generatedDates) {
+        if (!updatedDates.includes(date)) {
+          const data = await addAllowedDeliveryDate(date);
+          updatedDates = data;
+        }
+      }
+      
+      setDates(updatedDates);
+      setSelectedWeekdays([]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка добавления дней недели");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRemoveWeekdays = async () => {
+    if (selectedWeekdays.length === 0) return;
+    setLoading(true);
+    setError(null);
+    try {
+      // Находим все даты, которые соответствуют выбранным дням недели
+      const datesToRemove = dates.filter(date => 
+        WeekdayDateGenerator.isDateInWeekdays(date, selectedWeekdays)
+      );
+      
+      // Удаляем каждую дату по отдельности
+      let updatedDates = [...dates];
+      for (const date of datesToRemove) {
+        const data = await removeAllowedDeliveryDate(date);
+        updatedDates = data;
+      }
+      
+      setDates(updatedDates);
+      setSelectedWeekdays([]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка удаления дней недели");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleWeekday = (day: number) => {
+    setSelectedWeekdays(prev => 
+      prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day]
+    );
+  };
+
   const onAddRange = async () => {
     if (!newRangeStart || !newRangeEnd) return;
     setLoading(true);
@@ -155,6 +219,16 @@ export const AdminDeliveryDates: React.FC = () => {
   }, [newRangeStart, newRangeEnd, TIME_RE]);
   const isValidHour = useMemo(() => TIME_RE.test(newTimeHour.trim()), [newTimeHour, TIME_RE]);
 
+  const weekdaysList = [
+    { day: 1, label: t("monday_short") },
+    { day: 2, label: t("tuesday_short") },
+    { day: 3, label: t("wednesday_short") },
+    { day: 4, label: t("thursday_short") },
+    { day: 5, label: t("friday_short") },
+    { day: 6, label: t("saturday_short") },
+    { day: 0, label: t("sunday_short") },
+  ];
+
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-md p-4">
       <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
@@ -184,7 +258,12 @@ export const AdminDeliveryDates: React.FC = () => {
         <ul className="divide-y divide-gray-200">
           {dates.map((d) => (
             <li key={d} className="flex items-center justify-between py-2">
-              <span className="text-sm text-gray-900">{d}</span>
+              <div className="flex flex-col">
+                <span className="text-sm text-gray-900">{d}</span>
+                <span className="text-xs text-gray-500">
+                  {WeekdayDateGenerator.getShortDayName(d)}
+                </span>
+              </div>
               <button
                 onClick={() => onRemove(d)}
                 className="text-red-600 hover:text-red-800 text-sm"
@@ -198,6 +277,65 @@ export const AdminDeliveryDates: React.FC = () => {
           )}
         </ul>
       )}
+
+      <h3 className="text-lg leading-6 font-medium text-gray-900 mt-8 mb-4">
+        {t("allowed_delivery_weekdays")}
+      </h3>
+
+      <p className="text-sm text-gray-600 mb-4">
+        {t("weekdays_help")}
+      </p>
+
+      {/* Weekdays selection */}
+      <div className="mb-4">
+        <div className="flex flex-wrap gap-2 mb-3">
+          {weekdaysList.map(({ day, label }) => (
+            <button
+              key={day}
+              onClick={() => toggleWeekday(day)}
+              className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                selectedWeekdays.includes(day)
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2 items-center">
+          {selectedWeekdays.length > 0 && (
+            <span className="text-sm text-gray-600">
+              {(() => {
+                let dayKey = 'day_plural_5_20';
+                if (selectedWeekdays.length === 1) {
+                  dayKey = 'day_singular';
+                } else if (selectedWeekdays.length >= 2 && selectedWeekdays.length <= 4) {
+                  dayKey = 'day_plural_2_4';
+                }
+                return t("selected_days", { 
+                  count: selectedWeekdays.length, 
+                  day: t(dayKey) 
+                });
+              })()}
+            </span>
+          )}
+          <button
+            onClick={onAddWeekdays}
+            disabled={loading || selectedWeekdays.length === 0}
+            className="bg-green-600 text-white px-3 py-1 rounded disabled:opacity-50"
+          >
+            {t("add_weekdays")}
+          </button>
+          <button
+            onClick={onRemoveWeekdays}
+            disabled={loading || selectedWeekdays.length === 0}
+            className="bg-red-600 text-white px-3 py-1 rounded disabled:opacity-50"
+          >
+            {t("remove_weekdays")}
+          </button>
+        </div>
+      </div>
 
       <h3 className="text-lg leading-6 font-medium text-gray-900 mt-8 mb-4">
         {t("allowed_delivery_times")}

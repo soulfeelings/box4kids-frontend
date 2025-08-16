@@ -54,8 +54,9 @@ export const ProfileItem: React.FC<ProfileItemProps> = ({
             >
               <img
                 src="/illustrations/pen.svg"
-                alt="Edit"
+                alt=""
                 className="w-4 h-4"
+                loading="eager"
               />
             </button>
           )}
