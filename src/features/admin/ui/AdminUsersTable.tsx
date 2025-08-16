@@ -94,12 +94,6 @@ export const AdminUsersTable: React.FC = () => {
                     >
                       {expandedUser === user.id ? t("hide") : t("details")}
                     </button>
-                    <button
-                      onClick={() => setExpandedUser(user.id)}
-                      className="ml-4 text-indigo-600 hover:text-indigo-900"
-                    >
-                      {t("manage")}
-                    </button>
                   </td>
                 </tr>
 

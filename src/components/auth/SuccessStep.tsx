@@ -40,8 +40,9 @@ export const SuccessStep: React.FC = () => {
         <div className="mb-8">
           <img
             src="/illustrations/ok.svg"
-            alt="Success"
+            alt=""
             className="w-32 h-32 mx-auto"
+            loading="eager"
           />
         </div>
 
